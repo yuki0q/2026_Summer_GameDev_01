@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-class GameScene;
+class FpsController;
 
 class Application
 {
@@ -8,8 +8,20 @@ class Application
 public:
 
 	// スクリーンサイズ
-	static constexpr int SCREEN_SIZE_X = 1024;
-	static constexpr int SCREEN_SIZE_Y = 640;
+	static constexpr int SCREEN_SIZE_X = 1280;
+	static constexpr int SCREEN_SIZE_Y = 720;
+
+	// 固定FPS
+	static constexpr int FRAME_RATE = 60;
+
+	// 重力
+	static constexpr float GRAVITY = 9.81f * 100.0f;
+	static constexpr float GRAVITY_SCALE = 0.7f;
+
+	static const std::string PATH_CSV;
+
+	// 重力の取得
+	float GetGravityPow(void) const { return GRAVITY * GRAVITY_SCALE; }
 
 	// データパス関連
 	//-------------------------------------------
@@ -18,6 +30,10 @@ public:
 	static const std::string PATH_MODEL;
 	static const std::string PATH_EFFECT;
 	static const std::string PATH_MUSIC;
+
+	static const std::string PATH_KEY_CONFIG;
+	static const std::string PATH_KEY_CONFIG_GAMEPAD;
+	static const std::string PATH_KEY_CONFIG_KEYBOARD;
 	//-------------------------------------------
 
 	// インスタンスを明示的に生成
@@ -41,26 +57,19 @@ public:
 	// 解放成功／失敗の判定
 	bool IsReleaseFail(void) const;
 
-	//void SetFollow(GameScene* gameNow);
-
-	void GameEnd(void);
-
-	void InitEffekseer(void);
-
 private:
 
 	// 静的インスタンス
 	static Application* instance_;
 
-	//GameScene* gameNow_;
+	// FPS制御
+	FpsController* fpsController_;
 
 	// 初期化失敗
 	bool isInitFail_;
 
 	// 解放失敗
 	bool isReleaseFail_;
-
-	bool isEnd_;
 
 	// デフォルトコンストラクタをprivateにして、
 	// 外部から生成できない様にする
@@ -71,5 +80,8 @@ private:
 
 	// デストラクタも同様
 	~Application(void) = default;
+
+	// エフェクシアの初期化
+	void InitEffekseer(void);
 
 };

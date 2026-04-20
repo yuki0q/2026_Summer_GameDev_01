@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
 #include <vector>
 #include <DxLib.h>
+#include <string>
 #include "../Common/Vector2.h"
 #include "../Common/Quaternion.h"
 class AsoUtility
@@ -26,22 +26,21 @@ public:
 	static constexpr VECTOR DIR_B = { 0.0f, 0.0f, -1.0f };
 	static constexpr VECTOR DIR_R = { 1.0f, 0.0f, 0.0f };
 	static constexpr VECTOR DIR_L = { -1.0f, 0.0f, 0.0f };
+	static constexpr VECTOR DIR_U = { 0.0f, 1.0f, 0.0f };
+	static constexpr VECTOR DIR_D = { 0.0f, -1.0f, 0.0f };
 
 	static constexpr VECTOR DIR_FR = { 1.0f, 0.0f, 1.0f };
 	static constexpr VECTOR DIR_FL = { -1.0f, 0.0f, 1.0f };
 	static constexpr VECTOR DIR_BR = { 1.0f, 0.0f, -1.0f };
 	static constexpr VECTOR DIR_BL = { -1.0f, 0.0f, -1.0f };
 
-	static constexpr VECTOR DIR_U = { 0.0f, 1.0f, 0.0f };
-	static constexpr VECTOR DIR_D = { 0.0f, -1.0f, 0.0f };
-
 	static constexpr float kEpsilonNormalSqrt = 1e-15F;
+
+	// 値を範囲に収める
+	static float Clamp(float v, float min, float max);
 
 	// 四捨五入
 	static int Round(float v);
-
-	// 文字列の分割
-	static std::vector <std::string> Split(std::string& line, char delimiter);
 
 	// ラジアン(rad)から度(deg)
 	static double Rad2DegD(double rad);
@@ -61,10 +60,10 @@ public:
 
 	// 回転が少ない方の回転向きを取得する(時計回り:1、反時計回り:-1)
 	static int DirNearAroundRad(float from, float to);
-	
+
 	// 回転が少ない方の回転向きを取得する(時計回り:1、反時計回り:-1)
 	static int DirNearAroundDeg(float from, float to);
-	
+
 	// 線形補間
 	static int Lerp(int start, int end, float t);
 	static float Lerp(float start, float end, float t);
@@ -81,7 +80,7 @@ public:
 	// ベジェ曲線
 	static Vector2 Bezier(const Vector2& p1, const Vector2& p2, const Vector2& p3, float t);
 	static VECTOR Bezier(const VECTOR& p1, const VECTOR& p2, const VECTOR& p3, float t);
-	
+
 	// Y軸回転
 	static VECTOR RotXZPos(const VECTOR& centerPos, const VECTOR& radiusPos, float rad);
 
@@ -96,13 +95,15 @@ public:
 	static double Distance(const Vector2& v1, const Vector2& v2);
 	static double Distance(const VECTOR& v1, const VECTOR& v2);
 
+	static bool IsHitSphere(const VECTOR& pos1, const VECTOR& pos2, float radius);
+
 	// 球体同士の衝突判定
 	static bool IsHitSpheres(
 		const VECTOR& pos1, float radius1, const VECTOR& pos2, float radius2);
 
 	// 球体とカプセルの衝突判定
 	static bool IsHitSphereCapsule(
-		const VECTOR& sphPos, float sphRadius, 
+		const VECTOR& sphPos, float sphRadius,
 		const VECTOR& capPos1, const VECTOR& capPos2, float capRadius);
 
 	// 比較
@@ -118,13 +119,10 @@ public:
 
 	// 描画系
 	static void DrawLineDir(const VECTOR& pos, const VECTOR& dir, int color, float len = 50.0f);
+	static void DrawLineXYZ(const VECTOR& pos, const MATRIX& rot, float len = 50.0f);
 	static void DrawLineXYZ(const VECTOR& pos, const Quaternion& rot, float len = 50.0f);
 
-	// 角度を -π ～ +π に正規化
-	static float NormalizeAngle(float rad);
-
-	// 角度の線形補間(常に最短経路)
-	static float LerpAngle(float from, float to, float t);
-
+	// 文字列の分割
+	static std::vector<std::string> Split(std::string& line, char delimiter);
 };
 
