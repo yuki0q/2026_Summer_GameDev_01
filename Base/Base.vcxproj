@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Common\FpsController.cpp" />
     <ClCompile Include="src\Scene\SelectScene.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="src\Scene\TopSelectScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Common\FpsController.h" />
     <ClInclude Include="src\Scene\SelectScene.h" />
     <ClInclude Include="src\Scene\GameScene.h" />
     <ClInclude Include="src\Application.h" />

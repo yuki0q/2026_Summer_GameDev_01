@@ -76,6 +76,9 @@
     <ClCompile Include="src\Scene\TopSelectScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Common\FpsController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -121,5 +124,6 @@
     <ClInclude Include="src\Scene\ResultScene.h" />
     <ClInclude Include="src\Scene\SelectScene.h" />
     <ClInclude Include="src\Scene\TopSelectScene.h" />
+    <ClInclude Include="src\Common\FpsController.h" />
   </ItemGroup>
 </Project>
