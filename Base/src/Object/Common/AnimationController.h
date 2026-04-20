@@ -4,6 +4,7 @@
 
 class AnimationController
 {
+
 public:
 
 	// アニメーションデータ
@@ -23,40 +24,46 @@ public:
 	// デストラクタ
 	~AnimationController(void);
 
-	// アニメーション再生
-	void Play(int type, bool isLoop = true);
-
-	void Update(void);
-
-	void Release(void);
-
-	// 再生終了 右const＝メンバ変数を更新しない関数
-	bool IsEnd(void) const;
-
-	// 再生中のアニメーション
-	int GetPlayType(void) const;
-
 	// 外部FBXからアニメーション追加
 	void Add(int type, float speed, const std::string path);
 
 	// 同じFBX内のアニメーションを準備
 	void AddInFbx(int type, float speed, int animIndex);
 
+	// アニメーション再生
+	void Play(int type, bool isLoop = true);
+
+	// 更新
+	void Update(void);
+
+	// 解放
+	void Release(void);
+
+	// 再生中のアニメーション
+	int GetPlayType(void) const;
+
+	// 再生終了
+	bool IsEnd(void) const;
+
+	// 再生中のアニメーション情報を取得
+	const Animation& GetPlayAnim(void) const;
+
 private:
 
 	// アニメーションするモデルのハンドルID
 	int modelId_;
+
 	// 種類別のアニメーションデータ
 	std::map<int, Animation> animations_;
+
 	// 再生中のアニメーション
 	int playType_;
+	Animation playAnim_;
 
-	//アニメーションをループするかしないか
+	// アニメーションをループするかしないか
 	bool isLoop_;
 
 	// アニメーション追加の共通処理
 	void Add(int type, float speed, Animation& animation);
 
-	Animation playAnim_;
 };
-

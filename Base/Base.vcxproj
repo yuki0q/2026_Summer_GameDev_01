@@ -135,11 +135,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Object\Collider\ColliderBase.cpp" />
+    <ClCompile Include="src\Object\Actor\Charactor\CharactorBase.cpp" />
+    <ClCompile Include="src\Object\Actor\ActorBase.cpp" />
     <ClCompile Include="src\Common\FpsController.cpp" />
     <ClCompile Include="src\Scene\SelectScene.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Common\AnimationController.cpp" />
+    <ClCompile Include="src\Object\Common\AnimationController.cpp" />
     <ClCompile Include="src\Common\Fader.cpp" />
     <ClCompile Include="src\Common\Quaternion.cpp" />
     <ClCompile Include="src\Common\Vector2.cpp" />
@@ -154,13 +157,17 @@
     <ClCompile Include="src\Utility\AsoUtility.cpp" />
     <ClCompile Include="src\Utility\MatrixUtility.cpp" />
     <ClCompile Include="src\Scene\TopSelectScene.cpp" />
+    <ClCompile Include="src\Object\Common\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Object\Collider\ColliderBase.h" />
+    <ClInclude Include="src\Object\Actor\Charactor\CharactorBase.h" />
+    <ClInclude Include="src\Object\Actor\ActorBase.h" />
     <ClInclude Include="src\Common\FpsController.h" />
     <ClInclude Include="src\Scene\SelectScene.h" />
     <ClInclude Include="src\Scene\GameScene.h" />
     <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\Common\AnimationController.h" />
+    <ClInclude Include="src\Object\Common\AnimationController.h" />
     <ClInclude Include="src\Common\Fader.h" />
     <ClInclude Include="src\Common\Quaternion.h" />
     <ClInclude Include="src\Common\Vector2.h" />
@@ -174,6 +181,7 @@
     <ClInclude Include="src\Utility\AsoUtility.h" />
     <ClInclude Include="src\Utility\MatrixUtility.h" />
     <ClInclude Include="src\Scene\TopSelectScene.h" />
+    <ClInclude Include="src\Object\Common\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

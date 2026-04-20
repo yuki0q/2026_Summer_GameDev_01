@@ -40,7 +40,7 @@
     <ClCompile Include="src\Common\Vector2.cpp">
       <Filter>src\Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Common\AnimationController.cpp">
+    <ClCompile Include="src\Object\Common\AnimationController.cpp">
       <Filter>src\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Utility\MatrixUtility.cpp">
@@ -79,6 +79,18 @@
     <ClCompile Include="src\Common\FpsController.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Object\Actor\ActorBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Actor\Charactor\CharactorBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Common\Transform.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Collider\ColliderBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -96,7 +108,7 @@
     <ClInclude Include="src\Common\Vector2.h">
       <Filter>src\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common\AnimationController.h">
+    <ClInclude Include="src\Object\Common\AnimationController.h">
       <Filter>src\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Utility\MatrixUtility.h">
@@ -125,5 +137,9 @@
     <ClInclude Include="src\Scene\SelectScene.h" />
     <ClInclude Include="src\Scene\TopSelectScene.h" />
     <ClInclude Include="src\Common\FpsController.h" />
+    <ClInclude Include="src\Object\Actor\ActorBase.h" />
+    <ClInclude Include="src\Object\Actor\Charactor\CharactorBase.h" />
+    <ClInclude Include="src\Object\Common\Transform.h" />
+    <ClInclude Include="src\Object\Collider\ColliderBase.h" />
   </ItemGroup>
 </Project>

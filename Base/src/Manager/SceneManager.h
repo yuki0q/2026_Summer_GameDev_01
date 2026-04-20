@@ -1,10 +1,9 @@
 #pragma once
 #include <chrono>
+#include <DxLib.h>
 class SceneBase;
 class Fader;
 class Camera;
-class MiniCamera;
-class Application;
 
 class SceneManager
 {
@@ -13,11 +12,8 @@ public:
 
 	// 背景色
 	static constexpr int BACKGROUND_COLOR_R = 0;
-	static constexpr int BACKGROUND_COLOR_G = 110;
-	static constexpr int BACKGROUND_COLOR_B = 200;
-
-	// 重力
-	static constexpr float GRAVITY = 9.81f;
+	static constexpr int BACKGROUND_COLOR_G = 139;
+	static constexpr int BACKGROUND_COLOR_B = 139;
 
 	// ディレクショナルライトの方向
 	static constexpr VECTOR LIGHT_DIRECTION = { 0.3f, -0.7f, 0.8f };
@@ -28,11 +24,9 @@ public:
 		NONE,
 		TITLE,
 		GAME,
-		GAMEOVER,
-		GAMECLEAR,
-		OPTION,
+		DEBUG,
 	};
-	
+
 	// インスタンスの生成
 	static void CreateInstance(void);
 
@@ -41,7 +35,7 @@ public:
 
 	// 初期化
 	void Init(void);
-	
+
 	// 3Dの初期化
 	void Init3D(void);
 
@@ -66,8 +60,6 @@ public:
 	// カメラの取得
 	Camera* GetCamera(void) const;
 
-	Application* GetAppli(void)const;
-
 private:
 
 	// 静的インスタンス
@@ -85,18 +77,13 @@ private:
 	// カメラ
 	Camera* camera_;
 
-	Application* appli_;
-
-	// ミニカメラ
-	MiniCamera* miniCamera_;
-
 	// シーン遷移中判定
 	bool isSceneChanging_;
 
 	// デルタタイム
 	std::chrono::system_clock::time_point preTime_;
 	float deltaTime_;
-	
+
 	// デフォルトコンストラクタをprivateにして、
 	// 外部から生成できない様にする
 	SceneManager(void);
