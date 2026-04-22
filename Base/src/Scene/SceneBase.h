@@ -1,6 +1,6 @@
 #pragma once
-#include <DxLib.h>
-class AnimationController;
+class ResourceManager;
+class SceneManager;
 
 class SceneBase
 {
@@ -27,16 +27,9 @@ public:
 
 protected:
 
-	// アニメーション制御
-	AnimationController* animationController_;
+	// リソース管理
+	ResourceManager& resMng_;
 
-	int modelId_;
-
-	VECTOR pos_;
-	VECTOR angles_;
-	VECTOR localAngles_;
-	VECTOR scale_;
-
-	// 移動方向
-	VECTOR moveDir_;
+	// シーン管理
+	SceneManager& sceMng_;
 };

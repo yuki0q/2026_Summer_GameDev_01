@@ -48,11 +48,11 @@ void ResourceManager::Init(void)
 	//resourcesMap_.emplace(SRC::SPHERE_PLANET, res);
 
 	//// プレイヤーモデル
-	//res = new RES(RES_T::MODEL, PATH_MDL + "Player/Player.mv1");
-	//resourcesMap_.emplace(SRC::PLAYER, res);
+	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top.mv1");
+	resourcesMap_.emplace(SRC::TOP, res);
 
 	// ステージモデル
-	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/MainStage/MainStage.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Base.mv1");
 	resourcesMap_.emplace(SRC::MAIN_STAGE, res);
 
 	// スカイドーム

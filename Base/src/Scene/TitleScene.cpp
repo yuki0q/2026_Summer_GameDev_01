@@ -1,19 +1,21 @@
-#include <string>
 #include <DxLib.h>
-#include "../Application.h"
-#include "../Utility/MatrixUtility.h"
 #include "../Utility/AsoUtility.h"
-#include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/SceneManager.h"
 #include "../Manager/Camera.h"
-#include "../Object/Common/AnimationController.h"
+#include "../Manager/ResourceManager.h"
+#include "../Manager/Resource.h"
+//#include "../Object/Actor/SkyDome.h"
 #include "TitleScene.h"
 
 TitleScene::TitleScene(void)
+	:
+	imgTitle_(-1),
+	imgPushSpace_(-1),
+	animController_(nullptr),
+	//skyDome_(nullptr),
+	SceneBase()
 {
-	logoTitle_ = -1;
-	imgTitle_ = -1;
-	bgmTitle_ = -1;
 }
 
 TitleScene::~TitleScene(void)
@@ -22,99 +24,113 @@ TitleScene::~TitleScene(void)
 
 void TitleScene::Init(void)
 {
-	logoTitle_ = LoadGraph((Application::PATH_IMAGE + "TitleLogo.png").c_str());
-	imgTitle_ = LoadGraph((Application::PATH_IMAGE + "TitleImg.png").c_str());
-	bgmTitle_ = LoadSoundMem((Application::PATH_MUSIC + "TitleBgm.mp3").c_str());
+	// 画像読み込み
+	imgTitle_ = resMng_.Load(ResourceManager::SRC::TITLE_IMG).handleId_;
 
-	modelId_ = MV1LoadModel((Application::PATH_MODEL + "Top/NormalTop.mv1").c_str());
+	imgPushSpace_ = resMng_.Load(ResourceManager::SRC::TITLE_PUSH_SPACE).handleId_;
 
-	animationController_ = new AnimationController(modelId_);
+	//// メイン惑星
+	//bigPlanet_.SetModel(resMng_.Load(ResourceManager::SRC::PIT_FALL_PLANET).handleId_);
+	//bigPlanet_.scl = AsoUtility::VECTOR_ONE;
+	//bigPlanet_.quaRot = Quaternion::Identity();
+	//bigPlanet_.quaRotLocal = Quaternion::Identity();
+	//bigPlanet_.pos = AsoUtility::VECTOR_ZERO;
+	//bigPlanet_.Update();
 
-	animationController_->Add(static_cast<int>(ANIM_TYPE::IDLE), 100.0f,
-		Application::PATH_MODEL + "Top/Idle.mv1");
+	//// 小惑星
+	//SpherePlanet_.SetModel(resMng_.Load(ResourceManager::SRC::SPHERE_PLANET).handleId_);
+	//SpherePlanet_.scl = SPHERE_PLANET_DEFAULT_SCALE;
+	//SpherePlanet_.quaRot = Quaternion::Identity();
 
-	animationController_->Add(static_cast<int>(ANIM_TYPE::ATTACK), 30.0f,
-		Application::PATH_MODEL + "Top/Attack.mv1");
+	//SpherePlanet_.quaRot = Quaternion::Euler(SPHERE_PLANET_ROT);
 
-	animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
+	//SpherePlanet_.quaRotLocal = Quaternion::Identity();
+	///*SpherePlanet_.quaRotLocal = Quaternion::Mult(
+	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.y, AsoUtility::AXIS_Y));
+	//SpherePlanet_.quaRotLocal = Quaternion::Mult(
+	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.x, AsoUtility::AXIS_X));
+	//SpherePlanet_.quaRotLocal = Quaternion::Mult(
+	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.z, AsoUtility::AXIS_Z));*/
 
-	pos_ = { 25.0f, 150.0f, -200.0f };
-	scale_ = { 0.5f,0.5f,0.5f };
-	angles_ = { 0.0f, 0.0f, 0.0f };
-	localAngles_ = { AsoUtility::Deg2RadF(-15.0f), AsoUtility::Deg2RadF(30.0f), 0.0f };
+	//SpherePlanet_.pos = SPHERE_PLANET_DEFAULT_POS;
+	//SpherePlanet_.Update();
 
-	// パンの設定
-	//ChangePanSoundMem(105, bgmTitle_);
+	// プレイヤー
+	top_.SetModel(resMng_.Load(ResourceManager::SRC::TOP).handleId_);
+	top_.scl = PLAYER_DEFAULT_SCALE;
 
-	// 音量ボリュームの設定
-	ChangeVolumeSoundMem(240, bgmTitle_);
+	top_.quaRot = Quaternion::Identity();
+	top_.quaRot = Quaternion::Mult(top_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-90.0f), AsoUtility::AXIS_Y));
 
-	// BGMループ
-	PlaySoundMem(bgmTitle_, DX_PLAYTYPE_LOOP);
+	top_.quaRotLocal = Quaternion::Identity();
+	top_.quaRotLocal = Quaternion::Mult(top_.quaRotLocal,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(180.0f), AsoUtility::AXIS_Y));
 
-	Camera* camera = SceneManager::GetInstance().GetCamera();
-	camera->ChangeMode(Camera::MODE::FIXED_POINT);
-	camera->Init();
+	top_.pos = PLAYER_DEFAULT_POS;
+	top_.Update();
+	animController_ = new AnimationController(top_.modelId);
+	animController_->Add(static_cast<int>(ANIM_TYPE::RUN), 30.0f, Application::PATH_MODEL + "Player/Run.mv1");
 
-	// 大きさをモデルに反映
-	MV1SetScale(modelId_, scale_);
+	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
 
-	// 角度から方向に変換する
-	moveDir_ = { sinf(angles_.y), 0.0f, cosf(angles_.y) };
-	//preInputDir_ = moveDir_;
+	/*skyDome_ = new SkyDome(empty_);
+	skyDome_->Init();*/
 
-	// 行列の合成(子, 親と指定すると親⇒子の順に適用される)
-	MATRIX mat = MatrixUtility::Multiplication(localAngles_, angles_);
-
-	// 回転行列をモデルに反映
-	MV1SetRotationMatrix(modelId_, mat);
-
-	// 座標をモデルに反映
-	MV1SetPosition(modelId_, pos_);
-	MV1SetScale(modelId_, scale_);
+	// 定点カメラ
+	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
 }
 
 void TitleScene::Update(void)
 {
+	//SpherePlanet_.quaRot = Quaternion::Mult(SpherePlanet_.quaRot,
+	//	Quaternion::AngleAxis(AsoUtility::Deg2RadF(-1.0f), AsoUtility::AXIS_Y));
+	////;Euler(0.0f, 0.0f, AsoUtility::Deg2RadF(-1.0f)));
+
+	//SpherePlanet_.Update();
+
+	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
+
+	animController_->Update();
+
+	//skyDome_->Update();
+
 	// シーン遷移
-	InputManager& ins = InputManager::GetInstance();
-	bool isHitKey = ins.IsNew(KEY_INPUT_SPACE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
-		InputManager::JOYPAD_BTN::DOWN);
-
-	if (isHitKey)
+	auto const& ins = InputManager::GetInstance();
+	if (ins.IsTrgDown(KEY_INPUT_SPACE))
 	{
-		animationController_->Play(static_cast<int>(ANIM_TYPE::ATTACK), false);
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
 
-	if (animationController_->IsEnd()) {
-		// 再生終了
-		StopSoundMem(bgmTitle_);
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
-	}
-
-	MV1SetPosition(modelId_, pos_);
-	MV1SetScale(modelId_, scale_);
-	animationController_->Update();
 }
 
 void TitleScene::Draw(void)
 {
-	MV1DrawModel(modelId_);
+	// モデル描画
+	//skyDome_->Draw();
 
-	DrawBillboard3D({ 0.0f,200.0f,-300.0f },
-		0.5f, 0.5f, 500.0f, 0.0, logoTitle_, true);
+	/*MV1DrawModel(bigPlanet_.modelId);
 
-	DrawBillboard3D({ 0.0f,200.0f,-300.0f },
-		0.5f, 0.5f, 500.0f, 0.0, imgTitle_, true);
+	MV1DrawModel(SpherePlanet_.modelId);*/
+
+	MV1DrawModel(top_.modelId);
+
+	DrawRotaGraph(IMG_TITLE_POS_X, IMG_TITLE_POS_Y, 1.0f, 0.0f, imgTitle_, true);
+	DrawRotaGraph(IMG_PUSH_SPACE_POS_X, IMG_PUSH_SPACE_POS_Y, 1.0f, 0.0f, imgPushSpace_, true);
+
+
 }
 
 void TitleScene::Release(void)
 {
-	MV1DeleteModel(modelId_);
-
 	DeleteGraph(imgTitle_);
-	DeleteGraph(logoTitle_);
-	DeleteSoundMem(bgmTitle_);
+	DeleteGraph(imgPushSpace_);
+	//skyDome_->Release();
 
-	delete animationController_;
+	delete animController_;
+	//delete skyDome_;
+
+	/*bigPlanet_.Release();
+	SpherePlanet_.Release();*/
+	top_.Release();
 }

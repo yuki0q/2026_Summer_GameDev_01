@@ -109,6 +109,18 @@
     <ClCompile Include="src\Object\Collider\ColliderSphere.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Object\Actor\NormalStage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Actor\UI\UIBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Actor\UI\UISurprise.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Actor\Charactor\Player.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -165,5 +177,9 @@
     <ClInclude Include="src\Object\Collider\ColliderLine.h" />
     <ClInclude Include="src\Object\Collider\ColliderModel.h" />
     <ClInclude Include="src\Object\Collider\ColliderSphere.h" />
+    <ClInclude Include="src\Object\Actor\NormalStage.h" />
+    <ClInclude Include="src\Object\Actor\UI\UIBase.h" />
+    <ClInclude Include="src\Object\Actor\UI\UISurprise.h" />
+    <ClInclude Include="src\Object\Actor\Charactor\Player.h" />
   </ItemGroup>
 </Project>

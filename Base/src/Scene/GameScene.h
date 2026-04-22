@@ -1,30 +1,38 @@
 #pragma once
 #include "SceneBase.h"
-#include "../Common/Vector2.h"
+#include "../Object/Common/Transform.h"
+class NormalStage;
+class Player;
+//class EnemyManager;
 
-class Camera;
-class Stage;
-
-class GameScene	: public SceneBase
+class GameScene : public SceneBase
 {
+
 public:
 
 	// コンストラクタ
 	GameScene(void);
-	// デストラクタ
-	~GameScene(void)override;
 
-	void Init(void)override;
-	void Update(void)override;
-	void Draw(void)override;
-	void Release(void)override;
+	// デストラクタ
+	~GameScene(void) override;
+
+	// 初期化
+	void Init(void) override;
+
+	// 更新
+	void Update(void) override;
+
+	// 描画
+	void Draw(void) override;
+
+	// 解放
+	void Release(void) override;
 
 private:
 
-	// BGM 
-	int bgmBattle_;
+	NormalStage* normalStage_;
+	Player* player_;
+	//EnemyManager* enemyManager_;
 
-	// 画像
-	int imgBattleBack_;
+	int shadowMapHandle_;
 };
-
