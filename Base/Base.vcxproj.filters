@@ -91,6 +91,24 @@
     <ClCompile Include="src\Object\Collider\ColliderBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Manager\Resource.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Manager\ResourceManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Collider\ColliderCapsule.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Collider\ColliderLine.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Collider\ColliderModel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object\Collider\ColliderSphere.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -141,5 +159,11 @@
     <ClInclude Include="src\Object\Actor\Charactor\CharactorBase.h" />
     <ClInclude Include="src\Object\Common\Transform.h" />
     <ClInclude Include="src\Object\Collider\ColliderBase.h" />
+    <ClInclude Include="src\Manager\Resource.h" />
+    <ClInclude Include="src\Manager\ResourceManager.h" />
+    <ClInclude Include="src\Object\Collider\ColliderCapsule.h" />
+    <ClInclude Include="src\Object\Collider\ColliderLine.h" />
+    <ClInclude Include="src\Object\Collider\ColliderModel.h" />
+    <ClInclude Include="src\Object\Collider\ColliderSphere.h" />
   </ItemGroup>
 </Project>

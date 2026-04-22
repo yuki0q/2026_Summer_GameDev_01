@@ -7,19 +7,6 @@ class SceneBase
 
 public:
 
-	// アニメーション種別
-	enum class ANIM_TYPE
-	{
-		IDLE,
-		WALK,
-		ATTACK,
-		WALK,
-		JUMP,
-		DAMAGE,
-		BEFOR,
-		MAX,
-	};
-
 	// コンストラクタ
 	SceneBase(void);
 

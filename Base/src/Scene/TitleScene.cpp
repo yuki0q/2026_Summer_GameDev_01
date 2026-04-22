@@ -6,7 +6,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/Camera.h"
-#include "../Common/AnimationController.h"
+#include "../Object/Common/AnimationController.h"
 #include "TitleScene.h"
 
 TitleScene::TitleScene(void)

@@ -21,7 +21,7 @@ public:
 	enum class TAG
 	{
 		STAGE,
-		PLAYER,
+		TOP,
 		CAMERA,
 		ENEMY,
 		VIEW_RANGE,

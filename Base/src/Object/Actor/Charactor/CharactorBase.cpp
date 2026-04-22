@@ -83,7 +83,7 @@ void CharactorBase::Release(void)
 void CharactorBase::InitLoad(void)
 {
 	// ŠÛ‰e‰æ‘œ
-	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
+	imgShadow_ = resMng_.Load(ResourceManager::SRC::TOP_SHADOW).handleId_;
 }
 
 void CharactorBase::DelayRotate(void)

@@ -5,6 +5,18 @@ class TitleScene : public SceneBase
 {
 public:
 
+	// アニメーション種別
+	enum class ANIM_TYPE
+	{
+		IDLE,
+		WALK,
+		ATTACK,
+		JUMP,
+		DAMAGE,
+		BEFOR,
+		MAX,
+	};
+	
 	// 初期位置
 	static constexpr VECTOR DEFAULT_POS = { 0.0f,0.0f,0.0f };
 
