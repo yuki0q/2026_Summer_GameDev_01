@@ -7,7 +7,6 @@
 #include "../Manager/Resource.h"
 #include "../Object/Actor/NormalStage.h"
 #include "../Object/Actor/Charactor/Player.h"
-//#include "../Object/Actor/Charactor/Enemy/EnemyRat.h"
 #include "../Object/Collider/ColliderBase.h"
 #include "GameScene.h"
 
@@ -53,7 +52,7 @@ void GameScene::Init(void)
 
 	// 追従カメラモードに変更
 	Camera* camera = sceMng_.GetCamera();
-	camera->SetFollow(&player_->GetTransform());
+	camera->SetFollow(&normalStage_->GetTransform());
 //	camera->SetFollow(&normalStage_->GetTransform());
 	camera->ChangeMode(Camera::MODE::FOLLOW);
 	camera->AddHitCollider(stageCollider);
@@ -74,7 +73,7 @@ void GameScene::Update(void)
 	auto const& ins = InputManager::GetInstance();
 	if (ins.IsTrgDown(KEY_INPUT_SPACE))
 	{
-		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
 	}
 
 	normalStage_->Update();

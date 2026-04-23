@@ -70,7 +70,7 @@ void TitleScene::Init(void)
 	top_.pos = PLAYER_DEFAULT_POS;
 	top_.Update();
 	animController_ = new AnimationController(top_.modelId);
-	animController_->Add(static_cast<int>(ANIM_TYPE::RUN), 30.0f, Application::PATH_MODEL + "Player/Run.mv1");
+	//animController_->Add(static_cast<int>(ANIM_TYPE::RUN), 30.0f, Application::PATH_MODEL + "Player/Run.mv1");
 
 	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
 

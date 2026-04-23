@@ -20,6 +20,12 @@ void ResultScene::Init(void)
 
 void ResultScene::Update(void)
 {
+	// ƒV[ƒ“‘JˆÚ
+	auto const& ins = InputManager::GetInstance();
+	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	{
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+	}
 }
 
 void ResultScene::Draw(void)

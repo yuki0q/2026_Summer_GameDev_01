@@ -70,7 +70,7 @@
     <ClCompile Include="src\Scene\ResultScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\SelectScene.cpp">
+    <ClCompile Include="src\Scene\StageSelectScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\TopSelectScene.cpp">
@@ -164,7 +164,7 @@
     </ClInclude>
     <ClInclude Include="src\Scene\GameScene.h" />
     <ClInclude Include="src\Scene\ResultScene.h" />
-    <ClInclude Include="src\Scene\SelectScene.h" />
+    <ClInclude Include="src\Scene\StageSelectScene.h" />
     <ClInclude Include="src\Scene\TopSelectScene.h" />
     <ClInclude Include="src\Common\FpsController.h" />
     <ClInclude Include="src\Object\Actor\ActorBase.h" />

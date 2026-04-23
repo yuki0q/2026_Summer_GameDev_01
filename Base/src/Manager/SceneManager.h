@@ -23,7 +23,10 @@ public:
 	{
 		NONE,
 		TITLE,
+		STAGE_SELECT,
+		TOP_SELECT,
 		GAME,
+		RESULT,
 		DEBUG,
 	};
 

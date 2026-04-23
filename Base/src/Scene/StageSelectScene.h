@@ -1,13 +1,13 @@
 #pragma once
 #include "SceneBase.h"
 
-class SelectScene : public SceneBase
+class StageSelectScene : public SceneBase
 {
 public:
 	// コンストラクタ
-	SelectScene(void);
+	StageSelectScene(void);
 	// デストラクタ
-	~SelectScene(void)override;
+	~StageSelectScene(void)override;
 
 	void Init(void)override;
 	void Update(void)override;

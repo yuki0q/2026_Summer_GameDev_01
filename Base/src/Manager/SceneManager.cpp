@@ -3,7 +3,10 @@
 #include <EffekseerForDXLib.h>
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
+#include "../Scene/StageSelectScene.h"
+#include "../Scene/TopSelectScene.h"
 #include "../Scene/GameScene.h"
+#include "../Scene/ResultScene.h"
 //#include "../Scene/DebugScene.h"
 #include "Camera.h"
 //#include "ResourceManager.h"
@@ -49,8 +52,8 @@ void SceneManager::Init(void)
 	Init3D();
 
 	// èâä˙ÉVÅ[ÉìÇÃê›íË
-	DoChangeScene(SCENE_ID::TITLE);
-	//DoChangeScene(SCENE_ID::GAME);
+	//DoChangeScene(SCENE_ID::TITLE);
+	DoChangeScene(SCENE_ID::GAME);
 }
 
 void SceneManager::Init3D(void)
@@ -240,8 +243,17 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	case SCENE_ID::TITLE:
 		scene_ = new TitleScene();
 		break;
+	case SCENE_ID::STAGE_SELECT:
+		scene_ = new StageSelectScene();
+		break;
+	case SCENE_ID::TOP_SELECT:
+		scene_ = new TopSelectScene();
+		break;
 	case SCENE_ID::GAME:
 		scene_ = new GameScene();
+		break;
+	case SCENE_ID::RESULT:
+		scene_ = new ResultScene();
 		break;
 	case SCENE_ID::DEBUG:
 		//scene_ = new DebugScene();
