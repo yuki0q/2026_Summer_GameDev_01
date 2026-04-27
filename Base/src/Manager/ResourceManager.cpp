@@ -48,7 +48,7 @@ void ResourceManager::Init(void)
 	//resourcesMap_.emplace(SRC::SPHERE_PLANET, res);
 
 	//// プレイヤーモデル
-	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top_Red.mv1");
 	resourcesMap_.emplace(SRC::TOP, res);
 
 	// ステージモデル

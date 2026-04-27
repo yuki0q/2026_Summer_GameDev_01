@@ -64,7 +64,8 @@ void GameScene::Init(void)
 	SetShadowMapLightDirection(shadowMapHandle_, VGet(0.5f, -0.5f, 0.5f));
 
 	// シャドウマップに描画する範囲を設定
-	SetShadowMapDrawArea(shadowMapHandle_, VGet(-5000.0f, -70.0f, -6000.0f), VGet(6000.0f, 1500.0f, 8000.0f));
+	SetShadowMapDrawArea(shadowMapHandle_, VGet(-5000.0f, -70.0f, -6000.0f), 
+		VGet(6000.0f, 1500.0f, 8000.0f));
 }
 
 void GameScene::Update(void)

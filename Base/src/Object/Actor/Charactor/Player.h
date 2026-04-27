@@ -24,6 +24,8 @@ public:
 	// 解放
 	void Release(void)override;
 
+	Quaternion Normalize(Quaternion q);
+
 protected:
 
 	// リソースロード
@@ -49,7 +51,7 @@ protected:
 
 private:
 
-	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 0.0f, 0.0f };
+	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 800.0f, 0.0f };
 
 	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 1.0f,1.0f,1.0f };
 
@@ -110,4 +112,6 @@ private:
 
 	// デバッグ描画
 	void DrawDebug(void);
+
+	float i;
 };

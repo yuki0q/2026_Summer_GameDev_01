@@ -41,9 +41,9 @@ protected:
 
 private:
 
-	static constexpr VECTOR STAGE_DEFAULT_POS = { 0.0f, -2000.0f, 0.0f };
+	static constexpr VECTOR STAGE_DEFAULT_POS = { 0.0f, -500.0f, 0.0f };
 
-	static constexpr VECTOR STAGE_DEFAULT_SCALE = { 15.0f,15.0f,15.0f };
+	static constexpr VECTOR STAGE_DEFAULT_SCALE = { 10.0f,10.0f,10.0f };
 
 	// ëŒè€ÉtÉåÅ[ÉÄ
 	const std::vector<std::string> TARGET_FRAME_NAMES =

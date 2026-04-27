@@ -100,6 +100,16 @@ void Player::UpdateProcess(void)
 
 	// ƒWƒƒƒ“ƒvˆ—
 	ProcessJump();
+
+	transform_.quaRot = Quaternion::Mult(transform_.quaRot, 
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(40.0f), AsoUtility::AXIS_Y));
+
+	transform_.Update();
+
+	if(transform_.pos.y < 300.0f)
+	{
+		transform_.pos = PLAYER_DEFAULT_POS;
+	}
 }
 
 void Player::UpdateProcessPost(void)
