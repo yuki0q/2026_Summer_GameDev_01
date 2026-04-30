@@ -89,11 +89,11 @@ void CharactorBase::InitLoad(void)
 void CharactorBase::DelayRotate(void)
 {
 	// ˆÚ“®•ûŒü‚©‚ç‰ñ“]‚É•ÏŠ·‚·‚é
-	Quaternion goalRot = Quaternion::LookRotation(moveDir_);
+//	Quaternion goalRot = Quaternion::LookRotation(moveDir_);
 
 	// ‰ñ“]‚Ì•âŠÔ
-	transform_.quaRot =
-		Quaternion::Slerp(transform_.quaRot, goalRot, 0.2f);
+	//transform_.quaRot =
+		//Quaternion::Slerp(transform_.quaRot, goalRot, 0.2f);
 }
 
 void CharactorBase::CalcGravityPow(void)

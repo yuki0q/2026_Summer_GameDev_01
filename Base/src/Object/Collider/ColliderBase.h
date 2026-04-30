@@ -14,6 +14,7 @@ public:
 		LINE,
 		SPHERE,
 		CAPSULE,
+		CORN,
 		MODEL,
 	};
 

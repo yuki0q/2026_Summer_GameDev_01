@@ -24,8 +24,6 @@ public:
 	// 解放
 	void Release(void)override;
 
-	Quaternion Normalize(Quaternion q);
-
 protected:
 
 	// リソースロード
@@ -51,7 +49,7 @@ protected:
 
 private:
 
-	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 800.0f, 0.0f };
+	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 75.0f, 0.0f };
 
 	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 1.0f,1.0f,1.0f };
 
@@ -85,7 +83,7 @@ private:
 	static constexpr float TIME_JUMP_INPUT = 0.5f;
 
 	// 衝突判定用カプセル上部球体
-	static constexpr VECTOR COL_CAPSULE_TOP_LOCAL_POS = { 0.0f, 110.0f, 0.0f };
+	static constexpr VECTOR COL_CAPSULE_TOP_LOCAL_POS = { 0.0f, 100.0f, 0.0f };
 
 	// 衝突判定用カプセル下部球体
 	static constexpr VECTOR COL_CAPSULE_DOWN_LOCAL_POS = { 0.0f, 30.0f, 0.0f };
@@ -93,13 +91,8 @@ private:
 	// 衝突判定用カプセル球体半径
 	static constexpr float COL_CAPSULE_RADIUS = 20.0f;
 
-	// 衝突判定用カプセル上部球体(ジャンプ時)
-	static constexpr VECTOR COL_CAPSULE_TOP_JUMP_LOCAL_POS =
-	{ 0.0f, 160.0f, 0.0f };
-
-	// 衝突判定用カプセル下部球体(ジャンプ時)
-	static constexpr VECTOR COL_CAPSULE_DOWN_JUMP_LOCAL_POS =
-	{ 0.0f, 80.0f, 0.0f };
+	// プレイヤーの回転の中心点の初期座標
+	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, 0.0f };
 
 	// 操作
 	void ProcessMove(void);
@@ -114,4 +107,9 @@ private:
 	void DrawDebug(void);
 
 	float i;
+
+	// プレイヤーの回転の中心点座標
+	VECTOR centorPos_;
+
+	VECTOR centorMovePow_;
 };

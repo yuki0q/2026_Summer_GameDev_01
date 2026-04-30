@@ -11,7 +11,9 @@
 
 Player::Player(void)
 	:
-	CharactorBase()
+	CharactorBase(),
+	centorMovePow_(AsoUtility::VECTOR_ZERO),
+	centorPos_(AsoUtility::VECTOR_ZERO)
 {
 }
 
@@ -91,6 +93,8 @@ void Player::InitAnimation(void)
 void Player::InitPost(void)
 {
 	isAnim_ = false;
+
+	centorPos_ = PLAYER_ROT_CENTER_POS;
 }
 
 void Player::UpdateProcess(void)
@@ -102,14 +106,17 @@ void Player::UpdateProcess(void)
 	ProcessJump();
 
 	transform_.quaRot = Quaternion::Mult(transform_.quaRot, 
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(40.0f), AsoUtility::AXIS_Y));
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
-	transform_.Update();
+	centorPos_.y = transform_.pos.y;
 
-	if(transform_.pos.y < 300.0f)
+	if(transform_.pos.y < -425.0f)
 	{
 		transform_.pos = PLAYER_DEFAULT_POS;
+		centorPos_ = PLAYER_ROT_CENTER_POS;
 	}
+
+	transform_.Update();
 }
 
 void Player::UpdateProcessPost(void)
@@ -126,7 +133,8 @@ void Player::ProcessMove(void)
 
 	moveSpeed_ = 0.0f;
 
-	movePow_ = AsoUtility::VECTOR_ZERO;
+	//movePow_ = AsoUtility::VECTOR_ZERO;
+	centorMovePow_ = AsoUtility::VECTOR_ZERO;
 
 	// ゲームパッドが接続されている数で処理を分ける
 	if (GetJoypadNum() == 0)
@@ -195,7 +203,12 @@ void Player::ProcessMove(void)
 		moveDir_ = Quaternion::PosAxis(cameraRot, dir);
 
 		// 移動量を計算
-		movePow_ = VScale(moveDir_, moveSpeed_);
+		//movePow_ = VScale(moveDir_, moveSpeed_);
+		centorMovePow_ = VScale(moveDir_, moveSpeed_);
+
+		// 移動処理
+		centorPos_ = VAdd(centorPos_, centorMovePow_);
+		//transform_.pos = VAdd(transform_.pos, movePow_);
 	}
 	else
 	{
@@ -248,8 +261,8 @@ void Player::ProcessJump(void)
 		isJump_ = true;
 
 		// アニメーション再生
-		animController_->Play(
-			static_cast<int>(ANIM_TYPE::JUMP), false);
+		/*animController_->Play(
+			static_cast<int>(ANIM_TYPE::JUMP), false);*/
 	}
 }
 
@@ -288,10 +301,10 @@ void Player::ProcessAnimCapsule(void)
 		// ジャンプ中は線分を伸ばす
 		if (ownColliders_.count(static_cast<int>(COLLIDER_TYPE::CAPSULE)) != 0)
 		{
-			ColliderCapsule* colCapsule = dynamic_cast<ColliderCapsule*>(
+			/*ColliderCapsule* colCapsule = dynamic_cast<ColliderCapsule*>(
 				ownColliders_.at(static_cast<int>(COLLIDER_TYPE::CAPSULE)));
 			colCapsule->SetLocalPosTop(COL_CAPSULE_TOP_JUMP_LOCAL_POS);
-			colCapsule->SetLocalPosDown(COL_CAPSULE_DOWN_JUMP_LOCAL_POS);
+			colCapsule->SetLocalPosDown(COL_CAPSULE_DOWN_JUMP_LOCAL_POS);*/
 		}
 	}
 	else
@@ -318,5 +331,7 @@ void Player::CollisionReserve(void)
 
 void Player::DrawDebug(void)
 {
-	DrawFormatString(15, 20, 0x000000, "%f,%f,%f", transform_.pos.x, transform_.pos.y, transform_.pos.z);
+	DrawFormatString(15, 20, 0x000000, "コマの位置:,%f,%f,%f", transform_.pos.x, transform_.pos.y, transform_.pos.z);
+	DrawFormatString(15, 40, 0x000000, "回転の中心:,%f,%f,%f", centorPos_.x, centorPos_.y, centorPos_.z);
+	DrawSphere3D(centorPos_, 30.0f, 16, 0xFF0000, 0xFF0000, true);
 }
