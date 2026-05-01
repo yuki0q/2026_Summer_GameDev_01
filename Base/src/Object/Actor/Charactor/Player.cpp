@@ -12,7 +12,7 @@
 
 Player::Player(void)
 	:
-	CharactorBase(),
+	TopBase(),
 	centorMovePow_(AsoUtility::VECTOR_ZERO),
 	centorPos_(AsoUtility::VECTOR_ZERO),
 	centorRot_(AsoUtility::VECTOR_ZERO),
@@ -28,19 +28,19 @@ Player::~Player(void)
 
 void Player::Draw(void)
 {
-	CharactorBase::Draw();
+	TopBase::Draw();
 	DrawDebug();
 }
 
 void Player::Release(void)
 {
-	CharactorBase::Release();
+	TopBase::Release();
 }
 
 void Player::InitLoad(void)
 {
 	// 基底クラスのリソースロード
-	CharactorBase::InitLoad();
+	TopBase::InitLoad();
 
 	transform_.SetModel(resMng_.Load(ResourceManager::SRC::TOP).handleId_);
 }
@@ -101,7 +101,7 @@ void Player::InitPost(void)
 
 	centorPos_ = PLAYER_ROT_CENTER_POS;
 
-	transform_.localPos = { 100.0f,0.0f,100.0f };
+	transform_.localPos = TOPS_DEFAULT_LOCAL_POS;
 
 	topsSpeed_ = SPEED_MOVE;
 
@@ -110,13 +110,15 @@ void Player::InitPost(void)
 
 void Player::UpdateProcess(void)
 {
+	TopBase::UpdateProcess();
+
 	// 移動操作
 	ProcessMove();
 
 	// ジャンプ処理
 	ProcessJump();
 
-	transform_.quaRot = Quaternion::Mult(transform_.quaRot, 
+	transform_.quaRot = Quaternion::Mult(transform_.quaRot,
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
 	centorQuaRot_ = Quaternion::Mult(centorQuaRot_,
@@ -129,7 +131,7 @@ void Player::UpdateProcess(void)
 	// 親（プレイヤーの回転）
 	MATRIX parentMat = MatrixUtility::GetMatrixRotateXYZ(
 		Quaternion::ToEuler(Quaternion::Mult(centorQuaRot_,
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y))));
+			Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y))));
 
 	// 行列の合成(子 : 、 親 : プレイヤー)
 	MATRIX mat = MatrixUtility::Multiplication(selfMat, parentMat);
@@ -150,7 +152,7 @@ void Player::UpdateProcess(void)
 		topsStamina_ = 0.0f;
 	}
 
-	if(transform_.pos.y < -425.0f|| topsStamina_ <= 0.0f)
+	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsStamina_ <= 0.0f)
 	{
 		transform_.pos = PLAYER_DEFAULT_POS;
 		centorPos_ = PLAYER_ROT_CENTER_POS;
@@ -162,6 +164,7 @@ void Player::UpdateProcess(void)
 
 void Player::UpdateProcessPost(void)
 {
+	TopBase::UpdateProcessPost();
 }
 
 void Player::ProcessMove(void)
@@ -311,65 +314,18 @@ void Player::ProcessJump(void)
 
 void Player::ProcessAnimPos(void)
 {
-	// アニメーションごとの線分調整
-	if (animController_->GetPlayType() == static_cast<int>(ANIM_TYPE::JUMP))
-	{
-		// ジャンプ中は線分を伸ばす
-		if (ownColliders_.count(static_cast<int>(COLLIDER_TYPE::LINE)) != 0)
-		{
-			ColliderLine* colLine = dynamic_cast<ColliderLine*>(
-				ownColliders_.at(static_cast<int>(COLLIDER_TYPE::LINE)));
-			colLine->SetLocalPosStart(COL_LINE_JUMP_START_LOCAL_POS);
-			colLine->SetLocalPosEnd(COL_LINE_JUMP_END_LOCAL_POS);
-		}
-	}
-	else
-	{
-		// 通常時の線分に戻す
-		if (ownColliders_.count(static_cast<int>(COLLIDER_TYPE::LINE)) != 0)
-		{
-			ColliderLine* colLine = dynamic_cast<ColliderLine*>(
-				ownColliders_.at(static_cast<int>(COLLIDER_TYPE::LINE)));
-			colLine->SetLocalPosStart(COL_LINE_START_LOCAL_POS);
-			colLine->SetLocalPosEnd(COL_LINE_END_LOCAL_POS);
-		}
-	}
+	TopBase::ProcessAnimPos();
 }
 
 void Player::ProcessAnimCapsule(void)
 {
-	// アニメーションごとの線分調整
-	if (animController_->GetPlayType() == static_cast<int>(ANIM_TYPE::JUMP))
-	{
-		// ジャンプ中は線分を伸ばす
-		if (ownColliders_.count(static_cast<int>(COLLIDER_TYPE::CAPSULE)) != 0)
-		{
-			/*ColliderCapsule* colCapsule = dynamic_cast<ColliderCapsule*>(
-				ownColliders_.at(static_cast<int>(COLLIDER_TYPE::CAPSULE)));
-			colCapsule->SetLocalPosTop(COL_CAPSULE_TOP_JUMP_LOCAL_POS);
-			colCapsule->SetLocalPosDown(COL_CAPSULE_DOWN_JUMP_LOCAL_POS);*/
-		}
-	}
-	else
-	{
-		// 通常時の線分に戻す
-		if (ownColliders_.count(static_cast<int>(COLLIDER_TYPE::CAPSULE)) != 0)
-		{
-			ColliderCapsule* colCapsule = dynamic_cast<ColliderCapsule*>(
-				ownColliders_.at(static_cast<int>(COLLIDER_TYPE::CAPSULE)));
-			colCapsule->SetLocalPosTop(COL_CAPSULE_TOP_LOCAL_POS);
-			colCapsule->SetLocalPosDown(COL_CAPSULE_DOWN_LOCAL_POS);
-		}
-	}
+	TopBase::ProcessAnimCapsule();
 }
 
 void Player::CollisionReserve(void)
 
 {
-	// アニメーションごとの位置調整
-	ProcessAnimPos();
-
-	ProcessAnimCapsule();
+	TopBase::CollisionReserve();
 }
 
 void Player::DrawDebug(void)

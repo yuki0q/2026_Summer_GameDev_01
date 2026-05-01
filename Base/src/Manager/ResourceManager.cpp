@@ -52,7 +52,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::TOP, res);
 
 	// ステージモデル
-	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Base.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Base2.mv1");
 	resourcesMap_.emplace(SRC::MAIN_STAGE, res);
 
 	// スカイドーム

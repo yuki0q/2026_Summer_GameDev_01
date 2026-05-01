@@ -1,44 +1,50 @@
 #pragma once
-#include "TopBase.h"
+#include "CharactorBase.h"
 
-class Player : public TopBase
+class TopBase : public CharactorBase
 {
 
 public:
 
-	Player(void);
-	virtual ~Player(void);
+	enum class ANIM_TYPE
+	{
+		IDLE,
+		RUN,
+		FAST_RUN,
+		JUMP,
+		//MAX,
+	};
+
+	TopBase(void);
+	virtual ~TopBase(void);
 
 	// 描画
-	void Draw(void)override;
+	virtual void Draw(void)override;
 
 	// 解放
-	void Release(void)override;
+	virtual void Release(void)override;
 
 protected:
 
 	// リソースロード
-	void InitLoad(void) override;
+	virtual void InitLoad(void) override;
 
 	// 大きさ、回転、座標の初期化
-	void InitTransform(void) override;
+	virtual void InitTransform(void) override;
 
 	// 衝突判定の初期化
-	void InitCollider(void) override;
+	virtual void InitCollider(void) override;
 
 	// アニメーションの初期化
-	void InitAnimation(void) override;
+	virtual void InitAnimation(void) override;
 
 	// 初期化後の個別処理
-	void InitPost(void) override;
+	virtual void InitPost(void) override;
 
 	// 更新系
-	void UpdateProcess(void) override;
+	virtual void UpdateProcess(void) override;
 
-	void UpdateProcessPost(void) override;
-
-
-private:
+	virtual void UpdateProcessPost(void) override;
 
 	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 75.0f, 0.0f };
 
@@ -92,25 +98,29 @@ private:
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
 	// 操作
-	void ProcessMove(void) override;
-	void ProcessJump(void) override;
-	void ProcessAnimPos(void) override;
-	void ProcessAnimCapsule(void) override;
+	virtual void ProcessMove(void);
+	virtual void ProcessJump(void);
+	virtual void ProcessAnimPos(void);
+	virtual	void ProcessAnimCapsule(void);
 
 	// 衝突判定
-	void CollisionReserve(void) override;
+	virtual void CollisionReserve(void) override;
 
 	// デバッグ描画
-	void DrawDebug(void) override;
+	virtual void DrawDebug(void);
 
 	float topsSpeed_;
 	float topsStamina_;
 
-	// プレイヤーの回転の中心点座標
+	//	コマの回転の中心点座標
 	VECTOR centorPos_;
 	VECTOR centorRot_;
 
 	VECTOR centorMovePow_;
 
 	Quaternion centorQuaRot_;
+
+private:
+
+	
 };

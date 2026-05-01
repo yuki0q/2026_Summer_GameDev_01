@@ -168,6 +168,7 @@
     <ClCompile Include="src\Utility\MatrixUtility.cpp" />
     <ClCompile Include="src\Scene\TopSelectScene.cpp" />
     <ClCompile Include="src\Object\Common\Transform.cpp" />
+    <ClCompile Include="src\Object\Actor\Charactor\TopBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Object\Actor\Charactor\Player.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="src\Utility\MatrixUtility.h" />
     <ClInclude Include="src\Scene\TopSelectScene.h" />
     <ClInclude Include="src\Object\Common\Transform.h" />
+    <ClInclude Include="src\Object\Actor\Charactor\TopBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
