@@ -1,4 +1,5 @@
 #include "../../../Utility/AsoUtility.h"
+#include "../../../Utility/MatrixUtility.h"
 #include "../../../Manager/ResourceManager.h"
 #include "../../../Manager/Resource.h"
 #include "../../../Manager/SceneManager.h"
@@ -13,7 +14,11 @@ Player::Player(void)
 	:
 	CharactorBase(),
 	centorMovePow_(AsoUtility::VECTOR_ZERO),
-	centorPos_(AsoUtility::VECTOR_ZERO)
+	centorPos_(AsoUtility::VECTOR_ZERO),
+	centorRot_(AsoUtility::VECTOR_ZERO),
+	centorQuaRot_(Quaternion::Identity()),
+	topsSpeed_(0.0f),
+	topsStamina_(0.0f)
 {
 }
 
@@ -95,6 +100,12 @@ void Player::InitPost(void)
 	isAnim_ = false;
 
 	centorPos_ = PLAYER_ROT_CENTER_POS;
+
+	transform_.localPos = { 100.0f,0.0f,100.0f };
+
+	topsSpeed_ = SPEED_MOVE;
+
+	topsStamina_ = TOPS_DEFAULT_STAMINA;
 }
 
 void Player::UpdateProcess(void)
@@ -108,12 +119,42 @@ void Player::UpdateProcess(void)
 	transform_.quaRot = Quaternion::Mult(transform_.quaRot, 
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
-	centorPos_.y = transform_.pos.y;
+	centorQuaRot_ = Quaternion::Mult(centorQuaRot_,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpeed_ *
+			topsStamina_ / TOPS_DEFAULT_STAMINA), AsoUtility::AXIS_Y));
 
-	if(transform_.pos.y < -425.0f)
+	// 行列の合成
+	MATRIX selfMat = Quaternion::ToMatrix(Quaternion::Mult(transform_.quaRotLocal, transform_.quaRot));
+
+	// 親（プレイヤーの回転）
+	MATRIX parentMat = MatrixUtility::GetMatrixRotateXYZ(
+		Quaternion::ToEuler(Quaternion::Mult(centorQuaRot_,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y))));
+
+	// 行列の合成(子 : 、 親 : プレイヤー)
+	MATRIX mat = MatrixUtility::Multiplication(selfMat, parentMat);
+
+	// 行列を使用してモデルの角度を設定
+	MV1SetRotationMatrix(transform_.modelId, mat);
+
+	//ローカル座標を親の回転行列で回転
+	VECTOR localRotPos_ = VTransform(transform_.localPos, parentMat);
+
+	// ワールド座標
+	transform_.pos = VAdd(localRotPos_, { centorPos_.x,transform_.pos.y,centorPos_.z });
+
+	//centorPos_.y = transform_.pos.y;
+	topsStamina_ -= scnMng_.GetDeltaTime() * (topsSpeed_ / 15.0f * 10.0f); // スタミナの減少量を調整
+	if (topsStamina_ < 0.0f)
+	{
+		topsStamina_ = 0.0f;
+	}
+
+	if(transform_.pos.y < -425.0f|| topsStamina_ <= 0.0f)
 	{
 		transform_.pos = PLAYER_DEFAULT_POS;
 		centorPos_ = PLAYER_ROT_CENTER_POS;
+		topsStamina_ = TOPS_DEFAULT_STAMINA;
 	}
 
 	transform_.Update();
@@ -132,6 +173,7 @@ void Player::ProcessMove(void)
 	bool isDash = false;
 
 	moveSpeed_ = 0.0f;
+	topsSpeed_ = SPEED_MOVE;
 
 	//movePow_ = AsoUtility::VECTOR_ZERO;
 	centorMovePow_ = AsoUtility::VECTOR_ZERO;
@@ -170,15 +212,16 @@ void Player::ProcessMove(void)
 
 	}
 
+	if (isDash)
+	{
+		moveSpeed_ = SPEED_DASH;
+		topsSpeed_ = SPEED_DASH;
+	}
+
 	if (!AsoUtility::EqualsVZero(dir))
 	{
 		// 移動スピード
 		moveSpeed_ = SPEED_MOVE;
-
-		if (isDash)
-		{
-			moveSpeed_ = SPEED_DASH;
-		}
 
 		// ジャンプ中はアニメーションを変えない
 		if (!isJump_)
@@ -204,7 +247,7 @@ void Player::ProcessMove(void)
 
 		// 移動量を計算
 		//movePow_ = VScale(moveDir_, moveSpeed_);
-		centorMovePow_ = VScale(moveDir_, moveSpeed_);
+		centorMovePow_ = VScale(moveDir_, moveSpeed_ * (topsStamina_ / TOPS_DEFAULT_STAMINA));
 
 		// 移動処理
 		centorPos_ = VAdd(centorPos_, centorMovePow_);
@@ -333,5 +376,6 @@ void Player::DrawDebug(void)
 {
 	DrawFormatString(15, 20, 0x000000, "コマの位置:,%f,%f,%f", transform_.pos.x, transform_.pos.y, transform_.pos.z);
 	DrawFormatString(15, 40, 0x000000, "回転の中心:,%f,%f,%f", centorPos_.x, centorPos_.y, centorPos_.z);
+	DrawFormatString(15, 60, 0x000000, "スタミナ:,%f", topsStamina_);
 	DrawSphere3D(centorPos_, 30.0f, 16, 0xFF0000, 0xFF0000, true);
 }

@@ -94,6 +94,8 @@ private:
 	// プレイヤーの回転の中心点の初期座標
 	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, 0.0f };
 
+	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
+
 	// 操作
 	void ProcessMove(void);
 	void ProcessJump(void);
@@ -106,10 +108,14 @@ private:
 	// デバッグ描画
 	void DrawDebug(void);
 
-	float i;
+	float topsSpeed_;
+	float topsStamina_;
 
 	// プレイヤーの回転の中心点座標
 	VECTOR centorPos_;
+	VECTOR centorRot_;
 
 	VECTOR centorMovePow_;
+
+	Quaternion centorQuaRot_;
 };
