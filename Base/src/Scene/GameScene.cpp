@@ -3,7 +3,7 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/Camera.h"
 #include "../Manager/ResourceManager.h"
-//#include "../Manager/EnemyManager.h"
+#include "../Manager/EnemyManager.h"
 #include "../Manager/Resource.h"
 #include "../Object/Actor/NormalStage.h"
 #include "../Object/Actor/Charactor/Player.h"
@@ -14,7 +14,7 @@ GameScene::GameScene(void)
 	:
 	normalStage_(nullptr),
 	player_(nullptr),
-	//enemyManager_(nullptr),
+	enemyManager_(nullptr),
 	shadowMapHandle_(0),
 	SceneBase()
 {
@@ -35,8 +35,8 @@ void GameScene::Init(void)
 	normalStage_->Init();
 
 	// エネミー管理
-	/*enemyManager_ = new EnemyManager(player_);
-	enemyManager_->Init();*/
+	enemyManager_ = new EnemyManager(player_);
+	enemyManager_->Init();
 
 	const ColliderBase* stageCollider =
 		normalStage_->GetOwnCollider(static_cast<int>(NormalStage::COLLIDER_TYPE::MODEL));
@@ -44,16 +44,26 @@ void GameScene::Init(void)
 	// ステージモデルのコライダーをプレイヤーに登録
 	player_->AddHitCollider(stageCollider);
 
-	// ステージモデルのコライダーをエネミーに登録
-	//enemyManager_->AddHitCollider(stageCollider);
+	for (auto& enemy : enemyManager_->GetEemies())
+	{
+		// エネミーのコライダーをプレイヤーに登録
+		player_->
+			AddHitCollider(enemy->GetOwnCollider(static_cast<int>
+				(CharactorBase::COLLIDER_TYPE::CAPSULE)));
+	}
 
-	//// プレイヤーのコライダーをエネミーに登録
-	//enemyManager_->AddHitCollider(player_->GetOwnCollider(static_cast<int>(CharactorBase::COLLIDER_TYPE::CAPSULE)));
+	// ステージモデルのコライダーをエネミーに登録
+	enemyManager_->AddHitCollider(stageCollider);
+
+	// プレイヤーのコライダーをエネミーに登録
+	enemyManager_->
+		AddHitCollider(player_->GetOwnCollider(static_cast<int>
+			(CharactorBase::COLLIDER_TYPE::CAPSULE)));
 
 	// 追従カメラモードに変更
 	Camera* camera = sceMng_.GetCamera();
 	camera->SetFollow(&normalStage_->GetTransform());
-//	camera->SetFollow(&normalStage_->GetTransform());
+	camera->SetFollow(&normalStage_->GetTransform());
 	camera->ChangeMode(Camera::MODE::FOLLOW);
 	camera->AddHitCollider(stageCollider);
 
@@ -79,7 +89,8 @@ void GameScene::Update(void)
 
 	normalStage_->Update();
 	player_->Update();
-	//enemyManager_->Update();
+	enemyManager_->Update();
+	Collision();
 }
 
 void GameScene::Draw(void)
@@ -88,7 +99,7 @@ void GameScene::Draw(void)
 	ShadowMap_DrawSetup(shadowMapHandle_);
 
 	player_->Draw();
-	//enemyManager_->Draw();
+	enemyManager_->Draw();
 	normalStage_->Draw();
 
 	// シャドウマップへの描画を終了
@@ -98,7 +109,7 @@ void GameScene::Draw(void)
 	SetUseShadowMap(0, shadowMapHandle_);
 
 	player_->Draw();
-	//enemyManager_->Draw();
+	enemyManager_->Draw();
 	normalStage_->Draw();
 	
 	// 描画に使用するシャドウマップの設定を解除
@@ -115,6 +126,57 @@ void GameScene::Release(void)
 	player_->Release();
 	delete player_;
 
-	/*enemyManager_->Release();
-	delete enemyManager_;*/
+	enemyManager_->Release();
+	delete enemyManager_;
 }
+
+void GameScene::Collision(void) 
+{
+	CollisionResolve();
+
+}
+
+// コマ同士の衝突
+void GameScene::CollisionResolve(void)
+{
+	//bool isHitCol = false;
+	//for (auto& enemy : enemyManager_->GetEemies())
+	//{
+	//	VECTOR diff = VSub(enemy->GetTransform().pos, player_->GetTransform().pos);
+	//	float dist = VSize(diff);
+	//	float hitDist = player_->GetRadius() + enemy->GetRadius();
+
+	//	// 衝突していない、または重なりすぎている場合は無視
+	//	if (dist >= hitDist || dist <= 0.0001f) return;
+
+	//}
+
+	
+}
+//// カプセルコライダ
+	//int capsuleType = static_cast<int>(COLLIDER_TYPE::CAPSULE);
+
+	//// カプセルコライダが無ければ処理を抜ける
+	//if (ownColliders_.count(capsuleType) == 0) return;
+
+	//// カプセルコライダ情報
+	//ColliderCapsule* colliderCapsule =
+	//	dynamic_cast<ColliderCapsule*>(ownColliders_.at(capsuleType));
+	//if (colliderCapsule == nullptr) return;
+
+	//// 登録されている衝突物を全てチェック
+	//for (const auto& hitCol : hitColliders_)
+	//{
+	//	// モデル以外は処理を飛ばす
+	//	if (hitCol->GetShape() != ColliderBase::SHAPE::MODEL) continue;
+
+	//	// 派生クラスへキャスト
+	//	const ColliderModel* colliderModel =
+	//		dynamic_cast<const ColliderModel*>(hitCol);
+
+	//	if (colliderModel == nullptr) continue;
+
+	//	colliderCapsule->PushBackAlongNormal(colliderModel, transform_, CNT_TRY_COLLISION,
+	//		COLLISION_BACK_DIS, true, false);
+
+	//}

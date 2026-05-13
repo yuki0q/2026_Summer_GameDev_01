@@ -12,8 +12,8 @@ public:
 	// 種別
 	enum class TYPE
 	{
-		RAT,
-		ROBOT,
+		NORMAL_TOP,
+		TOP,
 	};
 
 	// エネミーデータ

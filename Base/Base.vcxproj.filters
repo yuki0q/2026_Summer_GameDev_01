@@ -130,6 +130,9 @@
     <ClCompile Include="src\Object\Actor\Charactor\Enemy\EnemyBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -193,5 +196,6 @@
     <ClInclude Include="src\Object\Actor\Charactor\TopBase.h" />
     <ClInclude Include="src\Manager\EnemyManager.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Enemy\EnemyBase.h" />
+    <ClInclude Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.h" />
   </ItemGroup>
 </Project>

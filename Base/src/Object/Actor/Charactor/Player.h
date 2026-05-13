@@ -46,12 +46,6 @@ private:
 
 	static constexpr VECTOR PLAYER_DEFAULT_ROT_LOCAL = { 0.0f,180.0f * DX_PI_F / 180.0f,0.0f };
 
-	// 移動速度(通常)
-	static constexpr float SPEED_MOVE = 15.0f;
-
-	// 移動速度(ダッシュ)
-	static constexpr float SPEED_DASH = 30.0f;
-
 	// 衝突判定用線分開始
 	static constexpr VECTOR COL_LINE_START_LOCAL_POS = { 0.0f, 80.0f, 0.0f };
 
@@ -80,15 +74,29 @@ private:
 	static constexpr VECTOR COL_CAPSULE_DOWN_LOCAL_POS = { 0.0f, 30.0f, 0.0f };
 
 	// 衝突判定用カプセル球体半径
-	static constexpr float COL_CAPSULE_RADIUS = 20.0f;
+	static constexpr float COL_CAPSULE_RADIUS = 80.0f;
+	//static constexpr float COL_CAPSULE_RADIUS = 20.0f;
+
+	
 
 	// プレイヤーの回転の中心点の初期座標
 	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, 0.0f };
 
 	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
 
+	// コマのスタミナ
 	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
 
+	// コマの重さ
+	static constexpr float TOPS_WEIGHT = 30.0f;
+
+	// 移動速度(通常)
+	static constexpr float SPEED_MOVE = 15.0f;
+
+	// 移動速度(ダッシュ)
+	static constexpr float SPEED_DASH = 30.0f;
+
+	// コマのリスポーンY座標
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
 	// 操作
@@ -96,15 +104,13 @@ private:
 	void ProcessJump(void) override;
 	void ProcessAnimPos(void) override;
 	void ProcessAnimCapsule(void) override;
+	void ProcessTopMove(void);
 
 	// 衝突判定
 	void CollisionReserve(void) override;
 
 	// デバッグ描画
 	void DrawDebug(void) override;
-
-	float topsSpeed_;
-	float topsStamina_;
 
 	// プレイヤーの回転の中心点座標
 	VECTOR centorPos_;

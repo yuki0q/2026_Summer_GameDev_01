@@ -18,7 +18,11 @@ TopBase::TopBase(void)
 	centorRot_(AsoUtility::VECTOR_ZERO),
 	centorQuaRot_(Quaternion::Identity()),
 	topsSpeed_(0.0f),
-	topsStamina_(0.0f)
+	topsSpin_(0.0f),
+	topsWeight_(0.0f),
+	topsRadius_(0.0f),
+	topsVel_(AsoUtility::VECTOR_ZERO),
+	prevPos_(AsoUtility::VECTOR_ZERO)
 {
 }
 
@@ -35,6 +39,26 @@ void TopBase::Draw(void)
 void TopBase::Release(void)
 {
 	CharactorBase::Release();
+}
+
+float TopBase::GetRadius(void)
+{
+	return topsRadius_;
+}
+
+float TopBase::GetSpeed(void)
+{
+	return topsSpeed_;
+}
+
+float TopBase::GetWeight(void)
+{
+	return topsWeight_;
+}
+
+VECTOR TopBase::GetVel(void)
+{
+	return topsVel_;
 }
 
 void TopBase::InitLoad(void)
@@ -69,104 +93,6 @@ void TopBase::UpdateProcessPost(void)
 
 void TopBase::ProcessMove(void)
 {
-	//auto& ins = InputManager::GetInstance();
-
-	//VECTOR dir = AsoUtility::VECTOR_ZERO;
-
-	//bool isDash = false;
-
-	//moveSpeed_ = 0.0f;
-	//topsSpeed_ = SPEED_MOVE;
-
-	////movePow_ = AsoUtility::VECTOR_ZERO;
-	//centorMovePow_ = AsoUtility::VECTOR_ZERO;
-
-	//// ゲームパッドが接続されている数で処理を分ける
-	//if (GetJoypadNum() == 0)
-	//{
-	//	// WASDで移動する
-	//	if (ins.IsNew(KEY_INPUT_W)) { dir = AsoUtility::DIR_F; }
-	//	if (ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_L; }
-	//	if (ins.IsNew(KEY_INPUT_S)) { dir = AsoUtility::DIR_B; }
-	//	if (ins.IsNew(KEY_INPUT_D)) { dir = AsoUtility::DIR_R; }
-
-	//	if (ins.IsNew(KEY_INPUT_W) && ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_FL; }
-	//	if (ins.IsNew(KEY_INPUT_W) && ins.IsNew(KEY_INPUT_D)) { dir = AsoUtility::DIR_FR; }
-	//	if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_BL; }
-	//	if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_D)) { dir = AsoUtility::DIR_BR; }
-
-	//	if (ins.IsNew(KEY_INPUT_RSHIFT)) { isDash = true; }
-
-	//}
-	//else
-	//{
-	//	// 接続されているゲームパッド１の情報を取得
-	//	InputManager::JOYPAD_IN_STATE padState =
-	//		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
-
-	//	// アナログキーの入力値から方向を取得
-	//	dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
-
-	//	if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
-	//		InputManager::JOYPAD_BTN::R_TRIGGER))
-	//	{
-	//		isDash = true;
-	//	}
-
-	//}
-
-	//if (isDash)
-	//{
-	//	moveSpeed_ = SPEED_DASH;
-	//	topsSpeed_ = SPEED_DASH;
-	//}
-
-	//if (!AsoUtility::EqualsVZero(dir))
-	//{
-	//	// 移動スピード
-	//	moveSpeed_ = SPEED_MOVE;
-
-	//	// ジャンプ中はアニメーションを変えない
-	//	if (!isJump_)
-	//	{
-	//		// アニメーション
-	//		if (isDash)
-	//		{
-	//			animController_->Play(
-	//				static_cast<int>(ANIM_TYPE::FAST_RUN), true);
-	//		}
-	//		else
-	//		{
-	//			animController_->Play(
-	//				static_cast<int>(ANIM_TYPE::RUN), true);
-	//		}
-	//	}
-
-	//	// Y軸のみのカメラ角度を取得
-	//	Quaternion cameraRot = scnMng_.GetCamera()->GetQuaRotY();
-
-	//	// 移動方向をカメラに合わせる
-	//	moveDir_ = Quaternion::PosAxis(cameraRot, dir);
-
-	//	// 移動量を計算
-	//	//movePow_ = VScale(moveDir_, moveSpeed_);
-	//	centorMovePow_ = VScale(moveDir_, moveSpeed_ * (topsStamina_ / TOPS_DEFAULT_STAMINA));
-
-	//	// 移動処理
-	//	centorPos_ = VAdd(centorPos_, centorMovePow_);
-	//	//transform_.pos = VAdd(transform_.pos, movePow_);
-	//}
-	//else
-	//{
-	//	// ジャンプ中はアニメーションを変えない
-	//	if (!isJump_)
-	//	{
-	//		// IDLE状態に戻す
-	//		animController_->Play(
-	//			static_cast<int>(ANIM_TYPE::IDLE), true);
-
-	//	}
-	//}
 }
 
 void TopBase::ProcessJump(void)

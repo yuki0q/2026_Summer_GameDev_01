@@ -24,6 +24,14 @@ public:
 	// 解放
 	virtual void Release(void)override;
 
+	float GetRadius(void);
+
+	float GetSpeed(void);
+
+	float GetWeight(void);
+
+	VECTOR GetVel(void);
+
 protected:
 
 	// リソースロード
@@ -110,7 +118,14 @@ protected:
 	virtual void DrawDebug(void);
 
 	float topsSpeed_;
-	float topsStamina_;
+	float topsSpin_;
+	float topsWeight_;
+	float topsRadius_;
+
+	VECTOR topsVel_;
+
+	// コマの前座標
+	VECTOR prevPos_;
 
 	//	コマの回転の中心点座標
 	VECTOR centorPos_;

@@ -16,9 +16,7 @@ Player::Player(void)
 	centorMovePow_(AsoUtility::VECTOR_ZERO),
 	centorPos_(AsoUtility::VECTOR_ZERO),
 	centorRot_(AsoUtility::VECTOR_ZERO),
-	centorQuaRot_(Quaternion::Identity()),
-	topsSpeed_(0.0f),
-	topsStamina_(0.0f)
+	centorQuaRot_(Quaternion::Identity())
 {
 }
 
@@ -42,7 +40,7 @@ void Player::InitLoad(void)
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();
 
-	transform_.SetModel(resMng_.Load(ResourceManager::SRC::TOP).handleId_);
+	transform_.SetModel(resMng_.Load(ResourceManager::SRC::BLUE_TOP).handleId_);
 }
 
 void Player::InitTransform(void)
@@ -103,9 +101,17 @@ void Player::InitPost(void)
 
 	transform_.localPos = TOPS_DEFAULT_LOCAL_POS;
 
-	topsSpeed_ = SPEED_MOVE;
+	topsSpeed_ = 0.0f;
 
-	topsStamina_ = TOPS_DEFAULT_STAMINA;
+	topsSpin_ = TOPS_DEFAULT_STAMINA;
+
+	topsWeight_ = TOPS_WEIGHT;
+
+	topsRadius_ = COL_CAPSULE_RADIUS;
+
+	topsVel_ = { 0.0f,0.0f,0.0f };
+
+	prevPos_ = { 0.0f,0.0f,0.0f };
 }
 
 void Player::UpdateProcess(void)
@@ -118,48 +124,10 @@ void Player::UpdateProcess(void)
 	// ジャンプ処理
 	ProcessJump();
 
-	transform_.quaRot = Quaternion::Mult(transform_.quaRot,
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
+	// コマの回転・移動処理
+	ProcessTopMove();
 
-	centorQuaRot_ = Quaternion::Mult(centorQuaRot_,
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpeed_ *
-			topsStamina_ / TOPS_DEFAULT_STAMINA), AsoUtility::AXIS_Y));
-
-	// 行列の合成
-	MATRIX selfMat = Quaternion::ToMatrix(Quaternion::Mult(transform_.quaRotLocal, transform_.quaRot));
-
-	// 親（プレイヤーの回転）
-	MATRIX parentMat = MatrixUtility::GetMatrixRotateXYZ(
-		Quaternion::ToEuler(Quaternion::Mult(centorQuaRot_,
-			Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y))));
-
-	// 行列の合成(子 : 、 親 : プレイヤー)
-	MATRIX mat = MatrixUtility::Multiplication(selfMat, parentMat);
-
-	// 行列を使用してモデルの角度を設定
-	MV1SetRotationMatrix(transform_.modelId, mat);
-
-	//ローカル座標を親の回転行列で回転
-	VECTOR localRotPos_ = VTransform(transform_.localPos, parentMat);
-
-	// ワールド座標
-	transform_.pos = VAdd(localRotPos_, { centorPos_.x,transform_.pos.y,centorPos_.z });
-
-	//centorPos_.y = transform_.pos.y;
-	topsStamina_ -= scnMng_.GetDeltaTime() * (topsSpeed_ / 15.0f * 10.0f); // スタミナの減少量を調整
-	if (topsStamina_ < 0.0f)
-	{
-		topsStamina_ = 0.0f;
-	}
-
-	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsStamina_ <= 0.0f)
-	{
-		transform_.pos = PLAYER_DEFAULT_POS;
-		centorPos_ = PLAYER_ROT_CENTER_POS;
-		topsStamina_ = TOPS_DEFAULT_STAMINA;
-	}
-
-	transform_.Update();
+	
 }
 
 void Player::UpdateProcessPost(void)
@@ -250,7 +218,7 @@ void Player::ProcessMove(void)
 
 		// 移動量を計算
 		//movePow_ = VScale(moveDir_, moveSpeed_);
-		centorMovePow_ = VScale(moveDir_, moveSpeed_ * (topsStamina_ / TOPS_DEFAULT_STAMINA));
+		centorMovePow_ = VScale(moveDir_, moveSpeed_ * (topsSpin_ / TOPS_DEFAULT_STAMINA));
 
 		// 移動処理
 		centorPos_ = VAdd(centorPos_, centorMovePow_);
@@ -322,6 +290,74 @@ void Player::ProcessAnimCapsule(void)
 	TopBase::ProcessAnimCapsule();
 }
 
+void Player::ProcessTopMove(void)
+{
+	transform_.quaRot = Quaternion::Mult(transform_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpeed_ *
+			topsSpin_ / TOPS_DEFAULT_STAMINA), AsoUtility::AXIS_Y));
+
+	centorQuaRot_ = Quaternion::Mult(centorQuaRot_,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpeed_ *
+			topsSpin_ / TOPS_DEFAULT_STAMINA), AsoUtility::AXIS_Y));
+
+	// 行列の合成
+	MATRIX selfMat = Quaternion::ToMatrix(Quaternion::Mult(transform_.quaRotLocal, transform_.quaRot));
+
+	// 親（プレイヤーの回転）
+	MATRIX parentMat = MatrixUtility::GetMatrixRotateXYZ(
+		Quaternion::ToEuler(Quaternion::Mult(centorQuaRot_,
+			Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y))));
+
+	// 行列の合成(子 : 、 親 : プレイヤー)
+	MATRIX mat = MatrixUtility::Multiplication(selfMat, parentMat);
+
+	// 行列を使用してモデルの角度を設定
+	MV1SetRotationMatrix(transform_.modelId, mat);
+
+	//ローカル座標を親の回転行列で回転
+	VECTOR localRotPos_ = VTransform(transform_.localPos, parentMat);
+
+	// ワールド座標
+	transform_.pos = VAdd(localRotPos_, { centorPos_.x,transform_.pos.y,centorPos_.z });
+
+	//centorPos_.y = transform_.pos.y;
+	//topsStamina_ -= scnMng_.GetDeltaTime() * (topsSpeed_ / 15.0f * 10.0f); // スタミナの減少量を調整
+	topsSpin_ *= 0.998f;
+	if (topsSpin_ < 0.0f)
+	{
+		topsSpin_ = 0.0f;
+	}
+
+	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
+	{
+		transform_.pos = PLAYER_DEFAULT_POS;
+		centorPos_ = PLAYER_ROT_CENTER_POS;
+		topsSpin_ = TOPS_DEFAULT_STAMINA;
+	}
+
+	float dt = scnMng_.GetDeltaTime();
+
+	if (dt > 0.0f)
+	{
+		// 位置差分
+		VECTOR move = VSub(transform_.pos, prevPos_);
+
+		// 速度ベクトル
+		topsVel_ = VScale(move, 1.0f / dt);
+
+		// 速度の大きさ
+		topsSpeed_ = VSize(topsVel_);
+	}
+
+	// 摩擦
+	topsVel_ = VScale(topsVel_, 0.97f);
+
+	// 次フレーム用保存
+	prevPos_ = transform_.pos;
+
+	transform_.Update();
+}
+
 void Player::CollisionReserve(void)
 
 {
@@ -332,6 +368,6 @@ void Player::DrawDebug(void)
 {
 	DrawFormatString(15, 20, 0x000000, "コマの位置:,%f,%f,%f", transform_.pos.x, transform_.pos.y, transform_.pos.z);
 	DrawFormatString(15, 40, 0x000000, "回転の中心:,%f,%f,%f", centorPos_.x, centorPos_.y, centorPos_.z);
-	DrawFormatString(15, 60, 0x000000, "スタミナ:,%f", topsStamina_);
+	DrawFormatString(15, 60, 0x000000, "スタミナ:,%f", topsSpin_);
 	DrawSphere3D(centorPos_, 30.0f, 16, 0xFF0000, 0xFF0000, true);
 }

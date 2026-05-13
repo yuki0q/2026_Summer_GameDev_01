@@ -3,7 +3,7 @@
 #include "../Object/Common/Transform.h"
 class NormalStage;
 class Player;
-//class EnemyManager;
+class EnemyManager;
 
 class GameScene : public SceneBase
 {
@@ -28,11 +28,15 @@ public:
 	// ‰ð•ú
 	void Release(void) override;
 
+	void Collision(void);
+
+	void CollisionResolve(void);
+
 private:
 
 	NormalStage* normalStage_;
 	Player* player_;
-	//EnemyManager* enemyManager_;
+	EnemyManager* enemyManager_;
 
 	int shadowMapHandle_;
 };
