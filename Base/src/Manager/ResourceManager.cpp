@@ -85,6 +85,15 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "Surprise.png");
 	resourcesMap_.emplace(SRC::UI_SURPRISE, res);
 
+	res = new RES(RES_T::IMG, PATH_IMG + "3.png");
+	resourcesMap_.emplace(SRC::IMAGE_3, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "2.png");
+	resourcesMap_.emplace(SRC::IMAGE_2, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "1.png");
+	resourcesMap_.emplace(SRC::IMAGE_1, res);
+
 }
 
 void ResourceManager::Release(void)

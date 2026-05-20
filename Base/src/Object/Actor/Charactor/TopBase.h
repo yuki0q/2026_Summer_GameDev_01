@@ -26,11 +26,25 @@ public:
 
 	float GetRadius(void);
 
-	float GetSpeed(void);
+	float GetSpin(void);
+	void SpinScrape(float spin);
 
 	float GetWeight(void);
 
 	VECTOR GetVel(void);
+	void SetVel(VECTOR vel);
+
+	VECTOR GetPos(void);
+	void SetPos(VECTOR pos);
+
+	// 衝突による傾き（外部から加算できるように）
+	void AddCollisionTilt(VECTOR impulseDir, float impulseMag);
+
+	// ステージ衝突による傾き適用
+	void ApplyStageTilt(VECTOR hitNormal, float impactSpeed) override;
+
+	// 目標座標を設定（GameScene から呼ぶ）
+	void SetCollisionTarget(VECTOR targetPos);
 
 protected:
 
@@ -101,13 +115,14 @@ protected:
 
 	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
 
-	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
+	static constexpr float TOPS_SPIN_MAX = 100.0f;
 
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
 	// 操作
 	virtual void ProcessMove(void);
 	virtual void ProcessJump(void);
+	virtual void ProcessTopMove(void);
 	virtual void ProcessAnimPos(void);
 	virtual	void ProcessAnimCapsule(void);
 
@@ -117,10 +132,30 @@ protected:
 	// デバッグ描画
 	virtual void DrawDebug(void);
 
+	// 衝突による目標座標
+	VECTOR collisionTargetPos_;
+
+	// 衝突目標座標が有効かどうか
+	bool hasCollisionTarget_;
+
 	float topsSpeed_;
 	float topsSpin_;
 	float topsWeight_;
 	float topsRadius_;
+	float topsMovement_;
+
+	float tiltX_;
+	float tiltZ_;
+	// 傾きの軸角度（ラジアン）
+	float tiltAngle_;      // 傾きの大きさ
+	float tiltPhase_;      // 歳差運動の位相
+
+	// 傾き目標値（衝突由来）
+	float collisionTiltX_;
+	float collisionTiltZ_;
+
+	VECTOR respawnPos_;
+	VECTOR respawnCenterPos_;
 
 	VECTOR topsVel_;
 
@@ -128,12 +163,12 @@ protected:
 	VECTOR prevPos_;
 
 	//	コマの回転の中心点座標
-	VECTOR centorPos_;
-	VECTOR centorRot_;
+	VECTOR centerPos_;
+	VECTOR centerRot_;
 
-	VECTOR centorMovePow_;
+	VECTOR centerMovePow_;
 
-	Quaternion centorQuaRot_;
+	Quaternion centerQuaRot_;
 
 private:
 

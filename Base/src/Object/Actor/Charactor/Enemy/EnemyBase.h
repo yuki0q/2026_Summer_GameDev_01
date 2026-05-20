@@ -53,7 +53,9 @@ protected:
 	int hp_;
 
 	// 初期位置
-	const VECTOR defaultPos_;
+	VECTOR defaultPos_;
+
+	VECTOR defaultCenterPos_;
 
 	// 移動可能範囲
 	const float moveRange_;
@@ -75,6 +77,8 @@ protected:
 
 	// 更新系
 	virtual void UpdateProcessPost(void) override {}
+
+	void ProcessTopMove(void) override;
 
 	// 移動可能範囲判定
 	bool InMovableRange(void) const;

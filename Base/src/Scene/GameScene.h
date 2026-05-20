@@ -39,4 +39,10 @@ private:
 	EnemyManager* enemyManager_;
 
 	int shadowMapHandle_;
+	int countTime_;
+	bool isStart_;
+
+	int image3;
+	int image2;
+	int image1;
 };

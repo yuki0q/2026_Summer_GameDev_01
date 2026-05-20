@@ -29,32 +29,6 @@ void TitleScene::Init(void)
 
 	imgPushSpace_ = resMng_.Load(ResourceManager::SRC::TITLE_PUSH_SPACE).handleId_;
 
-	//// ƒƒCƒ“˜f¯
-	//bigPlanet_.SetModel(resMng_.Load(ResourceManager::SRC::PIT_FALL_PLANET).handleId_);
-	//bigPlanet_.scl = AsoUtility::VECTOR_ONE;
-	//bigPlanet_.quaRot = Quaternion::Identity();
-	//bigPlanet_.quaRotLocal = Quaternion::Identity();
-	//bigPlanet_.pos = AsoUtility::VECTOR_ZERO;
-	//bigPlanet_.Update();
-
-	//// ¬˜f¯
-	//SpherePlanet_.SetModel(resMng_.Load(ResourceManager::SRC::SPHERE_PLANET).handleId_);
-	//SpherePlanet_.scl = SPHERE_PLANET_DEFAULT_SCALE;
-	//SpherePlanet_.quaRot = Quaternion::Identity();
-
-	//SpherePlanet_.quaRot = Quaternion::Euler(SPHERE_PLANET_ROT);
-
-	//SpherePlanet_.quaRotLocal = Quaternion::Identity();
-	///*SpherePlanet_.quaRotLocal = Quaternion::Mult(
-	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.y, AsoUtility::AXIS_Y));
-	//SpherePlanet_.quaRotLocal = Quaternion::Mult(
-	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.x, AsoUtility::AXIS_X));
-	//SpherePlanet_.quaRotLocal = Quaternion::Mult(
-	//	SpherePlanet_.quaRotLocal, Quaternion::AngleAxis(SpherePlanet_.localPos.z, AsoUtility::AXIS_Z));*/
-
-	//SpherePlanet_.pos = SPHERE_PLANET_DEFAULT_POS;
-	//SpherePlanet_.Update();
-
 	// ƒvƒŒƒCƒ„[
 	top_.SetModel(resMng_.Load(ResourceManager::SRC::TOP).handleId_);
 	top_.scl = PLAYER_DEFAULT_SCALE;
@@ -88,6 +62,8 @@ void TitleScene::Update(void)
 	////;Euler(0.0f, 0.0f, AsoUtility::Deg2RadF(-1.0f)));
 
 	//SpherePlanet_.Update();
+	top_.quaRot = Quaternion::Mult(top_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
 	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
 
@@ -100,8 +76,9 @@ void TitleScene::Update(void)
 	if (ins.IsTrgDown(KEY_INPUT_SPACE))
 	{
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+		//sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 	}
-
+	top_.Update();
 }
 
 void TitleScene::Draw(void)
@@ -113,10 +90,11 @@ void TitleScene::Draw(void)
 
 	MV1DrawModel(SpherePlanet_.modelId);*/
 
-	MV1DrawModel(top_.modelId);
-
-	DrawRotaGraph(IMG_TITLE_POS_X, IMG_TITLE_POS_Y, 1.0f, 0.0f, imgTitle_, true);
+	//DrawRotaGraph(IMG_TITLE_POS_X, IMG_TITLE_POS_Y, 1.0f, 0.0f, imgTitle_, true);
+	DrawBillboard3D(VGet(0.0f, 0.0f, -50.0f), 0.5f, 0.5f, 1000.0f, 0.0f, imgTitle_, true);
 	DrawRotaGraph(IMG_PUSH_SPACE_POS_X, IMG_PUSH_SPACE_POS_Y, 1.0f, 0.0f, imgPushSpace_, true);
+
+	MV1DrawModel(top_.modelId);
 
 
 }

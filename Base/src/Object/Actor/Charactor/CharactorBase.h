@@ -72,6 +72,8 @@ protected:
 	// ジャンプの入力受付時間
 	float stepJump_;
 
+	VECTOR topsVel_ = { 0.0f, 0.0f, 0.0f };
+
 	// リソースロード
 	virtual void InitLoad(void) override;
 
@@ -95,4 +97,6 @@ protected:
 	// 丸影描画
 	void DrawShadow(void);
 
+	// ステージ衝突による傾き（TopBase で実装）
+	virtual void ApplyStageTilt(VECTOR hitNormal, float impactSpeed) {}
 };

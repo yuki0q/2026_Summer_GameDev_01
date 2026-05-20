@@ -7,6 +7,7 @@
 #include "../../Collider/ColliderCapsule.h"
 #include "../../../Manager/Resource.h"
 #include "../../../Manager/ResourceManager.h"
+#include "../Charactor/TopBase.h"
 #include "CharactorBase.h"
 
 CharactorBase::CharactorBase(void)
@@ -157,8 +158,26 @@ void CharactorBase::CollisionCapsule(void)
 
 		if (colliderModel == nullptr) continue;
 
+		// 押し戻し前の座標を保存
+		VECTOR posBefore = transform_.pos;
+
 		colliderCapsule->PushBackAlongNormal(colliderModel, transform_, CNT_TRY_COLLISION,
 			COLLISION_BACK_DIS, true, false);
+
+		// 押し戻し量から壁法線を近似
+		VECTOR pushBack = VSub(transform_.pos, posBefore);
+		float pushDist = VSize(pushBack);
+
+		if (pushDist > 0.01f)
+		{
+			// 壁法線 = 押し戻し方向を正規化
+			VECTOR wallNormal = VScale(pushBack, 1.0f / pushDist);
+
+			// 衝撃速度 = 壁方向への速度成分
+			float impactSpeed = fabsf(VDot(topsVel_, wallNormal));
+
+			ApplyStageTilt(wallNormal, impactSpeed);
+		}
 
 	}
 }
@@ -193,11 +212,21 @@ void CharactorBase::CollisionGravity(void)
 
 		if (colliderModel == nullptr) continue;
 
+		// 着地前の下向き速度を保存（衝撃の強さとして使用）
+		float impactSpeed = fabsf(jumpPow_.y);
+
 		bool isHit = colliderLine_->PushBackUp(colliderModel, transform_, true, false);
 
 		if (isHit)
 		{
 			isJump_ = false;
+
+			// ステージ衝突による傾き
+			// 地面法線を取得（PushBackUpが処理済みなので上向き法線を近似）
+			// 平地 = (0,1,0)、傾斜面は実際の法線が必要な場合は
+			// ColliderLine側で法線を返せるよう拡張する
+			VECTOR groundNormal = { 0.0f, 1.0f, 0.0f };
+			ApplyStageTilt(groundNormal, impactSpeed);
 		}
 
 	}

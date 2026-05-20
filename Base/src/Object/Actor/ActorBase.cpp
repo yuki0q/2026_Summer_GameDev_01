@@ -50,7 +50,7 @@ void ActorBase::Draw(void)
 	// 所有しているコライダの描画
 	for (const auto& own : ownColliders_)
 	{
-		own.second->Draw();
+		//own.second->Draw();
 	}
 #endif // _DEBUG
 }

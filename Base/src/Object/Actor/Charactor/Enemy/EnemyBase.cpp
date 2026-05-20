@@ -1,4 +1,6 @@
 #include "../../../../Utility/AsoUtility.h"
+#include "../../../../Utility/MatrixUtility.h"
+#include "../../../../Manager/SceneManager.h"
 #include "EnemyBase.h"
 #include "../Player.h"
 
@@ -7,7 +9,8 @@ EnemyBase::EnemyBase(const EnemyBase::EnemyData& data, Player* player)
 	TopBase(),
 	type_(data.type),
 	hp_(data.hp),
-	defaultPos_(data.defaultPos),
+	defaultPos_(AsoUtility::VECTOR_ZERO),
+	defaultCenterPos_(AsoUtility::VECTOR_ZERO),
 	moveRange_(data.moveRange),
 	stateBase_(),
 	stateChanges_(),
@@ -54,4 +57,9 @@ void EnemyBase::ChangeState(int state)
 	stateBase_ = state;
 	// Šeó‘Ô‘JˆÚ‚Ì‰Šúˆ—
 	stateChanges_[stateBase_]();
+}
+
+void EnemyBase::ProcessTopMove(void)
+{
+	TopBase::ProcessTopMove();
 }

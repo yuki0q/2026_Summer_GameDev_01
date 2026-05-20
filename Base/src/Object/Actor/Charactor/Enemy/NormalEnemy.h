@@ -71,6 +71,11 @@ private:
 	// 衝突判定用カプセル下部球体
 	static constexpr VECTOR COL_CAPSULE_DOWN_LOCAL_POS = { 0.0f, 30.0f, 0.0f };
 
+	static constexpr VECTOR ENEMY_DEFAULT_POS = { 0.0f, 75.0f, 500.0f };
+
+	// プレイヤーの回転の中心点の初期座標
+	static constexpr VECTOR ENEMY_CENTER_DEFAULT_POS = { 0.0f, 75.0f, 500.0f };
+
 	// 衝突判定用カプセル球体半径
 	static constexpr float COL_CAPSULE_RADIUS = 80.0f;
 	//static constexpr float COL_CAPSULE_RADIUS = 20.0f;
@@ -79,13 +84,16 @@ private:
 	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
 
 	// コマの重さ
-	static constexpr float TOPS_WEIGHT = 15.0f;
+	static constexpr float TOPS_WEIGHT = 30.0f;
 
 	// 移動速度(通常)
 	static constexpr float SPEED_MOVE = 15.0f;
 
 	// 移動速度(ダッシュ)
 	static constexpr float SPEED_DASH = 30.0f;
+
+	// 相対座標の初期値
+	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
 
 	// 状態
 	STATE state_;

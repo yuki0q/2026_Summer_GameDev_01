@@ -23,5 +23,11 @@ private:
 	int imgSkillSelect_;
 	int imgSkillSelectText_;
 
+	// ƒ‚ƒfƒ‹
+	int modelBlue_;
+	int modelRed_;
+	int modelYellow_;
+	int modelGreen_;
+
 };
 

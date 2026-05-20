@@ -45,7 +45,7 @@ void ResolveCollision(Top& a, Top& b)
     // 衝撃量 j の計算
     float j = -(1.0f + e) * velAlongNormal;
     j /= (1.0f / a.mass + 1.0f / b.mass);
-
+    
     // 衝撃ベクトルを適用
     VECTOR impulse = VScale(normal, j);
 

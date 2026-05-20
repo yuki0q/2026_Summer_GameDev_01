@@ -21,7 +21,10 @@ public:
 		MAIN_STAGE,
 		SKY_DOME,
 		VIEW_RANGE,
-		UI_SURPRISE
+		UI_SURPRISE,
+		IMAGE_3,
+		IMAGE_2,
+		IMAGE_1
 	};
 
 	// 明示的にインステンスを生成する

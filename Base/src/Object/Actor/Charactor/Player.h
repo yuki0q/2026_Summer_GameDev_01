@@ -40,7 +40,7 @@ protected:
 
 private:
 
-	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 75.0f, 0.0f };
+	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 75.0f, -500.0f };
 
 	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 1.0f,1.0f,1.0f };
 
@@ -80,12 +80,10 @@ private:
 	
 
 	// プレイヤーの回転の中心点の初期座標
-	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, 0.0f };
+	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, -500.0f };
 
+	// 相対座標の初期値
 	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
-
-	// コマのスタミナ
-	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
 
 	// コマの重さ
 	static constexpr float TOPS_WEIGHT = 30.0f;
@@ -104,7 +102,7 @@ private:
 	void ProcessJump(void) override;
 	void ProcessAnimPos(void) override;
 	void ProcessAnimCapsule(void) override;
-	void ProcessTopMove(void);
+	void ProcessTopMove(void) override;
 
 	// 衝突判定
 	void CollisionReserve(void) override;
@@ -112,11 +110,11 @@ private:
 	// デバッグ描画
 	void DrawDebug(void) override;
 
-	// プレイヤーの回転の中心点座標
-	VECTOR centorPos_;
-	VECTOR centorRot_;
+	//// プレイヤーの回転の中心点座標
+	//VECTOR centorPos_;
+	//VECTOR centorRot_;
 
-	VECTOR centorMovePow_;
+	//VECTOR centorMovePow_;
 
-	Quaternion centorQuaRot_;
+	//Quaternion centorQuaRot_;
 };

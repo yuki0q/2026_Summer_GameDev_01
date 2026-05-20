@@ -32,12 +32,33 @@ void NormalEnemy::InitLoad(void)
 
 void NormalEnemy::InitTransform(void)
 {
-	transform_.scl = VScale(AsoUtility::VECTOR_ONE, SCALE);
-	//transform_.pos = { 0.0f, 100.0f, 1500.0f };
-	transform_.quaRot = Quaternion::Identity();
-	transform_.quaRotLocal = Quaternion::Euler(ROT);
+	respawnCenterPos_ = ENEMY_CENTER_DEFAULT_POS;
 
+	respawnPos_ = ENEMY_DEFAULT_POS;
+
+	transform_.scl = VScale(AsoUtility::VECTOR_ONE, SCALE);
+	transform_.quaRot = Quaternion::Identity();
+	transform_.quaRotLocal = Quaternion::Identity();
+	transform_.quaRotLocal = Quaternion::Euler(ROT);
+	transform_.pos = respawnPos_;
+	transform_.localPos = TOPS_DEFAULT_LOCAL_POS;
 	transform_.Update();
+
+	centerPos_ = respawnCenterPos_;
+
+	topsMovement_ = topsSpeed_ = 0.0f;
+
+	topsSpin_ = TOPS_DEFAULT_STAMINA;
+
+	topsWeight_ = TOPS_WEIGHT;
+
+	topsSpeed_ = topsMovement_ = 0.0f;
+
+	topsRadius_ = COL_CAPSULE_RADIUS;
+
+	topsVel_ = { 0.0f,0.0f,0.0f };
+
+	prevPos_ = { 0.0f,0.0f,0.0f };
 }
 
 void NormalEnemy::InitCollider(void)
@@ -88,17 +109,12 @@ void NormalEnemy::InitPost(void)
 
 	ChangeState(STATE::THINK);
 
-	topsSpin_ = TOPS_DEFAULT_STAMINA;
-
-	topsWeight_ = TOPS_WEIGHT;
-
-	topsSpeed_ = SPEED_MOVE;
-
-	topsRadius_ = COL_CAPSULE_RADIUS;
+	
 }
 
 void NormalEnemy::UpdateProcess(void)
 {
+	TopBase::UpdateProcess();
 	/*switch (state_)
 	{
 	case STATE::NONE:
@@ -121,22 +137,28 @@ void NormalEnemy::UpdateProcess(void)
 	// 状態別更新
 	stateUpdate_();
 
-	//movePow_ = { -3.0f,0.0f,1.0f };
+	VECTOR dir = AsoUtility::VECTOR_ZERO;
+
+	bool isDash = false;
+	float accele = 0.3f;
+	moveSpeed_ = 0.0f;
+	topsSpeed_ = SPEED_MOVE;
+	centerMovePow_ = AsoUtility::VECTOR_ZERO;
 }
 
 void NormalEnemy::UpdateProcessPost(void)
 {
-	EnemyBase::UpdateProcessPost();
+	TopBase::UpdateProcessPost();
 
-	if (!InMovableRange())
-	{
-		transform_.pos = prevPos_;
+	//if (!InMovableRange())
+	//{
+	//	transform_.pos = prevPos_;
 
-		// モデル制御更新
-		transform_.Update();
+	//	// モデル制御更新
+	//	transform_.Update();
 
-		ChangeState(STATE::THINK);
-	}
+	//	ChangeState(STATE::THINK);
+	//}
 
 
 }
