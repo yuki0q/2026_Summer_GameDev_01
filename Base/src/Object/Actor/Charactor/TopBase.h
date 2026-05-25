@@ -37,6 +37,9 @@ public:
 	VECTOR GetPos(void);
 	void SetPos(VECTOR pos);
 
+	bool GetHit(void);
+	bool GetCollisionTarget_(void);
+
 	// 衝突による傾き（外部から加算できるように）
 	void AddCollisionTilt(VECTOR impulseDir, float impulseMag);
 
@@ -45,6 +48,11 @@ public:
 
 	// 目標座標を設定（GameScene から呼ぶ）
 	void SetCollisionTarget(VECTOR targetPos);
+
+	// リスポーン中（衝突無視中）かどうかを取得する
+	bool IsRespawning(void) const { return isRespawning_; }
+
+	bool IsGameEnd(void)const { return isEnd_; }
 
 protected:
 
@@ -129,14 +137,19 @@ protected:
 	// 衝突判定
 	virtual void CollisionReserve(void) override;
 
+	virtual void Respawn(void);
+
 	// デバッグ描画
 	virtual void DrawDebug(void);
+
+	float VSizeSq(const VECTOR& v);
 
 	// 衝突による目標座標
 	VECTOR collisionTargetPos_;
 
 	// 衝突目標座標が有効かどうか
 	bool hasCollisionTarget_;
+	bool isHit_;
 
 	float topsSpeed_;
 	float topsSpin_;
@@ -169,6 +182,11 @@ protected:
 	VECTOR centerMovePow_;
 
 	Quaternion centerQuaRot_;
+
+	bool isEnd_;
+	bool isRespawning_ = false;       // リスポーン直後フラグ
+	float respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
+	const float RESPAWN_MUTE_TIME = 1.0f; // 衝突を無視する時間（秒数。1.0fで1秒間）
 
 private:
 

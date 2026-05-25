@@ -94,9 +94,15 @@ void GameScene::Update(void)
 {
 	// シーン遷移
 	auto const& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))IsGameEnd
 	{
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
+	}*/
+	for (auto& enemy : enemyManager_->GetEemies())
+	{
+		if (player_->IsGameEnd() || enemy->IsGameEnd()) {
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
+		}
 	}
 
 	normalStage_->Update();
@@ -125,23 +131,6 @@ void GameScene::Draw(void)
 	enemyManager_->Draw();
 	normalStage_->Draw();
 
-	if (!isStart_) {
-		int i = countTime_ / 60;
-		switch (i)
-		{
-		case 2:
-			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 20.0f, 0.0f, image3, TRUE);
-			//DrawRotaGraph(640, 260, 1.0f, 0.0f, image3, true);
-			break;
-		case 1:
-			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 20.0f, 0.0f, image2, TRUE);
-			break;
-		case 0:
-			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 20.0f, 0.0f, image1, TRUE);
-			break;
-		}
-	}
-
 	// シャドウマップへの描画を終了
 	ShadowMap_DrawEnd();
 
@@ -151,9 +140,26 @@ void GameScene::Draw(void)
 	player_->Draw();
 	enemyManager_->Draw();
 	normalStage_->Draw();
-	
+
 	// 描画に使用するシャドウマップの設定を解除
 	SetUseShadowMap(0, -1);
+
+	if (!isStart_) {
+		int i = countTime_ / 60;
+		switch (i)
+		{
+		case 2:
+			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 500.0f, 0.0f, image3, TRUE);
+			//DrawRotaGraph(640, 260, 1.0f, 0.0f, image3, true);
+			break;
+		case 1:
+			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 500.0f, 0.0f, image2, TRUE);
+			break;
+		case 0:
+			DrawBillboard3D(VGet(0.0f, 250.0f, 0.0f), 0.5f, 0.5f, 500.0f, 0.0f, image1, TRUE);
+			break;
+		}
+	}
 }
 
 void GameScene::Release(void)
@@ -185,13 +191,15 @@ void GameScene::CollisionResolve(void)
 {
 	for (auto& enemy : enemyManager_->GetEemies())
 	{
-
 		VECTOR diff = VSub(enemy->GetTransform().pos, player_->GetTransform().pos);
 		float dist = VSize(diff);
 		float hitDist = player_->GetRadius() + enemy->GetRadius();
 
 		// 衝突していない、または重なりすぎている場合は無視
 		if (dist >= hitDist || dist <= 0.0001f) continue;
+
+		// どちらかがリスポーン直後なら、めり込み補正や反発速度計算を一切行わずにスルーする
+		if (player_->IsRespawning() || enemy->IsRespawning())continue;
 
 		// 衝突応答 (物理演算)
 		//VECTOR normal = VDiv(diff, dist); // VNormの代わり（distが判明しているので効率的）
@@ -233,8 +241,8 @@ void GameScene::CollisionResolve(void)
 			/*player_->SetVel(VScale(VSub(player_->GetVel(), VScale(impulse, 1.0f / player_->GetWeight())), 0.05f));
 			enemy->SetVel(VScale(VAdd(enemy->GetVel(), VScale(impulse, 1.0f / enemy->GetWeight())), 0.05f));*/
 
-			playerNewVel = VScale(VSub(player_->GetVel(), VScale(impulse, 1.0f / player_->GetWeight())), 0.05f);
-			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(impulse, 1.0f / enemy->GetWeight())), 0.05f);
+			playerNewVel = VScale(VSub(player_->GetVel(), VScale(impulse, 1.0f / player_->GetWeight())), 0.25f);
+			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(impulse, 1.0f / enemy->GetWeight())), 0.25f);
 
 		}
 		else {	// 擦りよりの時
@@ -260,9 +268,9 @@ void GameScene::CollisionResolve(void)
 
 			enemy->SetVel(VScale(VAdd(enemy->GetVel(),
 				VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 0.05f));*/
-
-			playerNewVel = VScale(VSub(player_->GetVel(), VScale(frictionImpulse, 1.0f / player_->GetWeight())), 0.05f);
-			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 0.05f);
+			VECTOR i = player_->GetVel();
+			playerNewVel = VScale(VSub(player_->GetVel(), VScale(frictionImpulse, 1.0f / player_->GetWeight())), 0.25f);
+			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 0.25f);
 		}
 
 		// めり込み補正 (Positional Correction)
@@ -296,8 +304,13 @@ void GameScene::CollisionResolve(void)
 		}
 
 		// 目標座標を TopBase に渡す（ProcessTopMove 内で補間移動）
-		player_->SetCollisionTarget(playerTargetPos);
-		enemy->SetCollisionTarget(enemyTargetPos);
+		/*player_->SetCollisionTarget(playerTargetPos);
+		enemy->SetCollisionTarget(enemyTargetPos);*/
+
+		if (!player_->GetCollisionTarget_())
+			player_->SetCollisionTarget(playerTargetPos);
+		if (!enemy->GetCollisionTarget_())
+			enemy->SetCollisionTarget(enemyTargetPos);
 
 		player_->SpinScrape(enemy->GetSpin() * 0.01f);
 		enemy->SpinScrape(player_->GetSpin() * 0.01f);

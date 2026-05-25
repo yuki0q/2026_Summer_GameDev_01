@@ -108,14 +108,12 @@ void NormalEnemy::InitPost(void)
 		std::bind(&NormalEnemy::ChangeStateEnd, this));
 
 	ChangeState(STATE::THINK);
-
-	
 }
 
 void NormalEnemy::UpdateProcess(void)
 {
 	TopBase::UpdateProcess();
-	/*switch (state_)
+	switch (state_)
 	{
 	case STATE::NONE:
 		UpdateNone();
@@ -132,7 +130,7 @@ void NormalEnemy::UpdateProcess(void)
 	case STATE::END:
 		UpdateEnd();
 		break;
-	}*/
+	}
 
 	// 状態別更新
 	stateUpdate_();
@@ -150,17 +148,26 @@ void NormalEnemy::UpdateProcessPost(void)
 {
 	TopBase::UpdateProcessPost();
 
-	//if (!InMovableRange())
-	//{
-	//	transform_.pos = prevPos_;
-
-	//	// モデル制御更新
-	//	transform_.Update();
-
-	//	ChangeState(STATE::THINK);
-	//}
+	if (!InMovableRange())
+	{
+		ChangeState(STATE::THINK);
+	}
 
 
+}
+
+void NormalEnemy::Respawn(void)
+{
+	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
+	{
+		isEnd_ = true;
+		transform_.pos = respawnPos_;
+		centerPos_ = respawnCenterPos_;
+		topsSpin_ = TOPS_SPIN_MAX;
+		topsVel_ = { 0.0f,0.0f,0.0f };
+		prevPos_ = respawnPos_;
+		ChangeState(STATE::THINK);
+	}
 }
 
 void NormalEnemy::ChangeState(STATE state)
@@ -170,7 +177,7 @@ void NormalEnemy::ChangeState(STATE state)
 	// 各状態遷移の初期処理
 	stateChanges_[static_cast<int>(state_)]();
 
-	/*switch (state_)
+	switch (state_)
 	{
 	case STATE::NONE:
 		ChangeStateNone();
@@ -187,7 +194,7 @@ void NormalEnemy::ChangeState(STATE state)
 	case STATE::END:
 		ChangeStateEnd();
 		break;
-	}*/
+	}
 }
 
 void NormalEnemy::ChangeStateNone(void)
@@ -202,16 +209,16 @@ void NormalEnemy::ChangeStateThink(void)
 	// 思考
 	// ランダムに次の行動を決定
 	// 30%で待機、70%で徘徊
-	int rand = GetRand(100);
+	//int rand = GetRand(100);
 
-	if (rand < 30)
+	/*if (rand < 30)
 	{
 		ChangeState(STATE::IDLE);
 	}
 	else
 	{
 		ChangeState(STATE::WANDER);
-	}
+	}*/
 }
 
 void NormalEnemy::ChangeStateIdle(void)
@@ -240,7 +247,7 @@ void NormalEnemy::ChangeStateWander(void)
 	moveDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
 
 	// ランダムな移動時間
-	step_ = 2.0f + static_cast<float>(GetRand(5));
+	step_ = 500.0f + static_cast<float>(GetRand(5));
 
 	// 移動スピード
 	//topsSpeed_ = 3.0f;
@@ -262,6 +269,41 @@ void NormalEnemy::UpdateNone(void)
 
 void NormalEnemy::UpdateThink(void)
 {
+	if (GetHit()) { 
+		ChangeState(STATE::WANDER); }
+	// Think時は中心にとどまる
+		// XZ成分のみで距離を計算
+		float dx = 0.0f - centerPos_.x;
+		float dz = 0.0f - centerPos_.z;
+		/*VECTOR toTarget = VSub(AsoUtility::VECTOR_ZERO, centerPos_);
+		float distXZ = sqrtf(dx * dx + dz * dz);*/
+		VECTOR toTarget = VGet(0.0f - centerPos_.x, 0.0f, 0.0f - centerPos_.z);
+		float distXZ = VSize(toTarget);
+
+		// 到達判定（誤差以内なら完了）
+		if (distXZ < 2.0f)
+		{
+			// XZのみ目標座標に合わせる（Yは触らない）
+			centerPos_.x = 0.0f;
+			centerPos_.z = 0.0f;
+		}
+		else
+		{
+			//// 補間速度（大きいほど素早く移動）
+			//float lerpSpeed = 0.3f;
+			//centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
+
+			// 中心への方向ベクトルを正規化
+			VECTOR moveDir = VNorm(toTarget);
+
+			// スタミナ（スピン量）の割合に応じた移動量を計算
+			float spinRatio = topsSpin_ / TOPS_SPIN_MAX * 2;
+			//float spinRatio = 2.0f;
+			centerMovePow_ = VScale(moveDir, topsSpeed_ * spinRatio);
+
+			// centerPos_ を物理移動
+			centerPos_ = VAdd(centerPos_, centerMovePow_);
+		}
 }
 
 void NormalEnemy::UpdateIdle(void)
@@ -279,7 +321,8 @@ void NormalEnemy::UpdateWander(void)
 		ChangeState(STATE::THINK);
 	}
 
-	movePow_ = VScale(moveDir_, moveSpeed_);
+	if (GetHit()) step_ += 100.0f;
+	//movePow_ = VScale(moveDir_, moveSpeed_);
 
 	step_--;
 }

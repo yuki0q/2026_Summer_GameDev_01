@@ -101,6 +101,8 @@ private:
 	// 更新ステップ
 	float step_;
 
+	void Respawn(void) override;
+
 	// 状態遷移
 	void ChangeState(STATE state);
 	void ChangeStateNone(void);

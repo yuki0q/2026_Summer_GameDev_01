@@ -58,7 +58,7 @@ protected:
 	VECTOR defaultCenterPos_;
 
 	// 移動可能範囲
-	const float moveRange_;
+	/*const */float moveRange_;
 
 	// リソースロード
 	void InitLoad(void) override {}

@@ -32,9 +32,11 @@ TopBase::TopBase(void)
 	topsVel_(AsoUtility::VECTOR_ZERO),
 	prevPos_(AsoUtility::VECTOR_ZERO),
 	hasCollisionTarget_(false),
+	isHit_(false),
 	collisionTargetPos_(AsoUtility::VECTOR_ZERO),
 	respawnPos_(AsoUtility::VECTOR_ZERO),
-	respawnCenterPos_(AsoUtility::VECTOR_ZERO)
+	respawnCenterPos_(AsoUtility::VECTOR_ZERO),
+	isEnd_(false)
 {
 }
 
@@ -92,6 +94,16 @@ void TopBase::SetPos(VECTOR pos)
 {
 	//transform_.pos = pos;
 	centerPos_ = pos;
+}
+
+bool TopBase::GetHit(void)
+{
+	return isHit_;
+}
+
+bool TopBase::GetCollisionTarget_(void)
+{
+	return hasCollisionTarget_;
 }
 
 void TopBase::AddCollisionTilt(VECTOR impulseDir, float impulseMag)
@@ -157,6 +169,7 @@ void TopBase::SetCollisionTarget(VECTOR targetPos)
 {
 	collisionTargetPos_ = targetPos;
 	hasCollisionTarget_ = true;
+	isHit_ = true;
 }
 
 void TopBase::InitLoad(void)
@@ -234,6 +247,19 @@ void TopBase::ProcessJump(void)
 
 void TopBase::ProcessTopMove(void)
 {
+	Respawn(); // リスポーン判定
+
+	// リスポーンタイマーの更新
+	if (isRespawning_)
+	{
+		respawnTimer_ += scnMng_.GetDeltaTime();
+		if (respawnTimer_ >= RESPAWN_MUTE_TIME)
+		{
+			isRespawning_ = false; // 指定時間経過したら通常状態に戻す
+			respawnTimer_ = 0.0f;
+		}
+	}
+
 	// コマ自身の回転
 	transform_.quaRot = Quaternion::Mult(transform_.quaRot,
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(TOPS_SPIN_MAX *
@@ -264,6 +290,8 @@ void TopBase::ProcessTopMove(void)
 
 	//ローカル座標を親の回転行列で回転
 	VECTOR localRotPos_ = VTransform(transform_.localPos, parentMat);
+	/*VECTOR localRotPos_ = VTransform(VScale(transform_.localPos,
+		topsSpin_ / TOPS_SPIN_MAX), parentMat);*/
 
 	// ワールド座標
 	//transform_.pos = VAdd(localRotPos_, { centerPos_.x,transform_.pos.y,centerPos_.z });
@@ -279,16 +307,14 @@ void TopBase::ProcessTopMove(void)
 		topsSpin_ = 0.0f;
 	}
 
-	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
-	{
-		transform_.pos = respawnPos_;
-		centerPos_ = respawnCenterPos_;
-		topsSpin_ = TOPS_SPIN_MAX;
-	}
-
 	if (transform_.pos.y > 300.0f) transform_.pos.y = 300.0f;
 
 	float dt = scnMng_.GetDeltaTime();
+
+	if (VSizeSq(VSub(transform_.pos, prevPos_)) > 500.0f * 500.0f) 
+	{
+		prevPos_ = transform_.pos;
+	}
 
 	if (dt > 0.0f)
 	{
@@ -308,6 +334,12 @@ void TopBase::ProcessTopMove(void)
 
 	// 摩擦
 	topsVel_ = VScale(topsVel_, 0.97f);
+
+	/*if (!hasCollisionTarget_)
+	{
+		centerPos_.x += topsVel_.x * scnMng_.GetDeltaTime();
+		centerPos_.z += topsVel_.z * scnMng_.GetDeltaTime();
+	}*/
 
 	// 次フレーム用保存
 	prevPos_ = transform_.pos;
@@ -334,6 +366,7 @@ void TopBase::ProcessTopMove(void)
 			// 補間速度（大きいほど素早く移動）
 			float lerpSpeed = 0.3f;
 			centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
+			//hasCollisionTarget_ = false;
 		}
 	}
 
@@ -403,6 +436,29 @@ void TopBase::CollisionReserve(void)
 	ProcessAnimCapsule();
 }
 
+void TopBase::Respawn(void)
+{
+	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
+	{
+		isEnd_ = true;
+		transform_.pos = respawnPos_;
+		centerPos_ = respawnCenterPos_;
+		topsSpin_ = TOPS_SPIN_MAX;
+
+		// 速度をゼロに
+		topsVel_ = { 0.0f, 0.0f, 0.0f };
+		prevPos_ = respawnPos_;
+
+		isRespawning_ = true;
+		respawnTimer_ = 0.0f;
+	}
+}
+
 void TopBase::DrawDebug(void)
 {
+}
+
+float TopBase::VSizeSq(const VECTOR& v)
+{
+	return (v.x * v.x) + (v.y * v.y) + (v.z * v.z);
 }

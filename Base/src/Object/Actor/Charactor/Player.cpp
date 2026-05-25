@@ -123,7 +123,7 @@ void Player::UpdateProcess(void)
 
 	// ƒWƒƒƒ“ƒvˆ—
 	ProcessJump();
-
+	
 }
 
 void Player::UpdateProcessPost(void)
