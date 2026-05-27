@@ -144,8 +144,6 @@
     <ClCompile Include="src\Object\Actor\NormalStage.cpp" />
     <ClCompile Include="src\Manager\Resource.cpp" />
     <ClCompile Include="src\Manager\ResourceManager.cpp" />
-    <ClCompile Include="src\Object\Actor\UI\UIBase.cpp" />
-    <ClCompile Include="src\Object\Actor\UI\UISurprise.cpp" />
     <ClCompile Include="src\Object\Collider\ColliderBase.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\CharactorBase.cpp" />
     <ClCompile Include="src\Object\Actor\ActorBase.cpp" />
@@ -183,8 +181,6 @@
     <ClInclude Include="src\Object\Actor\NormalStage.h" />
     <ClInclude Include="src\Manager\Resource.h" />
     <ClInclude Include="src\Manager\ResourceManager.h" />
-    <ClInclude Include="src\Object\Actor\UI\UIBase.h" />
-    <ClInclude Include="src\Object\Actor\UI\UISurprise.h" />
     <ClInclude Include="src\Object\Collider\ColliderBase.h" />
     <ClInclude Include="src\Object\Actor\Charactor\CharactorBase.h" />
     <ClInclude Include="src\Object\Actor\ActorBase.h" />

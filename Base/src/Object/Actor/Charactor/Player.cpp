@@ -59,7 +59,7 @@ void Player::InitTransform(void)
 
 	topsMovement_ = topsSpeed_ = 0.0f;
 
-	topsSpin_ = TOPS_SPIN_MAX;
+	topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
 
 	topsWeight_ = TOPS_WEIGHT;
 
@@ -70,6 +70,8 @@ void Player::InitTransform(void)
 	topsVel_ = { 0.0f,0.0f,0.0f };
 
 	prevPos_ = { 0.0f,0.0f,0.0f };
+
+	topsShock_ = TOPS_SHOCK;
 }
 
 void Player::InitCollider(void)
@@ -111,7 +113,7 @@ void Player::InitAnimation(void)
 
 void Player::InitPost(void)
 {
-	
+	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_1P).handleId_;
 }
 
 void Player::UpdateProcess(void)

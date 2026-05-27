@@ -94,6 +94,21 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "1.png");
 	resourcesMap_.emplace(SRC::IMAGE_1, res);
 
+	res = new RES(RES_T::IMG, PATH_IMG + "YouWin.png");
+	resourcesMap_.emplace(SRC::RESULT_WIN, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "YouLose.png");
+	resourcesMap_.emplace(SRC::RESULT_LOSE, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "1P.png");
+	resourcesMap_.emplace(SRC::IMAGE_1P, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "2P.png");
+	resourcesMap_.emplace(SRC::IMAGE_2P, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "CPU.png");
+	resourcesMap_.emplace(SRC::IMAGE_CPU, res);
+
 }
 
 void ResourceManager::Release(void)

@@ -48,7 +48,7 @@ void NormalEnemy::InitTransform(void)
 
 	topsMovement_ = topsSpeed_ = 0.0f;
 
-	topsSpin_ = TOPS_DEFAULT_STAMINA;
+	topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
 
 	topsWeight_ = TOPS_WEIGHT;
 
@@ -59,6 +59,8 @@ void NormalEnemy::InitTransform(void)
 	topsVel_ = { 0.0f,0.0f,0.0f };
 
 	prevPos_ = { 0.0f,0.0f,0.0f };
+
+	topsShock_ = TOPS_SHOCK;
 }
 
 void NormalEnemy::InitCollider(void)
@@ -95,6 +97,8 @@ void NormalEnemy::InitAnimation(void)
 
 void NormalEnemy::InitPost(void)
 {
+	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_CPU).handleId_;
+
 	// 状態遷移初期処理登録
 	stateChanges_.emplace(static_cast<int>(STATE::NONE),
 		std::bind(&NormalEnemy::ChangeStateNone, this));
@@ -247,7 +251,8 @@ void NormalEnemy::ChangeStateWander(void)
 	moveDir_ = VGet(cosf(angle), 0.0f, sinf(angle));
 
 	// ランダムな移動時間
-	step_ = 500.0f + static_cast<float>(GetRand(5));
+	//step_ = 100.0f + static_cast<float>(GetRand(5));
+	step_ = (3.0f + GetRand(3)) * 60.0f;
 
 	// 移動スピード
 	//topsSpeed_ = 3.0f;
@@ -269,7 +274,7 @@ void NormalEnemy::UpdateNone(void)
 
 void NormalEnemy::UpdateThink(void)
 {
-	if (GetHit()) { 
+	if (GetCollisionTarget_()) { 
 		ChangeState(STATE::WANDER); }
 	// Think時は中心にとどまる
 		// XZ成分のみで距離を計算
@@ -297,12 +302,12 @@ void NormalEnemy::UpdateThink(void)
 			VECTOR moveDir = VNorm(toTarget);
 
 			// スタミナ（スピン量）の割合に応じた移動量を計算
-			float spinRatio = topsSpin_ / TOPS_SPIN_MAX * 2;
+			float spinRatio = topsSpin_ / TOPS_SPIN_MAX;
 			//float spinRatio = 2.0f;
 			centerMovePow_ = VScale(moveDir, topsSpeed_ * spinRatio);
 
 			// centerPos_ を物理移動
-			centerPos_ = VAdd(centerPos_, centerMovePow_);
+ 			centerPos_ = VAdd(centerPos_, centerMovePow_);
 		}
 }
 
@@ -321,7 +326,9 @@ void NormalEnemy::UpdateWander(void)
 		ChangeState(STATE::THINK);
 	}
 
-	if (GetHit()) step_ += 100.0f;
+	if (GetCollisionTarget_()) {
+		step_ += 1.0f;
+	}
 	//movePow_ = VScale(moveDir_, moveSpeed_);
 
 	step_--;

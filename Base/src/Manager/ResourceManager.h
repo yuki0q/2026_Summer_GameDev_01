@@ -24,7 +24,12 @@ public:
 		UI_SURPRISE,
 		IMAGE_3,
 		IMAGE_2,
-		IMAGE_1
+		IMAGE_1,
+		RESULT_WIN,
+		RESULT_LOSE,
+		IMAGE_1P,
+		IMAGE_2P,
+		IMAGE_CPU
 	};
 
 	// 明示的にインステンスを生成する

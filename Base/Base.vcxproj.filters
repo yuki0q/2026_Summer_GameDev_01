@@ -112,12 +112,6 @@
     <ClCompile Include="src\Object\Actor\NormalStage.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Object\Actor\UI\UIBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Object\Actor\UI\UISurprise.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Object\Actor\Charactor\Player.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -190,8 +184,6 @@
     <ClInclude Include="src\Object\Collider\ColliderModel.h" />
     <ClInclude Include="src\Object\Collider\ColliderSphere.h" />
     <ClInclude Include="src\Object\Actor\NormalStage.h" />
-    <ClInclude Include="src\Object\Actor\UI\UIBase.h" />
-    <ClInclude Include="src\Object\Actor\UI\UISurprise.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Player.h" />
     <ClInclude Include="src\Object\Actor\Charactor\TopBase.h" />
     <ClInclude Include="src\Manager\EnemyManager.h" />

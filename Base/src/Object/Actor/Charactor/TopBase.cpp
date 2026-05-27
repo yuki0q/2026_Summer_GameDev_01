@@ -20,6 +20,7 @@ TopBase::TopBase(void)
 	centerQuaRot_(Quaternion::Identity()),
 	topsSpeed_(0.0f),
 	topsSpin_(0.0f),
+	topsSpinMax_(0.0f),
 	topsWeight_(0.0f),
 	topsRadius_(0.0f),
 	topsMovement_(0.0f),
@@ -36,7 +37,9 @@ TopBase::TopBase(void)
 	collisionTargetPos_(AsoUtility::VECTOR_ZERO),
 	respawnPos_(AsoUtility::VECTOR_ZERO),
 	respawnCenterPos_(AsoUtility::VECTOR_ZERO),
-	isEnd_(false)
+	topsShock_(0.0f),
+	isEnd_(false),
+	imgChara_(0)
 {
 }
 
@@ -53,6 +56,8 @@ void TopBase::Draw(void)
 void TopBase::Release(void)
 {
 	CharactorBase::Release();
+
+	DeleteGraph(imgChara_);
 }
 
 float TopBase::GetRadius(void)
@@ -94,11 +99,6 @@ void TopBase::SetPos(VECTOR pos)
 {
 	//transform_.pos = pos;
 	centerPos_ = pos;
-}
-
-bool TopBase::GetHit(void)
-{
-	return isHit_;
 }
 
 bool TopBase::GetCollisionTarget_(void)
@@ -158,7 +158,7 @@ void TopBase::ApplyStageTilt(VECTOR hitNormal, float impactSpeed)
 	}
 
 	// 傾きの上限（コマが倒れすぎないようにクランプ）
-	float spinRatio = topsSpin_ / TOPS_SPIN_MAX;
+	float spinRatio = topsSpin_ / topsSpinMax_;
 	float maxColTilt = AsoUtility::Deg2RadF(20.0f + 30.0f * (1.0f - spinRatio));
 
 	collisionTiltX_ = std::clamp(collisionTiltX_, -maxColTilt, maxColTilt);
@@ -170,6 +170,12 @@ void TopBase::SetCollisionTarget(VECTOR targetPos)
 	collisionTargetPos_ = targetPos;
 	hasCollisionTarget_ = true;
 	isHit_ = true;
+}
+
+void TopBase::DrawImage(void)
+{
+	DrawBillboard3D({ centerPos_.x,centerPos_.y + 200.0f,centerPos_.z },
+		0.5f, 0.5f, 200.0f, 0.0f, imgChara_, true);
 }
 
 void TopBase::InitLoad(void)
@@ -203,7 +209,7 @@ void TopBase::UpdateProcess(void)
 
 	// スピンに応じた傾き角度
 	// スピンが最大のときは傾きゼロ、ゼロに近づくほど大きく傾く
-	float spinRatio = topsSpin_ / TOPS_SPIN_MAX;          // 1.0→0.0
+	float spinRatio = topsSpin_ / topsSpinMax_;          // 1.0→0.0
 	float maxTilt = AsoUtility::Deg2RadF(35.0f);        // 最大傾き角度(調整可)
 	float gravTilt = maxTilt * (1.0f - spinRatio);       // 重力由来の傾き
 
@@ -262,13 +268,13 @@ void TopBase::ProcessTopMove(void)
 
 	// コマ自身の回転
 	transform_.quaRot = Quaternion::Mult(transform_.quaRot,
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(TOPS_SPIN_MAX *
-			topsSpin_ / TOPS_SPIN_MAX), AsoUtility::AXIS_Y));
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpinMax_ *
+			topsSpin_ / topsSpinMax_), AsoUtility::AXIS_Y));
 
 	// centerPos周りの回転
 	centerQuaRot_ = Quaternion::Mult(centerQuaRot_,
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(topsSpeed_ *
-			topsSpin_ / TOPS_SPIN_MAX), AsoUtility::AXIS_Y));
+			topsSpin_ / topsSpinMax_), AsoUtility::AXIS_Y));
 
 	// 行列の合成
 	MATRIX selfMat = Quaternion::ToMatrix(Quaternion::Mult(transform_.quaRotLocal, transform_.quaRot));
@@ -289,7 +295,9 @@ void TopBase::ProcessTopMove(void)
 	MV1SetRotationMatrix(transform_.modelId, mat);
 
 	//ローカル座標を親の回転行列で回転
-	VECTOR localRotPos_ = VTransform(transform_.localPos, parentMat);
+	VECTOR localRotPos_ = VTransform(
+		{ transform_.localPos.x * topsSpin_ / topsSpinMax_, 0.0f,
+		transform_.localPos.z * topsSpin_ / topsSpinMax_ }, parentMat);
 	/*VECTOR localRotPos_ = VTransform(VScale(transform_.localPos,
 		topsSpin_ / TOPS_SPIN_MAX), parentMat);*/
 
@@ -321,9 +329,9 @@ void TopBase::ProcessTopMove(void)
 		// 位置差分
 		VECTOR move = VSub(transform_.pos, prevPos_);
 
-		if (move.x == 0.0f && move.z == 0.0f) {
+		/*if (move.x == 0.0f && move.z == 0.0f) {
 			move.x = move.z = 1.0f;
-		}
+		}*/
 
 		// 速度ベクトル
 		topsVel_ = VScale(move, 1.0f / dt);
@@ -443,7 +451,7 @@ void TopBase::Respawn(void)
 		isEnd_ = true;
 		transform_.pos = respawnPos_;
 		centerPos_ = respawnCenterPos_;
-		topsSpin_ = TOPS_SPIN_MAX;
+		topsSpin_ = topsSpinMax_;
 
 		// 速度をゼロに
 		topsVel_ = { 0.0f, 0.0f, 0.0f };

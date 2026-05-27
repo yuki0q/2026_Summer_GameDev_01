@@ -17,11 +17,16 @@ public:
 
 private:
 
-	// ‰æ‘œ
-	int imgResult_;
-	int imgResultBack_;
+	bool isWin_ = false; // •`‰æ•ªŠò—p‚Ìƒ[ƒJƒ‹•Ï”
 
+	// ‰æ‘œ
+	int imgResultWin_;
+	int imgResultBackWin_;
+
+	int imgResultLose_;
+	int imgResultBackLose_;
 	// BGM
-	int bgmResult_;
+	int bgmResultWin_;
+	int bgmResultLose_;
 
 };

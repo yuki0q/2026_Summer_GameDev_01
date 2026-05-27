@@ -80,11 +80,14 @@ private:
 	static constexpr float COL_CAPSULE_RADIUS = 80.0f;
 	//static constexpr float COL_CAPSULE_RADIUS = 20.0f;
 
-	// コマのスタミナ
-	static constexpr float TOPS_DEFAULT_STAMINA = 100.0f;
-
 	// コマの重さ
-	static constexpr float TOPS_WEIGHT = 30.0f;
+	static constexpr float TOPS_WEIGHT = 25.0f;
+
+	// コマの最大スピン（スタミナ）
+	static constexpr float TOPS_SPIN_MAX = 120.0f;
+
+	// コマの吹き飛ばす力
+	static constexpr float TOPS_SHOCK = 0.25f;
 
 	// 移動速度(通常)
 	static constexpr float SPEED_MOVE = 15.0f;

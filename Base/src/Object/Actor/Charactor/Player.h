@@ -77,8 +77,6 @@ private:
 	static constexpr float COL_CAPSULE_RADIUS = 80.0f;
 	//static constexpr float COL_CAPSULE_RADIUS = 20.0f;
 
-	
-
 	// プレイヤーの回転の中心点の初期座標
 	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, -500.0f };
 
@@ -87,6 +85,12 @@ private:
 
 	// コマの重さ
 	static constexpr float TOPS_WEIGHT = 30.0f;
+
+	// コマの吹き飛ばす力
+	static constexpr float TOPS_SHOCK = 0.5f;
+
+	// コマの最大スピン（スタミナ）
+	static constexpr float TOPS_SPIN_MAX = 100.0f;
 
 	// 移動速度(通常)
 	static constexpr float SPEED_MOVE = 15.0f;

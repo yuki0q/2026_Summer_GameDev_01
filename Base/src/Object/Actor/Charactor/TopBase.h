@@ -37,7 +37,6 @@ public:
 	VECTOR GetPos(void);
 	void SetPos(VECTOR pos);
 
-	bool GetHit(void);
 	bool GetCollisionTarget_(void);
 
 	// 衝突による傾き（外部から加算できるように）
@@ -53,6 +52,10 @@ public:
 	bool IsRespawning(void) const { return isRespawning_; }
 
 	bool IsGameEnd(void)const { return isEnd_; }
+
+	void DrawImage(void);
+
+	float GetTopsShock(void)const { return topsShock_; }
 
 protected:
 
@@ -123,8 +126,6 @@ protected:
 
 	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
 
-	static constexpr float TOPS_SPIN_MAX = 100.0f;
-
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
 	// 操作
@@ -146,6 +147,8 @@ protected:
 
 	// 衝突による目標座標
 	VECTOR collisionTargetPos_;
+
+	int imgChara_;
 
 	// 衝突目標座標が有効かどうか
 	bool hasCollisionTarget_;
@@ -182,6 +185,12 @@ protected:
 	VECTOR centerMovePow_;
 
 	Quaternion centerQuaRot_;
+
+	// コマごとの最大スピン
+	float topsSpinMax_;
+
+	// コマごとの衝突の強さ
+	float topsShock_;
 
 	bool isEnd_;
 	bool isRespawning_ = false;       // リスポーン直後フラグ

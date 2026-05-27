@@ -101,6 +101,7 @@ void GameScene::Update(void)
 	for (auto& enemy : enemyManager_->GetEemies())
 	{
 		if (player_->IsGameEnd() || enemy->IsGameEnd()) {
+			sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
 		}
 	}
@@ -144,6 +145,16 @@ void GameScene::Draw(void)
 	// 描画に使用するシャドウマップの設定を解除
 	SetUseShadowMap(0, -1);
 
+	player_->DrawImage();
+
+	for (auto& enemy : enemyManager_->GetEemies()) {
+		enemy->DrawImage();
+	}
+
+	// 3Dの奥行き判定を一時的に無効化する
+	SetUseZBuffer3D(FALSE);
+	SetWriteZBuffer3D(FALSE);
+
 	if (!isStart_) {
 		int i = countTime_ / 60;
 		switch (i)
@@ -160,6 +171,10 @@ void GameScene::Draw(void)
 			break;
 		}
 	}
+
+	// 終わったら3D用に設定を戻す
+	SetUseZBuffer3D(TRUE);
+	SetWriteZBuffer3D(TRUE);
 }
 
 void GameScene::Release(void)
@@ -241,8 +256,12 @@ void GameScene::CollisionResolve(void)
 			/*player_->SetVel(VScale(VSub(player_->GetVel(), VScale(impulse, 1.0f / player_->GetWeight())), 0.05f));
 			enemy->SetVel(VScale(VAdd(enemy->GetVel(), VScale(impulse, 1.0f / enemy->GetWeight())), 0.05f));*/
 
-			playerNewVel = VScale(VSub(player_->GetVel(), VScale(impulse, 1.0f / player_->GetWeight())), 0.25f);
-			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(impulse, 1.0f / enemy->GetWeight())), 0.25f);
+			playerNewVel = VScale(VSub(player_->GetVel(), 
+				VScale(impulse, 1.0f / player_->GetWeight())), 
+				enemy->GetTopsShock());
+			enemyNewVel = VScale(VAdd(enemy->GetVel(), 
+				VScale(impulse, 1.0f / enemy->GetWeight())), 
+				player_->GetTopsShock());
 
 		}
 		else {	// 擦りよりの時
@@ -269,8 +288,12 @@ void GameScene::CollisionResolve(void)
 			enemy->SetVel(VScale(VAdd(enemy->GetVel(),
 				VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 0.05f));*/
 			VECTOR i = player_->GetVel();
-			playerNewVel = VScale(VSub(player_->GetVel(), VScale(frictionImpulse, 1.0f / player_->GetWeight())), 0.25f);
-			enemyNewVel = VScale(VAdd(enemy->GetVel(), VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 0.25f);
+			playerNewVel = VScale(VSub(player_->GetVel(), 
+				VScale(frictionImpulse, 1.0f / player_->GetWeight())), 
+				enemy->GetTopsShock());
+			enemyNewVel = VScale(VAdd(enemy->GetVel(), 
+				VScale(frictionImpulse, 1.0f / enemy->GetWeight())), 
+				player_->GetTopsShock());
 		}
 
 		// めり込み補正 (Positional Correction)

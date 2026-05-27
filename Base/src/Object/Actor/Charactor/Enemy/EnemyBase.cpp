@@ -27,7 +27,7 @@ EnemyBase::~EnemyBase(void)
 void EnemyBase::Draw(void)
 {
 
-	CharactorBase::Draw();
+	TopBase::Draw();
 
 #ifdef _DEBUG
 	// 移動可能範囲のデバッグ描画

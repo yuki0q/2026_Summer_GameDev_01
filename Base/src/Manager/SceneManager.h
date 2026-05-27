@@ -63,10 +63,18 @@ public:
 	// カメラの取得
 	Camera* GetCamera(void) const;
 
+	// 勝敗フラグをセットする (GameSceneから呼ぶ)
+	void SetPlayerWin(bool isWin) { isPlayerWin_ = isWin; }
+
+	// 勝敗フラグを取得する (ResultSceneから呼ぶ)
+	bool IsPlayerWin(void) const { return isPlayerWin_; }
+
 private:
 
 	// 静的インスタンス
 	static SceneManager* instance_;
+
+	bool isPlayerWin_ = false; // プレイヤーが勝ったかどうか（生存フラグ）
 
 	SCENE_ID sceneId_;
 	SCENE_ID waitSceneId_;
