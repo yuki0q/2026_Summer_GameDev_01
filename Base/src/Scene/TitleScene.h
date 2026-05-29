@@ -48,7 +48,7 @@ private:
 
 	static constexpr VECTOR SPHERE_PLANET_ROT = { 90.0f + DX_PI_F / 180.0f,0.0f,0.0f };
 
-	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 120.0f, -105.0f };
+	static constexpr VECTOR PLAYER_DEFAULT_POS = { 160.0f, 130.0f, -105.0f };
 
 	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 0.4f,0.4f,0.4f };
 

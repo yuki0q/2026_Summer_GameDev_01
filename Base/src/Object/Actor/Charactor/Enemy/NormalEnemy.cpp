@@ -154,10 +154,23 @@ void NormalEnemy::UpdateProcessPost(void)
 
 	if (!InMovableRange())
 	{
-		ChangeState(STATE::THINK);
+	//	ChangeState(STATE::THINK);
 	}
 
 
+}
+
+void NormalEnemy::Draw(void)
+{
+	EnemyBase::Draw();
+	DrawBoxAA(Application::SCREEN_SIZE_X - 300.0f, Application::SCREEN_SIZE_Y - 120.0f,
+		Application::SCREEN_SIZE_X - 30.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
+	DrawBoxAA(Application::SCREEN_SIZE_X - 290.0f, Application::SCREEN_SIZE_Y - 110.0f,
+		Application::SCREEN_SIZE_X - 290.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f, 
+		Application::SCREEN_SIZE_Y - 70.0f,
+		0xffff00, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
+		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
 }
 
 void NormalEnemy::Respawn(void)
@@ -178,26 +191,10 @@ void NormalEnemy::ChangeState(STATE state)
 {
 	state_ = state;
 
-	// 各状態遷移の初期処理
-	stateChanges_[static_cast<int>(state_)]();
-
-	switch (state_)
+	// マップに登録した初期化関数を呼ぶだけで十分（switch文は削除する）
+	if (stateChanges_.count(static_cast<int>(state_)))
 	{
-	case STATE::NONE:
-		ChangeStateNone();
-		break;
-	case STATE::THINK:
-		ChangeStateThink();
-		break;
-	case STATE::IDLE:
-		ChangeStateIdle();
-		break;
-	case STATE::WANDER:
-		ChangeStateWander();
-		break;
-	case STATE::END:
-		ChangeStateEnd();
-		break;
+		stateChanges_[static_cast<int>(state_)]();
 	}
 }
 

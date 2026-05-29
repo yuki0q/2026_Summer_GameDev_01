@@ -51,6 +51,8 @@ protected:
 	void UpdateProcess(void) override;
 	void UpdateProcessPost(void) override;
 
+	void Draw(void)override;
+
 private:
 
 	// ƒ‚ƒfƒ‹‚Ì‘å‚«‚³

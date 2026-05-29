@@ -41,12 +41,15 @@ bool EnemyBase::InMovableRange(void) const
 
 	// ‰ŠúˆÊ’u‚©‚ç‚Ì‹——£
 	float dis = static_cast<float>(
-		AsoUtility::SqrMagnitude(defaultPos_, transform_.pos));
+		AsoUtility::SqrMagnitude(defaultPos_, centerPos_));
 
 	// w’è‹——£”»’è
 	if (dis < moveRange_ * moveRange_)
 	{
 		ret = true;
+	}
+	else {
+		ret = false;
 	}
 
 	return ret;

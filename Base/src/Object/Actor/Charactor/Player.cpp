@@ -24,6 +24,14 @@ void Player::Draw(void)
 {
 	TopBase::Draw();
 	DrawDebug();
+	DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
+		300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
+	DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
+		40.0f + topsSpin_ /TOPS_SPIN_MAX * 250.0f, Application::SCREEN_SIZE_Y - 70.0f, 
+		0xffff00, true);
+
+	DrawRotaGraph(50.0f, 
+		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
 }
 
 void Player::Release(void)
@@ -304,10 +312,10 @@ void Player::CollisionReserve(void)
 
 void Player::DrawDebug(void)
 {
-	DrawFormatString(15, 20, 0x000000, "コマの位置:,  %f,  %f,  %f", 
+	/*DrawFormatString(15, 20, 0x000000, "コマの位置:,  %f,  %f,  %f", 
 		transform_.pos.x, transform_.pos.y, transform_.pos.z);
 	DrawFormatString(15, 40, 0x000000, "回転の中心:,%f,%f,%f", centerPos_.x, centerPos_.y, centerPos_.z);
 	DrawFormatString(15, 60, 0x000000, "スタミナ:,%f", topsSpin_);
 	DrawFormatString(15, 80, 0x000000, "スピード:,%f", topsSpeed_);
-	DrawSphere3D(centerPos_, 30.0f, 16, 0xFF0000, 0xFF0000, true);
+	DrawSphere3D(centerPos_, 30.0f, 16, 0xFF0000, 0xFF0000, true);*/
 }

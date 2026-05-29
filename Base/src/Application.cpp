@@ -82,7 +82,7 @@ void Application::Run(void)
 	SceneManager& sceneManager = SceneManager::GetInstance();
 
 	// ÉQÅ[ÉÄÉãÅ[Év
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)//&& !isShutdownRequested_)
 	{
 
 		inputManager.Update();
@@ -156,4 +156,9 @@ void Application::InitEffekseer(void)
 	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 
 	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+}
+
+void Application::Shutdown()
+{
+	isShutdownRequested_ = true;
 }

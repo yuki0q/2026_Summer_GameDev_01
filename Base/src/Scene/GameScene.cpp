@@ -316,6 +316,25 @@ void GameScene::CollisionResolve(void)
 			VAdd(enemy->GetPos(), enemyNewVel),
 			VScale(correction, 1.0f / enemy->GetWeight()));
 
+		// スピンが50以下の時、押し出す力を強くする
+		if (player_->GetSpin() <= 50.0f || enemy->GetSpin() <= 50.0f)
+		{
+			// 押し出しの基本強度
+			float pushPower = 150.0f;
+
+			// プレイヤーは法線と「逆」方向（引かれる方向）に強く押し出す
+			playerTargetPos = VSub(playerTargetPos, VScale(normal, pushPower));
+
+			// エネミーは法線方向（進む方向）に強く押し出す
+			enemyTargetPos = VAdd(enemyTargetPos, VScale(normal, pushPower));
+
+			// ついでにノックバック感を出すために、速度ベクトル（慣性）も少し外側に上書き付与
+			player_->SetVel(VSub(player_->GetVel(), VScale(normal, 
+				pushPower * enemy->GetTopsShock())));
+			enemy->SetVel(VAdd(enemy->GetVel(), VScale(normal, 
+				pushPower * player_->GetTopsShock())));
+		}
+
 		if(playerTargetPos.y > 200.0f)
 		{
 			playerTargetPos.y = 200.0f;
@@ -335,8 +354,12 @@ void GameScene::CollisionResolve(void)
 		if (!enemy->GetCollisionTarget_())
 			enemy->SetCollisionTarget(enemyTargetPos);
 
-		player_->SpinScrape(enemy->GetSpin() * 0.01f);
-		enemy->SpinScrape(player_->GetSpin() * 0.01f);
+		player_->SpinScrape(VSize(VSub(playerTargetPos,
+			player_->GetTransform().pos))*
+			enemy->GetSpin() * 0.0001f);
+		enemy->SpinScrape(VSize(VSub(enemyTargetPos,
+			enemy->GetTransform().pos))*
+			enemy->GetSpin() * 0.0001f);
 
 	}
 }

@@ -176,6 +176,7 @@ void TopBase::DrawImage(void)
 {
 	DrawBillboard3D({ centerPos_.x,centerPos_.y + 200.0f,centerPos_.z },
 		0.5f, 0.5f, 200.0f, 0.0f, imgChara_, true);
+
 }
 
 void TopBase::InitLoad(void)
@@ -310,6 +311,11 @@ void TopBase::ProcessTopMove(void)
 	topsSpin_ -= (topsSpin_ * 0.002f + topsMovement_ * 0.0001f) / 2.0f;
 	//0.998f
 
+	/*if (20.0f > topsSpin_)
+	{
+		topsSpeed_ = 3.0f;
+	}*/
+
 	if (topsSpin_ < 0.0f)
 	{
 		topsSpin_ = 0.0f;
@@ -372,7 +378,7 @@ void TopBase::ProcessTopMove(void)
 		else
 		{
 			// •âŠÔ‘¬“xi‘å‚«‚¢‚Ù‚Ç‘f‘‚­ˆÚ“®j
-			float lerpSpeed = 0.3f;
+			float lerpSpeed = 0.1f;
 			centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
 			//hasCollisionTarget_ = false;
 		}

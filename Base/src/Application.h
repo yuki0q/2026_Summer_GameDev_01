@@ -57,7 +57,11 @@ public:
 	// 解放成功／失敗の判定
 	bool IsReleaseFail(void) const;
 
+	void Shutdown();
+
 private:
+
+	bool isShutdownRequested_ = false;
 
 	// 静的インスタンス
 	static Application* instance_;
