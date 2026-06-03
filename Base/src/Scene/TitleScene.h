@@ -67,4 +67,25 @@ private:
 	int imgTitle_;
 	int imgPushSpace_;
 
+	// デフォルトの選択位置
+	static constexpr int DEFAULT_SELECT = 480;
+
+	// ボタンの移動量
+	static constexpr int SELECT_MOVE = 100;
+
+	// 選択枠の移動
+	int select_;
+	int count_;
+
+	// 操作説明ウィンドウのフラグ
+	bool window_;
+
+	// 描画用
+	int button_;
+	int pushedButton_;
+	int gameEnd_;
+	int gameStart_;
+	int instructions_;
+	int selectNow_;
+
 };

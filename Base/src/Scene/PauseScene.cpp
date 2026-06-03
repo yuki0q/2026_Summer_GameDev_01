@@ -1,221 +1,129 @@
 #include "PauseScene.h"
 #include<DxLib.h>
 #include "../Manager/SceneManager.h"
-#include "../Input.h"
+#include "../Manager/InputManager.h"
+#include "../Manager/ResourceManager.h"
+#include "../Manager/Resource.h"
 #include "../Application.h"
 #include "TitleScene.h"
-#include "KeyConfigScene.h"
 
 constexpr int margin_size = 50;	// 端からのサイズ
 constexpr int expand_interval = 30;	// 30フレーム
 
-void PauseScene::AppearUpdate(Input& input)
+PauseScene::PauseScene(void)
+	:
+	SceneBase(),
+	button_(0),
+	pushedButton_(0),
+	select_(0),
+	count_(0),
+	returnGame_(0),
+	returnTitle_(0),
+	returnSelect_(0),
+	gameEnd_(0),
+	selectNow_(0)
 {
-	if (++frame_ >= expand_interval) {
-		update_ = &PauseScene::NormalUpdate;
-		draw_ = &PauseScene::NormalDraw;
-		return;
-	}
 }
 
-void PauseScene::NormalUpdate(Input& input)
+PauseScene::~PauseScene(void)
 {
-	if (input.IsTriggred("pause"))
+}
+
+void PauseScene::Init(void)
+{
+	button_ = resMng_.Load(ResourceManager::SRC::IMAGE_BUTTON).handleId_;
+	pushedButton_ = resMng_.Load(ResourceManager::SRC::IMAGE_PUSHED_BUTTON).handleId_;
+	returnGame_ = resMng_.Load(ResourceManager::SRC::RETURN_GAME).handleId_;
+	returnTitle_ = resMng_.Load(ResourceManager::SRC::RETURN_TITLE).handleId_;
+	returnSelect_ = resMng_.Load(ResourceManager::SRC::RETURN_SELECT).handleId_;
+	gameEnd_ = resMng_.Load(ResourceManager::SRC::GAME_END).handleId_;
+	selectNow_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
+
+	select_ = DEFAULT_SELECT;
+	count_ = 0;
+}
+
+void PauseScene::Update(void)
+{
+	// シーン遷移
+	auto const& ins = InputManager::GetInstance();
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE)||
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
-		update_ = &PauseScene::DissappearUpdate;
-		draw_ = &PauseScene::ExpandDraw;
-		return;
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
-	if (input.IsTriggred("up")) {
-		selectedIndex_ = (selectedIndex_ + menuItems_.size() - 1) %
-			menuItems_.size();
+
+	if (ins.IsTrgDown(KEY_INPUT_S)) {
+		select_ += SELECT_MOVE;
 	}
-	if (input.IsTriggred("down")) {
-		selectedIndex_ = (selectedIndex_ + 1) % menuItems_.size();
+	else if (select_ > 560) {
+		select_ = 200;
 	}
-	if (input.IsTriggred("ok")) {
-		auto menuString = menuItems_[selectedIndex_];
-		commandTable_[menuString](input);
+
+	if (ins.IsTrgDown(KEY_INPUT_W)) {
+		select_ -= SELECT_MOVE;
+	}
+	else if (select_ < 200) {
+		select_ = 560;
+	}
+
+	count_ = select_ / SELECT_MOVE;
+
+	if (ins.IsTrgDown(KEY_INPUT_SPACE) ||
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	{
+		switch (count_) {
+		case 1:
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+			break;
+		case 2:
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+			break;
+		case 3:
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
+			break;
+		case 4:
+			Application::GetInstance().Shutdown();
+			break;
+		}
 	}
 }
 
-void PauseScene::DissappearUpdate(Input& input)
+void PauseScene::Draw(void)
 {
-	if (--frame_ <= 0) {
-		controller_.PopScene();
-		return;
-	}
-}
-
-void PauseScene::ExpandDraw()
-{
-	DrawFrame(static_cast<float>(frame_) / static_cast<float>(expand_interval));
-}
-
-void PauseScene::NormalDraw()
-{
-	DrawFrame(1.0f);
-	DrawMenu();
-}
-
-void PauseScene::DrawFrame(float rate)
-{
-	const auto& wsize = Application::GetInstance().GetWindowSize();
-
-	auto centerY = wsize.h / 2; // 画面の真ん中のY座標
-	auto height = (wsize.h - margin_size) / 2; // 広がり切った高さ/2(真ん中から見た高さ)
-
-	// 元の画面の明度を落とすためのセロファン
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 168);
-	DrawBoxAA(margin_size, centerY - height * rate, wsize.w - margin_size,
-		centerY + height * rate, 0x000000, true, 1.0f);
+	// 画面全体を薄暗くする（アルファ値 120 / 255）
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+	DrawBox(0, 0, 1280, 720, GetColor(0, 0, 0), TRUE); // サイズはApplicationに合わせて調整してください
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	// 枠の描画（白枠）
-	DrawBoxAA(margin_size, centerY - height * rate, wsize.w - margin_size,
-		centerY + height * rate, 0xffffff, false, 3.0f);
-}
+	// 「PAUSE」などの文字やUIを描画
+	DrawString(600, 60, "ポーズ中", GetColor(255, 255, 255));
+	//DrawString(520, 380, "ESCAPEでゲームに戻る", GetColor(255, 255, 255));
+	// ボタンの描画
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 200, 0.75f, 0.0f, button_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 320, 0.75f, 0.0f, button_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 440, 0.75f, 0.0f, button_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 560, 0.75f, 0.0f, button_, true);
 
-void PauseScene::DrawMenu(void)
-{
-	// メニューの先頭Y座標
-	constexpr int menu_top_offset = margin_size + 100;
-	constexpr int menu_left_offset = margin_size + 300;
-	constexpr int menu_item_height = 40;
-	constexpr uint32_t menu_item_color = 0xffffffff;
-	constexpr uint32_t indicator_color = 0xffffaaaa;
-	constexpr int menu_indent_size = 10;
-	constexpr uint32_t selected_item_color = 0xffffaaff;
+	// 文字の描画
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 200, 0.75f, 0.0f, returnGame_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 320, 0.75f, 0.0f, returnTitle_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 440, 0.75f, 0.0f, returnSelect_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 560, 0.75f, 0.0f, gameEnd_, true);
 
-	int y = menu_top_offset;
-	int x = menu_left_offset;
-
-	for (const auto& item : menuItems_) {
-		int x = menu_left_offset;
-		auto itemColor = menu_item_color;
-		if (menuItems_[selectedIndex_] == item) {
-			DrawString(x - 30, y, L"⇒", indicator_color);
-			x += menu_indent_size;
-			itemColor = selected_item_color;
-		}
-
-		DrawFormatString(x, y, itemColor, L"%s", item.c_str());
-
-		y += menu_item_height;
+	// 選択中のボタン用枠
+	if ((select_ >= 200) && (select_ <= 560)) {
+		DrawRotaGraph(Application::SCREEN_SIZE_X / 2, select_, 1.0f, 0.0f, selectNow_, true);
 	}
 }
 
-void PauseScene::YesNoUpdate(Input& input)
+void PauseScene::Release(void)
 {
-	if (input.IsTriggred("left") || input.IsTriggred("right")) {
-		isYes_ = !isYes_;
-	}
-	if (input.IsTriggred("ok")) {
-		if (isYes_) {
-			execYesFunc_(input);
-			return;
-		}
-		else {
-			update_ = &PauseScene::NormalUpdate;
-			draw_ = &PauseScene::NormalDraw;
-		}
-	}
-}
-
-void PauseScene::YesNoDraw()
-{
-	NormalDraw();
-	const auto& wsize = Application::GetInstance().GetWindowSize();
-	auto centerX = wsize.w / 2;
-	auto centerY = wsize.h / 2;
-	constexpr int yesno_frame_height = 150;
-	constexpr int yesno_frame_width = 300;
-	int top = centerY - yesno_frame_height / 2;
-	int bottom = centerY + yesno_frame_height / 2;
-	int left = centerX - yesno_frame_width / 2;
-	int right = centerX + yesno_frame_width / 2;
-
-	DrawBox(left, top, right, bottom, 0x000000, true);
-	DrawBoxAA(left, top, right, bottom, 0xffffff, false, 3.0f);
-
-	int x = left + 50;
-	int y = top + 20;
-	DrawFormatString(x, y, 0xffffff, L"%s", yesNoTitle_.c_str());
-	y += 40;
-	int idx = 0;
-	if (!isYes_) {
-		idx = 1;
-	}
-	for (const auto& item : yesNoItems_) {
-		uint32_t itemColor = 0xffffff;
-		if (item == yesNoItems_[idx]) {
-			DrawString(x - 30, y, L"⇒", 0xff0000);
-			itemColor = 0xff00ff;
-		}
-		DrawFormatString(x, y, itemColor, L"%s", item.c_str());
-		x += 100;
-	}
-
-}
-
-PauseScene::PauseScene(SceneController& ctrl) :Scene(ctrl)
-{
-	frame_ = 0;
-	update_ = &PauseScene::AppearUpdate;
-	draw_ = &PauseScene::ExpandDraw;
-
-	yesNoItems_ = { L"はい",L"いいえ" };
-
-	menuItems_ = {
-		L"ゲームに戻る",
-		L"キーコンフィグ",
-		L"設定",
-		L"遊び方",
-		L"タイトルに戻る",
-		L"ゲームを終了する",
-	};
-
-	commandTable_[L"ゲームに戻る"] = [this](Input& input) {
-		update_ = &PauseScene::DissappearUpdate;
-		draw_ = &PauseScene::ExpandDraw;
-		};
-	commandTable_[L"キーコンフィグ"] = [this](Input& input) {
-		//DrawString(600, 360, L"キーコンフィグ選択",0xffffff);
-		controller_.PushScene(std::make_shared<KeyConfigScene>(controller_, input));
-		};
-	commandTable_[L"設定"] = [this](Input& input) {
-		DrawString(600, 360, L"設定選択", 0xffffff);
-		};
-	commandTable_[L"遊び方"] = [this](Input& input) {
-		DrawString(600, 360, L"遊び方選択", 0xffffff);
-		};
-	commandTable_[L"タイトルに戻る"] = [this](Input& input) {
-		//DrawString(600, 360, L"タイトルに戻る", 0xffffff);
-		execYesFunc_ = [this](Input& input) {
-			controller_.ResetScene(std::make_shared<TitleScene>(controller_));
-			};
-		yesNoTitle_ = L"タイトルに戻る";
-		update_ = &PauseScene::YesNoUpdate;
-		draw_ = &PauseScene::YesNoDraw;
-		};
-	commandTable_[L"ゲームを終了する"] = [this](Input& input) {
-		//DrawString(600, 360, L"ゲームを終了する", 0xffffff);
-		execYesFunc_ = [this](Input& input) {
-			Application::GetInstance().Shutdown();
-			};
-		yesNoTitle_ = L"ゲームを終了する";
-		update_ = &PauseScene::YesNoUpdate;
-		draw_ = &PauseScene::YesNoDraw;
-		};
-
-}
-
-void PauseScene::Update(Input& input)
-{
-	(this->*update_)(input);
-}
-
-void PauseScene::Draw()
-{
-	(this->*draw_)();
+	DeleteGraph(button_);
+	DeleteGraph(pushedButton_);
+	DeleteGraph(returnGame_);
+	DeleteGraph(returnTitle_);
+	DeleteGraph(returnSelect_);
+	DeleteGraph(gameEnd_);
+	DeleteGraph(selectNow_);
 }

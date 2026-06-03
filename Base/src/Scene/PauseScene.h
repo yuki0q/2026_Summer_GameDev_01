@@ -8,52 +8,37 @@
 class PauseScene :public SceneBase
 {
 
+public:
+
+	// コンストラクタ
+	PauseScene(void);
+	// デストラクタ
+	~PauseScene(void)override;
+
+	void Init(void)override;
+	void Update(void)override;
+	void Draw(void)override;
+	void Release(void)override;
+
 private:
 
-	int frame_;
+	// デフォルトの選択位置
+	static constexpr int DEFAULT_SELECT = 200;
 
-	int selectedIndex_ = 0; // 選択中のメニューアイテム
-	std::vector<std::wstring> menuItems_; // メニューアイテム文字列
+	// ボタンの移動量
+	static constexpr int SELECT_MOVE = 120;
 
-	std::map<std::wstring, std::function<void(Input&)>> commandTable_;
+	// 選択枠の移動
+	int select_;
+	int count_;
 
-	// YES/NOダイアログに使用する
-	std::vector<std::wstring> yesNoItems_;
-	std::function<void(Input&)> execYesFunc_;
-	bool isYes_ = false;
-	std::wstring yesNoTitle_ = L"";
-
-	using Update_t = void(PauseScene::*)(Input& input);
-	using Draw_t = void(PauseScene::*)();
-
-	Update_t update_;
-	Draw_t draw_;
-
-	void AppearUpdate(Input& input);
-	void NormalUpdate(Input& input);
-	void DissappearUpdate(Input& input);
-
-	void YesNoUpdate(Input& input);
-	void YesNoDraw();
-
-	void ExpandDraw();
-	void NormalDraw();
-
-	/// <summary>
-	/// 広がるメニュー枠を表示
-	/// </summary>
-	/// <param name="rate">0.0の時非表示、1.0の時フル表示</param>
-	void DrawFrame(float rate);
-
-	/// <summary>
-	/// メニューを表示する
-	/// </summary>
-	/// <param name=""></param>
-	void DrawMenu(void);
-
-public:
-	PauseScene(SceneController& ctrl);
-	void Update(Input& input)override;
-	void Draw()override;
+	// 描画用
+	int button_;
+	int pushedButton_;
+	int returnGame_;
+	int returnTitle_;
+	int returnSelect_;
+	int gameEnd_;
+	int selectNow_;
 };
 

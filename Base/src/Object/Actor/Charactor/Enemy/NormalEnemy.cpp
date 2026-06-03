@@ -175,16 +175,20 @@ void NormalEnemy::Draw(void)
 
 void NormalEnemy::Respawn(void)
 {
-	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
-	{
-		isEnd_ = true;
-		transform_.pos = respawnPos_;
-		centerPos_ = respawnCenterPos_;
-		topsSpin_ = TOPS_SPIN_MAX;
-		topsVel_ = { 0.0f,0.0f,0.0f };
-		prevPos_ = respawnPos_;
-		ChangeState(STATE::THINK);
-	}
+
+	isEnd_ = true;
+	transform_.pos = respawnPos_;
+	centerPos_ = respawnCenterPos_;
+	topsSpin_ = TOPS_SPIN_MAX;
+	topsVel_ = { 0.0f,0.0f,0.0f };
+	prevPos_ = respawnPos_;
+	ChangeState(STATE::THINK);
+
+
+	isDying_ = false;
+	dyingTimer_ = 0.0f;
+	tiltX_ = 0.0f;
+	tiltZ_ = 0.0f;
 }
 
 void NormalEnemy::ChangeState(STATE state)

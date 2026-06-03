@@ -197,6 +197,9 @@ protected:
 	float respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
 	const float RESPAWN_MUTE_TIME = 1.0f; // 衝突を無視する時間（秒数。1.0fで1秒間）
 
+	bool isDying_ = false;       // 倒れ中フラグ
+	float dyingTimer_ = 0.0f;    // 倒れ始めてからの経過時間
+
 private:
 
 	

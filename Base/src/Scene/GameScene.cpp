@@ -94,10 +94,12 @@ void GameScene::Update(void)
 {
 	// ƒV[ƒ“‘JˆÚ
 	auto const& ins = InputManager::GetInstance();
-	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))IsGameEnd
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || 
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
-		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
-	}*/
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::PAUSE);
+	}
+
 	for (auto& enemy : enemyManager_->GetEemies())
 	{
 		if (player_->IsGameEnd() || enemy->IsGameEnd()) {

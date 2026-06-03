@@ -26,6 +26,7 @@ public:
 		STAGE_SELECT,
 		TOP_SELECT,
 		GAME,
+		PAUSE,
 		RESULT,
 		DEBUG,
 	};
@@ -84,6 +85,8 @@ private:
 
 	// 各種シーン
 	SceneBase* scene_;
+	// ポーズ画面用のシーン保持変数
+	SceneBase* pauseScene_;  
 
 	// カメラ
 	Camera* camera_;

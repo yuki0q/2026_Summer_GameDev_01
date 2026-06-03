@@ -108,6 +108,33 @@ void ResourceManager::Init(void)
 
 	res = new RES(RES_T::IMG, PATH_IMG + "CPU.png");
 	resourcesMap_.emplace(SRC::IMAGE_CPU, res);
+		
+	res = new RES(RES_T::IMG, PATH_IMG + "Button.png");
+	resourcesMap_.emplace(SRC::IMAGE_BUTTON, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "ButtonPushed.png");
+	resourcesMap_.emplace(SRC::IMAGE_PUSHED_BUTTON, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "returnGame.png");
+	resourcesMap_.emplace(SRC::RETURN_GAME, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "returnTitle.png");
+	resourcesMap_.emplace(SRC::RETURN_TITLE, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "returnSelect.png");
+	resourcesMap_.emplace(SRC::RETURN_SELECT, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "gameEnd.png");
+	resourcesMap_.emplace(SRC::GAME_END, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "SelectNow.png");
+	resourcesMap_.emplace(SRC::SELECT_NOW, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "gameStart.png");
+	resourcesMap_.emplace(SRC::GAME_START, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "instructions.png");
+	resourcesMap_.emplace(SRC::IMAGE_INSTRUCTUION, res);
 
 }
 

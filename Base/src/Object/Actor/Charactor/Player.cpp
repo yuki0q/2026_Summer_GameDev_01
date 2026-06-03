@@ -183,7 +183,7 @@ void Player::ProcessMove(void)
 			dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
 			if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
-				InputManager::JOYPAD_BTN::R_TRIGGER))
+				InputManager::JOYPAD_BTN::RB))
 			{
 				isDash = true;
 			}

@@ -228,8 +228,43 @@ void TopBase::UpdateProcess(void)
 	collisionTiltZ_ *= 0.92f;
 
 	// 傾きを合成（歳差 + 慣性 + 衝突）
-    tiltX_ = sinf(tiltPhase_) * gravTilt + inertiaTiltX + collisionTiltX_;
-    tiltZ_ = cosf(tiltPhase_) * gravTilt + inertiaTiltZ + collisionTiltZ_;
+    /*tiltX_ = sinf(tiltPhase_) * gravTilt + inertiaTiltX + collisionTiltX_;
+    tiltZ_ = cosf(tiltPhase_) * gravTilt + inertiaTiltZ + collisionTiltZ_;*/
+
+	if (!isDying_)
+	{
+		// 通常時の傾き合成（既存の処理）
+		tiltX_ = sinf(tiltPhase_) * gravTilt + inertiaTiltX + collisionTiltX_;
+		tiltZ_ = cosf(tiltPhase_) * gravTilt + inertiaTiltZ + collisionTiltZ_;
+	}
+	else
+	{
+		// 倒れる演出中の処理
+		dyingTimer_ += dt;
+
+		// 1.5秒かけて完全に倒れると設定（好みの長さに調整してください）
+		float fallDuration = 1.5f;
+		float progress = dyingTimer_ / fallDuration; // 0.0 ～ 1.0 に変化
+		if (progress > 1.0f) progress = 1.0f;
+
+		// 倒れる限界角度（約80度＝ほぼ真横にパタンと倒れる）
+		float maxFallTilt = AsoUtility::Deg2RadF(80.0f);
+
+		// 徐々に激しくブレながら（ヨロヨロしながら）倒れる演出
+		// progressが進むほど、ベースの傾き(maxFallTilt * progress)が大きくなる
+		float wobbleSpeed = 30.0f; // ヨロヨロする速さ
+		float wobbleWav = sinf(dyingTimer_ * wobbleSpeed) * AsoUtility::Deg2RadF(15.0f) * (1.0f - progress);
+
+		// 特定の方向（ここではX軸方向）に倒れ込ませる例
+		tiltX_ = (maxFallTilt * progress) + wobbleWav;
+		tiltZ_ = cosf(tiltPhase_) * AsoUtility::Deg2RadF(10.0f) * (1.0f - progress); // Zは徐々に抑える
+
+		// 演出時間が終了したらリスポーン
+		if (dyingTimer_ >= fallDuration)
+		{
+			Respawn(); // ここでようやく画面リセット
+		}
+	}
 	
 }
 
@@ -254,7 +289,9 @@ void TopBase::ProcessJump(void)
 
 void TopBase::ProcessTopMove(void)
 {
-	Respawn(); // リスポーン判定
+	if (transform_.pos.y < TOPS_DEAD_POS_Y) {
+		Respawn(); // リスポーン判定
+	}
 
 	// リスポーンタイマーの更新
 	if (isRespawning_)
@@ -308,7 +345,27 @@ void TopBase::ProcessTopMove(void)
 	transform_.pos.z = localRotPos_.z + centerPos_.z;
 
 	centerPos_.y = transform_.pos.y;
-	topsSpin_ -= (topsSpin_ * 0.002f + topsMovement_ * 0.0001f) / 2.0f;
+
+ 	/*if (topsSpin_ > 13.5f) {
+		topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+	}
+	else {
+		Respawn();
+	}*/
+
+	if (!isDying_)
+	{
+		if (topsSpin_ > 13.5f) {
+			topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+		}
+		else {
+			// スピンが切れたら死亡演出（倒れるモード）へ移行
+			isDying_ = true;
+			dyingTimer_ = 0.0f;
+			topsSpin_ = 0.0f; // スピンを完全に止める
+		}
+	}
+
 	//0.998f
 
 	/*if (20.0f > topsSpin_)
@@ -452,20 +509,24 @@ void TopBase::CollisionReserve(void)
 
 void TopBase::Respawn(void)
 {
-	if (transform_.pos.y < TOPS_DEAD_POS_Y || topsSpin_ <= 0.0f)
-	{
-		isEnd_ = true;
-		transform_.pos = respawnPos_;
-		centerPos_ = respawnCenterPos_;
-		topsSpin_ = topsSpinMax_;
+	isEnd_ = true;
+	transform_.pos = respawnPos_;
+	centerPos_ = respawnCenterPos_;
+	topsSpin_ = topsSpinMax_;
 
-		// 速度をゼロに
-		topsVel_ = { 0.0f, 0.0f, 0.0f };
-		prevPos_ = respawnPos_;
+	// 速度をゼロに
+	topsVel_ = { 0.0f, 0.0f, 0.0f };
+	prevPos_ = respawnPos_;
 
-		isRespawning_ = true;
-		respawnTimer_ = 0.0f;
-	}
+	isRespawning_ = true;
+	respawnTimer_ = 0.0f;
+
+
+
+	isDying_ = false;
+	dyingTimer_ = 0.0f;
+	tiltX_ = 0.0f;
+	tiltZ_ = 0.0f;
 }
 
 void TopBase::DrawDebug(void)

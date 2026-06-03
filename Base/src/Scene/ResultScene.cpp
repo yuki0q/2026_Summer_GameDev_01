@@ -44,7 +44,8 @@ void ResultScene::Update(void)
 {
 	// ÉVÅ[ÉìëJà⁄
 	auto const& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	if (ins.IsTrgDown(KEY_INPUT_SPACE)
+		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}

@@ -6,6 +6,7 @@
 #include "../Scene/StageSelectScene.h"
 #include "../Scene/TopSelectScene.h"
 #include "../Scene/GameScene.h"
+#include "../Scene/PauseScene.h"
 #include "../Scene/ResultScene.h"
 //#include "../Scene/DebugScene.h"
 #include "Camera.h"
@@ -110,8 +111,15 @@ void SceneManager::Update(void)
 	}
 	else
 	{
-		// 各シーンの更新処理
-		scene_->Update();
+		// ポーズ中なら、ポーズ画面だけを更新（背後のゲームは止まる）
+		if (sceneId_ == SCENE_ID::PAUSE && pauseScene_ != nullptr)
+		{
+			pauseScene_->Update();
+		}
+		else if (scene_ != nullptr)
+		{
+			scene_->Update(); // 通常時の更新
+		}
 	}
 
 	// カメラ更新
@@ -135,14 +143,22 @@ void SceneManager::Draw(void)
 	// Effekseerにより再生中のエフェクトを更新する。
 	UpdateEffekseer3D();
 
-	// 各シーンの描画処理
-	scene_->Draw();
+	if (scene_ != nullptr)
+	{
+		scene_->Draw();
+	}
 
 	// カメラ描画
 	camera_->DrawDebug();
 
 	// Effekseerにより再生中のエフェクトを描画する。
 	DrawEffekseer3D();
+
+	// ポーズ中なら、ゲーム画面の上に重ねてポーズ画面を描画する
+	if (sceneId_ == SCENE_ID::PAUSE && pauseScene_ != nullptr)
+	{
+		pauseScene_->Draw();
+	}
 
 	// 暗転・明転
 	fader_->Draw();
@@ -156,6 +172,11 @@ void SceneManager::Destroy(void)
 	if (scene_ != nullptr)
 	{
 		delete scene_;
+	}
+
+	if (pauseScene_ != nullptr)
+	{
+		delete pauseScene_;
 	}
 
 	// フェード機能の解放
@@ -177,9 +198,18 @@ void SceneManager::ChangeScene(SCENE_ID nextId)
 	// 遷移先シーンをメンバ変数に保持
 	waitSceneId_ = nextId;
 
-	// フェードアウト(暗転)を開始する
-	fader_->SetFade(Fader::STATE::FADE_OUT);
-	isSceneChanging_ = true;
+	if (waitSceneId_ == SCENE_ID::PAUSE ||
+		(sceneId_ == SCENE_ID::PAUSE && waitSceneId_ == SCENE_ID::GAME)) 
+	{
+		isSceneChanging_ = false;
+		DoChangeScene(waitSceneId_);
+	}
+	else 
+	{
+		// フェードアウト(暗転)を開始する
+		fader_->SetFade(Fader::STATE::FADE_OUT);
+		isSceneChanging_ = true;
+	}
 
 }
 
@@ -206,6 +236,7 @@ SceneManager::SceneManager(void)
 	waitSceneId_ = SCENE_ID::NONE;
 
 	scene_ = nullptr;
+	pauseScene_ = nullptr;
 	fader_ = nullptr;
 
 	isSceneChanging_ = false;
@@ -226,8 +257,32 @@ void SceneManager::ResetDeltaTime(void)
 void SceneManager::DoChangeScene(SCENE_ID sceneId)
 {
 
-	// リソースの解放
-	//ResourceManager::GetInstance().Release();
+	// ポーズ画面を開くとき
+	if (sceneId == SCENE_ID::PAUSE)
+	{
+		sceneId_ = sceneId; // 現在のIDをPAUSEにする
+		pauseScene_ = new PauseScene();
+		pauseScene_->Init();
+		ResetDeltaTime();
+		waitSceneId_ = SCENE_ID::NONE;
+		return;
+	}
+
+	// ポーズ画面からゲーム画面に戻るとき
+	if (sceneId_ == SCENE_ID::PAUSE && sceneId == SCENE_ID::GAME)
+	{
+		sceneId_ = sceneId; // 現在のIDをGAMEに戻す
+		if (pauseScene_ != nullptr)
+		{
+			delete pauseScene_; // ポーズ画面だけを消去
+			pauseScene_ = nullptr;
+		}
+		ResetDeltaTime();
+		waitSceneId_ = SCENE_ID::NONE;
+		return;
+	}
+
+	
 
 	// シーンを変更する
 	sceneId_ = sceneId;
@@ -235,7 +290,8 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	// 現在のシーンを解放
 	if (scene_ != nullptr)
 	{
-		delete scene_;
+		delete scene_; // 元の通常シーンを解放
+		scene_ = nullptr;
 	}
 
 	switch (sceneId_)
@@ -251,6 +307,9 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 		break;
 	case SCENE_ID::GAME:
 		scene_ = new GameScene();
+		break;
+	case SCENE_ID::PAUSE:
+		scene_ = new PauseScene();
 		break;
 	case SCENE_ID::RESULT:
 		scene_ = new ResultScene();

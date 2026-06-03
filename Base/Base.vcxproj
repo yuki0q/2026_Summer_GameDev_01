@@ -152,6 +152,7 @@
     <ClCompile Include="src\Object\Collider\ColliderLine.cpp" />
     <ClCompile Include="src\Object\Collider\ColliderModel.cpp" />
     <ClCompile Include="src\Object\Collider\ColliderSphere.cpp" />
+    <ClCompile Include="src\Scene\PauseScene.cpp" />
     <ClCompile Include="src\Scene\StageSelectScene.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="src\Object\Collider\ColliderLine.h" />
     <ClInclude Include="src\Object\Collider\ColliderModel.h" />
     <ClInclude Include="src\Object\Collider\ColliderSphere.h" />
+    <ClInclude Include="src\Scene\PauseScene.h" />
     <ClInclude Include="src\Scene\StageSelectScene.h" />
     <ClInclude Include="src\Scene\GameScene.h" />
     <ClInclude Include="src\Application.h" />
