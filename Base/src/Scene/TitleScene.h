@@ -77,6 +77,9 @@ private:
 	int select_;
 	int count_;
 
+	bool isStickUpOld;
+	bool isStickDownOld;
+
 	// 操作説明ウィンドウのフラグ
 	bool window_;
 

@@ -39,7 +39,11 @@ TopBase::TopBase(void)
 	respawnCenterPos_(AsoUtility::VECTOR_ZERO),
 	topsShock_(0.0f),
 	isEnd_(false),
-	imgChara_(0)
+	imgChara_(0),
+	isRespawning_(false),
+	respawnTimer_(0.0f),
+	isDying_(false),
+	dyingTimer_(0.0f)
 {
 }
 
@@ -199,6 +203,10 @@ void TopBase::InitAnimation(void)
 
 void TopBase::InitPost(void)
 {
+	isRespawning_ = false;       // リスポーン直後フラグ
+	respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
+	isDying_ = false;       // 倒れ中フラグ
+	dyingTimer_ = 0.0f;    // 倒れ始めてからの経過時間
 }
 
 void TopBase::UpdateProcess(void)
@@ -242,27 +250,38 @@ void TopBase::UpdateProcess(void)
 		// 倒れる演出中の処理
 		dyingTimer_ += dt;
 
-		// 1.5秒かけて完全に倒れると設定（好みの長さに調整してください）
-		float fallDuration = 1.5f;
+		// 完全に倒れるまでの時間
+		float fallDuration = 2.5f;
 		float progress = dyingTimer_ / fallDuration; // 0.0 ～ 1.0 に変化
 		if (progress > 1.0f) progress = 1.0f;
 
 		// 倒れる限界角度（約80度＝ほぼ真横にパタンと倒れる）
-		float maxFallTilt = AsoUtility::Deg2RadF(80.0f);
+		float maxFallTilt = AsoUtility::Deg2RadF(60.0f);
 
-		// 徐々に激しくブレながら（ヨロヨロしながら）倒れる演出
+		// 徐々に激しくブレながら倒れる演出
 		// progressが進むほど、ベースの傾き(maxFallTilt * progress)が大きくなる
-		float wobbleSpeed = 30.0f; // ヨロヨロする速さ
-		float wobbleWav = sinf(dyingTimer_ * wobbleSpeed) * AsoUtility::Deg2RadF(15.0f) * (1.0f - progress);
+		float fallSpinSpeed = 30.0f * (1.0f - progress * 0.5f);
+		float fallPhase = dyingTimer_ * fallSpinSpeed;
 
-		// 特定の方向（ここではX軸方向）に倒れ込ませる例
-		tiltX_ = (maxFallTilt * progress) + wobbleWav;
-		tiltZ_ = cosf(tiltPhase_) * AsoUtility::Deg2RadF(10.0f) * (1.0f - progress); // Zは徐々に抑える
+		// 現在どの方向に倒れ込んでいるかのベース
+		float currentBaseTilt = maxFallTilt * progress;
 
-		// 演出時間が終了したらリスポーン
+		// コマがすり鉢状に回転しながら（ブレながら）倒れる様子を、円運動（sin, cos）で表現
+		// progressが進むほど、回転の軸自体が大きく傾いていく
+		float maxWobbleWidth = AsoUtility::Deg2RadF(5.0f);
+		float wobbleWidth = maxWobbleWidth * (1.0f - progress);
+
+		tiltX_ = sinf(fallPhase) * currentBaseTilt + cosf(fallPhase) * wobbleWidth;
+		tiltZ_ = cosf(fallPhase) * currentBaseTilt + sinf(fallPhase) * wobbleWidth;
+
+		topsSpin_ *= 0.95f; // 毎フレーム5%ずつ回転を遅くする
+
+		// 指定時間経過したらリスポーン
 		if (dyingTimer_ >= fallDuration)
 		{
-			Respawn(); // ここでようやく画面リセット
+			//Respawn();
+			isEnd_ = true;
+			isDying_ = false;
 		}
 	}
 	
@@ -270,13 +289,36 @@ void TopBase::UpdateProcess(void)
 
 void TopBase::UpdateProcessPost(void)
 {
-	// 行列合成
-	MATRIX rotX = MGetRotX(tiltX_);
-	MATRIX rotZ = MGetRotZ(tiltZ_);
-	MATRIX rotY = Quaternion::ToMatrix(transform_.quaRot);
+	if (!isDying_)
+	{
+		// 通常時の行列合成
+		MATRIX rotX = MGetRotX(tiltX_);
+		MATRIX rotZ = MGetRotZ(tiltZ_);
+		MATRIX rotY = Quaternion::ToMatrix(transform_.quaRot);
 
-	MATRIX mat = MMult(rotZ, MMult(rotX, rotY));
-	MV1SetRotationMatrix(transform_.modelId, mat);
+		MATRIX mat = MMult(rotZ, MMult(rotX, rotY));
+		MV1SetRotationMatrix(transform_.modelId, mat);
+
+	}
+	else
+	{
+		// 死亡演出時：
+		// tiltX_ と tiltZ_ の中にすでに「回転しながら倒れる」という軌道（円運動）が計算されているため、
+		// X軸とZ軸の回転を合成するだけで、コマが螺旋を描くように回りながら倒れます。
+		MATRIX rotX = MGetRotX(tiltX_);
+		MATRIX rotZ = MGetRotZ(tiltZ_);
+		MATRIX rotY = Quaternion::ToMatrix(transform_.quaRot);
+
+		MATRIX rotMat = MMult(rotZ, MMult(rotX, rotY));
+
+		// 現在の座標（平行移動）の行列を作成
+		MATRIX posMat = MGetTranslate(transform_.pos);
+
+		// 回転してから現在の位置へ平行移動するように合成
+		MATRIX mat = MMult(rotMat, posMat);
+
+		MV1SetMatrix(transform_.modelId, mat);
+	}
 }
 
 void TopBase::ProcessMove(void)
@@ -302,6 +344,15 @@ void TopBase::ProcessTopMove(void)
 			isRespawning_ = false; // 指定時間経過したら通常状態に戻す
 			respawnTimer_ = 0.0f;
 		}
+	}
+
+	if (isDying_)
+	{
+		hasCollisionTarget_ = false; // 座標ロックを解除
+		prevPos_ = transform_.pos;
+		// 座標の更新などは行わず、UpdatePostでの行列合成に任せる
+		transform_.Update();
+		return;
 	}
 
 	// コマ自身の回転
@@ -355,14 +406,25 @@ void TopBase::ProcessTopMove(void)
 
 	if (!isDying_)
 	{
-		if (topsSpin_ > 13.5f) {
-			topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+		if (topsSpin_ > 0.0f) 
+		{
+			if (topsSpin_ < 15.0f)
+			{
+				topsSpin_ -= 0.10f;
+			}
+			else
+			{
+				// 通常時（10.0f以上）の緩やかな削れかた
+				topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+			}
 		}
 		else {
 			// スピンが切れたら死亡演出（倒れるモード）へ移行
 			isDying_ = true;
 			dyingTimer_ = 0.0f;
 			topsSpin_ = 0.0f; // スピンを完全に止める
+
+			isEnd_ = false;
 		}
 	}
 
@@ -510,8 +572,10 @@ void TopBase::CollisionReserve(void)
 void TopBase::Respawn(void)
 {
 	isEnd_ = true;
-	transform_.pos = respawnPos_;
-	centerPos_ = respawnCenterPos_;
+
+
+	//transform_.pos = respawnPos_;
+	//centerPos_ = respawnCenterPos_;
 	topsSpin_ = topsSpinMax_;
 
 	// 速度をゼロに

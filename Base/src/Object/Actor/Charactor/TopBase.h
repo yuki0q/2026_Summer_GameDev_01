@@ -1,5 +1,6 @@
 #pragma once
 #include "CharactorBase.h"
+#include <vector>
 
 class TopBase : public CharactorBase
 {
@@ -51,7 +52,9 @@ public:
 	// リスポーン中（衝突無視中）かどうかを取得する
 	bool IsRespawning(void) const { return isRespawning_; }
 
-	bool IsGameEnd(void)const { return isEnd_; }
+	bool IsGameEnd(void)const { return isEnd_ && !isDying_;}
+
+	bool IsDying(void) const { return isDying_; }
 
 	void DrawImage(void);
 
@@ -193,12 +196,12 @@ protected:
 	float topsShock_;
 
 	bool isEnd_;
-	bool isRespawning_ = false;       // リスポーン直後フラグ
-	float respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
+	bool isRespawning_;       // リスポーン直後フラグ
+	float respawnTimer_;       // 無敵・衝突無視のタイマー数
 	const float RESPAWN_MUTE_TIME = 1.0f; // 衝突を無視する時間（秒数。1.0fで1秒間）
 
-	bool isDying_ = false;       // 倒れ中フラグ
-	float dyingTimer_ = 0.0f;    // 倒れ始めてからの経過時間
+	bool isDying_;       // 倒れ中フラグ
+	float dyingTimer_;    // 倒れ始めてからの経過時間
 
 private:
 

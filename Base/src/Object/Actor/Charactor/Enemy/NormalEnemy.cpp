@@ -117,6 +117,12 @@ void NormalEnemy::InitPost(void)
 void NormalEnemy::UpdateProcess(void)
 {
 	TopBase::UpdateProcess();
+
+	if (isDying_)
+	{
+		return;
+	}
+
 	switch (state_)
 	{
 	case STATE::NONE:
@@ -177,8 +183,8 @@ void NormalEnemy::Respawn(void)
 {
 
 	isEnd_ = true;
-	transform_.pos = respawnPos_;
-	centerPos_ = respawnCenterPos_;
+	//transform_.pos = respawnPos_;
+	//centerPos_ = respawnCenterPos_;
 	topsSpin_ = TOPS_SPIN_MAX;
 	topsVel_ = { 0.0f,0.0f,0.0f };
 	prevPos_ = respawnPos_;

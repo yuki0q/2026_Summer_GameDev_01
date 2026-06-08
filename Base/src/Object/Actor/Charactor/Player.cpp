@@ -128,6 +128,11 @@ void Player::UpdateProcess(void)
 {
 	TopBase::UpdateProcess();
 
+	if (isDying_)
+	{
+		return;
+	}
+
 	// à⁄ìÆëÄçÏ
 	ProcessMove();
 
@@ -172,6 +177,8 @@ void Player::ProcessMove(void)
 
 			if (ins.IsNew(KEY_INPUT_RSHIFT)) { isDash = true; }
 
+			if (ins.IsNew(KEY_INPUT_G)) { isDying_ = true; }
+			
 		}
 		else
 		{

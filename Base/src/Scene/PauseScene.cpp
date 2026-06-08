@@ -21,7 +21,9 @@ PauseScene::PauseScene(void)
 	returnTitle_(0),
 	returnSelect_(0),
 	gameEnd_(0),
-	selectNow_(0)
+	selectNow_(0),
+	isStickUpOld(false),
+	isStickDownOld(false)
 {
 }
 
@@ -39,6 +41,9 @@ void PauseScene::Init(void)
 	gameEnd_ = resMng_.Load(ResourceManager::SRC::GAME_END).handleId_;
 	selectNow_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
 
+	isStickUpOld = false;
+	isStickDownOld = false;
+
 	select_ = DEFAULT_SELECT;
 	count_ = 0;
 }
@@ -46,26 +51,40 @@ void PauseScene::Init(void)
 void PauseScene::Update(void)
 {
 	// シーン遷移
-	auto const& ins = InputManager::GetInstance();
+	auto& ins = InputManager::GetInstance();
 	if (ins.IsTrgDown(KEY_INPUT_ESCAPE)||
 		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
 
-	if (ins.IsTrgDown(KEY_INPUT_S)) {
+	// 接続されているゲームパッド１の情報を取得
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	VECTOR inputDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+	// スティックが上/下に一定以上倒されているかの判定フラグ
+	// (inputDir.z > 0.5f が「上」、inputDir.z < -0.5f が「下」になります)
+	bool isStickUpNow = (inputDir.z > 0.5f);
+	bool isStickDownNow = (inputDir.z < -0.5f);
+
+	if (ins.IsTrgDown(KEY_INPUT_S)|| (isStickDownNow && !isStickDownOld)) {
 		select_ += SELECT_MOVE;
 	}
 	else if (select_ > 560) {
 		select_ = 200;
 	}
 
-	if (ins.IsTrgDown(KEY_INPUT_W)) {
+	if (ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
 		select_ -= SELECT_MOVE;
 	}
 	else if (select_ < 200) {
 		select_ = 560;
 	}
+
+	isStickUpOld = isStickUpNow;
+	isStickDownOld = isStickDownNow;
 
 	count_ = select_ / SELECT_MOVE;
 

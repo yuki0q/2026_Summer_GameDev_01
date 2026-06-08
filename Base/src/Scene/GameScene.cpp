@@ -19,6 +19,7 @@ GameScene::GameScene(void)
 	SceneBase(),
 	countTime_(0),
 	isStart_(false),
+	isEnd_(false),
 	image3(0),
 	image2(0),
 	image1(0)
@@ -84,6 +85,7 @@ void GameScene::Init(void)
 
 	countTime_ = 180;
 	isStart_ = false;
+	isEnd_ = false;
 
 	image3 = resMng_.Load(ResourceManager::SRC::IMAGE_3).handleId_;
 	image2 = resMng_.Load(ResourceManager::SRC::IMAGE_2).handleId_;
@@ -100,25 +102,29 @@ void GameScene::Update(void)
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::PAUSE);
 	}
 
+	if (countTime_ > 0)
+	{
+		countTime_--;
+	}
+	else {
+		isStart_ = true;
+	}
+
 	for (auto& enemy : enemyManager_->GetEemies())
 	{
 		if (player_->IsGameEnd() || enemy->IsGameEnd()) {
-			sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
+			isEnd_ = true;
 		}
 	}
 
 	normalStage_->Update();
 
-	if (countTime_ > 0)
-	{
-		countTime_--;
-	}
-	else{
-		isStart_ = true;
+	if (isEnd_) {
+		sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
 	}
 
-	if (isStart_) {
+	if (isStart_&&!isEnd_) {
 		player_->Update();
 		enemyManager_->Update();
 		Collision();
@@ -335,6 +341,19 @@ void GameScene::CollisionResolve(void)
 				pushPower * enemy->GetTopsShock())));
 			enemy->SetVel(VAdd(enemy->GetVel(), VScale(normal, 
 				pushPower * player_->GetTopsShock())));
+		}
+
+		// コマが倒れかけているとき、押し出す力を弱くする
+		if (player_->IsDying() || enemy->IsDying())
+		{
+			// 押し出しの基本強度
+			float pushPower = 5.0f;
+
+			// プレイヤーは法線と「逆」方向（引かれる方向）に強く押し出す
+			playerTargetPos = VSub(playerTargetPos, VScale(normal, pushPower));
+
+			// エネミーは法線方向（進む方向）に強く押し出す
+			enemyTargetPos = VAdd(enemyTargetPos, VScale(normal, pushPower));
 		}
 
 		if(playerTargetPos.y > 200.0f)

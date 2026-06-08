@@ -41,6 +41,7 @@ private:
 	int shadowMapHandle_;
 	int countTime_;
 	bool isStart_;
+	bool isEnd_;
 
 	int image3;
 	int image2;

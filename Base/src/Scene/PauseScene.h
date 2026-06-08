@@ -31,6 +31,8 @@ private:
 	// ‘I‘ð˜g‚ÌˆÚ“®
 	int select_;
 	int count_;
+	bool isStickUpOld;
+	bool isStickDownOld;
 
 	// •`‰æ—p
 	int button_;

@@ -22,6 +22,8 @@ TitleScene::TitleScene(void)
 	select_(0),
 	count_(0),
 	window_(false),
+	isStickUpOld(false),
+	isStickDownOld(false),
 	SceneBase()
 {
 }
@@ -71,6 +73,8 @@ void TitleScene::Init(void)
 	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
 
 	window_ = false;
+	isStickUpOld = false;
+	isStickDownOld = false;
 }
 
 void TitleScene::Update(void)
@@ -90,20 +94,35 @@ void TitleScene::Update(void)
 	//skyDome_->Update();
 
 	// シーン遷移
-	auto const& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_S)) {
+	auto& ins = InputManager::GetInstance();
+
+	// 接続されているゲームパッド１の情報を取得
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	VECTOR inputDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+	// スティックが上/下に一定以上倒されているかの判定フラグ
+	// (inputDir.z > 0.5f が「上」、inputDir.z < -0.5f が「下」になります)
+	bool isStickUpNow = (inputDir.z > 0.5f);
+	bool isStickDownNow = (inputDir.z < -0.5f);
+
+	if (ins.IsTrgDown(KEY_INPUT_S) || (isStickDownNow && !isStickDownOld)) {
 		select_ += SELECT_MOVE;
 	}
 	else if (select_ > 680) {
 		select_ = 480;
 	}
 
-	if (ins.IsTrgDown(KEY_INPUT_W)) {
+	if (ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
 		select_ -= SELECT_MOVE;
 	}
 	else if (select_ < 480) {
 		select_ = 680;
 	}
+
+	isStickUpOld = isStickUpNow;
+	isStickDownOld = isStickDownNow;
 
 	count_ = (select_ - DEFAULT_SELECT) / SELECT_MOVE;
 
