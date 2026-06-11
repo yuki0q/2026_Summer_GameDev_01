@@ -41,10 +41,11 @@ void Player::Release(void)
 
 void Player::InitLoad(void)
 {
+	topType_ = static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType());
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();
 
-	transform_.SetModel(resMng_.Load(ResourceManager::SRC::BLUE_TOP).handleId_);
+	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_1P).handleId_;
 }
 
 void Player::InitTransform(void)
@@ -67,10 +68,6 @@ void Player::InitTransform(void)
 
 	topsMovement_ = topsSpeed_ = 0.0f;
 
-	topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
-
-	topsWeight_ = TOPS_WEIGHT;
-
 	topsSpeed_ = topsMovement_ = 0.0f;
 
 	topsRadius_ = COL_CAPSULE_RADIUS;
@@ -79,7 +76,9 @@ void Player::InitTransform(void)
 
 	prevPos_ = { 0.0f,0.0f,0.0f };
 
-	topsShock_ = TOPS_SHOCK;
+	/*topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
+	topsWeight_ = TOPS_WEIGHT;
+	topsShock_ = TOPS_SHOCK;*/
 }
 
 void Player::InitCollider(void)
@@ -121,7 +120,7 @@ void Player::InitAnimation(void)
 
 void Player::InitPost(void)
 {
-	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_1P).handleId_;
+	TopBase::InitPost();
 }
 
 void Player::UpdateProcess(void)

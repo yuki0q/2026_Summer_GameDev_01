@@ -70,12 +70,19 @@ public:
 	// 勝敗フラグを取得する (ResultSceneから呼ぶ)
 	bool IsPlayerWin(void) const { return isPlayerWin_; }
 
+	// コマのタイプをセットする
+	void SetPlayerTopType(int type) { playerType_ = type; }
+
+	int GetPlayerTopType(void)const { return playerType_; }
+
 private:
 
 	// 静的インスタンス
 	static SceneManager* instance_;
 
 	bool isPlayerWin_ = false; // プレイヤーが勝ったかどうか（生存フラグ）
+
+	int playerType_;
 
 	SCENE_ID sceneId_;
 	SCENE_ID waitSceneId_;

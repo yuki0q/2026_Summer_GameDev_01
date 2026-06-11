@@ -24,10 +24,12 @@ NormalEnemy::~NormalEnemy(void)
 
 void NormalEnemy::InitLoad(void)
 {
-	// 基底クラスのリソースロード
-	CharactorBase::InitLoad();
+	topType_ = TOP_TYPE::STAMINA;
 
-	transform_.SetModel(resMng_.LoadModelDuplicate(ResourceManager::SRC::RED_TOP));
+	// 基底クラスのリソースロード
+	TopBase::InitLoad();
+
+	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_CPU).handleId_;
 }
 
 void NormalEnemy::InitTransform(void)
@@ -48,10 +50,6 @@ void NormalEnemy::InitTransform(void)
 
 	topsMovement_ = topsSpeed_ = 0.0f;
 
-	topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
-
-	topsWeight_ = TOPS_WEIGHT;
-
 	topsSpeed_ = topsMovement_ = 0.0f;
 
 	topsRadius_ = COL_CAPSULE_RADIUS;
@@ -60,7 +58,9 @@ void NormalEnemy::InitTransform(void)
 
 	prevPos_ = { 0.0f,0.0f,0.0f };
 
-	topsShock_ = TOPS_SHOCK;
+	/*topsSpin_ = topsSpinMax_ = TOPS_SPIN_MAX;
+	topsWeight_ = TOPS_WEIGHT;
+	topsShock_ = TOPS_SHOCK;*/
 }
 
 void NormalEnemy::InitCollider(void)
@@ -97,7 +97,7 @@ void NormalEnemy::InitAnimation(void)
 
 void NormalEnemy::InitPost(void)
 {
-	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_CPU).handleId_;
+	TopBase::InitPost();
 
 	// 状態遷移初期処理登録
 	stateChanges_.emplace(static_cast<int>(STATE::NONE),
@@ -185,7 +185,7 @@ void NormalEnemy::Respawn(void)
 	isEnd_ = true;
 	//transform_.pos = respawnPos_;
 	//centerPos_ = respawnCenterPos_;
-	topsSpin_ = TOPS_SPIN_MAX;
+	//topsSpin_ = TOPS_SPIN_MAX;
 	topsVel_ = { 0.0f,0.0f,0.0f };
 	prevPos_ = respawnPos_;
 	ChangeState(STATE::THINK);

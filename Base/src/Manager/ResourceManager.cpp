@@ -57,6 +57,12 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top_Red.mv1");
 	resourcesMap_.emplace(SRC::RED_TOP, res);
 
+	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top_Green.mv1");
+	resourcesMap_.emplace(SRC::GREEN_TOP, res);
+
+	res = new RES(RES_T::MODEL, PATH_MDL + "Tops/Top_Yellow.mv1");
+	resourcesMap_.emplace(SRC::YELLOW_TOP, res);
+
 	// ステージモデル
 	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Base2.mv1");
 	resourcesMap_.emplace(SRC::MAIN_STAGE, res);

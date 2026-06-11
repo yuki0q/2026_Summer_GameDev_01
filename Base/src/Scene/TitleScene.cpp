@@ -132,7 +132,7 @@ void TitleScene::Update(void)
 	{
 		switch (count_) {
 		case 0:
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 			break;
 		case 1:
 			//sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);

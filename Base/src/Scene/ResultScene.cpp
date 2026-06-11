@@ -49,6 +49,12 @@ void ResultScene::Update(void)
 	{
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
+
+	if (ins.IsTrgDown(KEY_INPUT_R)
+		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+	{
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+	}
 }
 
 void ResultScene::Draw(void)
@@ -62,6 +68,9 @@ void ResultScene::Draw(void)
 	{
 		DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResultWin_, TRUE);
 	}
+
+	DrawFormatString(100, 100, 0xffffff, "Press R Key or Start Button to Retry");
+	DrawFormatString(100, 120, 0xffffff, "Press Space Key or A Button to Title");
 }
 
 void ResultScene::Release(void)

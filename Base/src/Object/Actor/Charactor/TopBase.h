@@ -16,6 +16,15 @@ public:
 		//MAX,
 	};
 
+	// コマのタイプ定義
+	enum class TOP_TYPE
+	{
+		ATTACK,   // 攻撃型：激しく傾きながら暴れる
+		DEFENSE,  // 防御型：どっしりしてブレにくい
+		STAMINA,  // 持久型：軸がブレず超安定
+		BALANCE,  // バランス型:すべての中間
+	};
+
 	TopBase(void);
 	virtual ~TopBase(void);
 
@@ -59,6 +68,10 @@ public:
 	void DrawImage(void);
 
 	float GetTopsShock(void)const { return topsShock_; }
+
+	// 外部からタイプを設定・取得
+	void SetTopType(TOP_TYPE type) { topType_ = type; }
+	TOP_TYPE GetTopType(void) const { return topType_; }
 
 protected:
 
@@ -131,6 +144,17 @@ protected:
 
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
+	// 衝突を無視する時間（秒数。1.0fで1秒間）
+	static constexpr float RESPAWN_MUTE_TIME = 1.0f;
+
+	// 調整用定数
+	// 何秒ごとに点を打つか（小さいほど滑らか）
+	static constexpr float TRAIL_INTERVAL = 0.02f;
+	// 軌跡を残す最大の長さ（個数）
+	static constexpr size_t TRAIL_MAX_POINTS = 50;
+	// 軌跡（帯）の横幅
+	static constexpr float TRAIL_WIDTH = 25.0f;
+
 	// 操作
 	virtual void ProcessMove(void);
 	virtual void ProcessJump(void);
@@ -146,7 +170,25 @@ protected:
 	// デバッグ描画
 	virtual void DrawDebug(void);
 
+	void TrailDraw(void);
+
 	float VSizeSq(const VECTOR& v);
+
+	// コマの傾き
+	void ProcessTopTilt(void);
+
+	// コマの軌跡
+	void ProcessTopTrail(void);
+
+	void TopSorting(void);
+
+	void ProccesTypeAttack(void);
+	void ProccesTypeDefense(void);
+	void ProccesTypeStamina(void);
+	void ProccesTypeBalance(void);
+
+	// シーン管理
+	SceneManager& sceMng_;
 
 	// 衝突による目標座標
 	VECTOR collisionTargetPos_;
@@ -158,7 +200,16 @@ protected:
 	bool isHit_;
 
 	float topsSpeed_;
+	// コマのスタミナ
 	float topsSpin_;
+
+	// スタミナの削れる速度
+	float scrapSpeed_;
+
+	// スタミナが15以下の時の削れる速度
+	float dyingScrapSpeed_;
+
+	// コマの重さ
 	float topsWeight_;
 	float topsRadius_;
 	float topsMovement_;
@@ -198,12 +249,29 @@ protected:
 	bool isEnd_;
 	bool isRespawning_;       // リスポーン直後フラグ
 	float respawnTimer_;       // 無敵・衝突無視のタイマー数
-	const float RESPAWN_MUTE_TIME = 1.0f; // 衝突を無視する時間（秒数。1.0fで1秒間）
 
 	bool isDying_;       // 倒れ中フラグ
 	float dyingTimer_;    // 倒れ始めてからの経過時間
 
-private:
 
-	
+
+
+	// 軌跡の1点ごとのデータ
+	struct TrailPoint {
+		VECTOR pos;       // 座標
+		float alpha;      // 透明度
+	};
+
+	int trailColorF_;
+	int trailColorE_;
+
+	std::vector<TrailPoint> trailPoints_; // 軌跡データの配列
+	float trailTimer_ = 0.0f;             // 軌跡を追加する周期タイマー
+
+	TOP_TYPE topType_; //
+
+	// タイプごとの挙動調整用パラメータ
+	float stability_ = 1.0f;    // 軸の安定度（高いほどブレがすぐ収まる）
+	float defaultTilt_ = 0.0f;  // 平常時の傾き（攻撃型などは最初から少し傾ける）
+	float wobbleSpeed_ = 1.0f;  // ヨロヨロと円を描く速度（歳差運動の速さ）
 };
