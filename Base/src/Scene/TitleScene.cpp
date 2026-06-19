@@ -17,6 +17,7 @@ TitleScene::TitleScene(void)
 	pushedButton_(0),
 	gameEnd_(0),
 	gameStart_(0),
+	configImg_(0),
 	instructions_(0),
 	selectNow_(0),
 	select_(0),
@@ -40,6 +41,7 @@ void TitleScene::Init(void)
 	button_ = resMng_.Load(ResourceManager::SRC::IMAGE_BUTTON).handleId_;
 	pushedButton_ = resMng_.Load(ResourceManager::SRC::IMAGE_PUSHED_BUTTON).handleId_;
 	gameStart_ = resMng_.Load(ResourceManager::SRC::GAME_START).handleId_;
+	configImg_ = resMng_.Load(ResourceManager::SRC::CONFIG_IMG).handleId_;
 	instructions_ = resMng_.Load(ResourceManager::SRC::IMAGE_INSTRUCTUION).handleId_;
 	gameEnd_ = resMng_.Load(ResourceManager::SRC::GAME_END).handleId_;
 	selectNow_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
@@ -184,7 +186,7 @@ void TitleScene::Draw(void)
 
 	if (window_) {
 		// ëÄçÏê‡ñæópÇÃâÊëúÇï`âÊ
-		DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 480, 1.0f, 0.0f, gameStart_, true);
+		DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 360, 0.7f, 0.0f, configImg_, true);
 	}
 }
 
@@ -196,6 +198,7 @@ void TitleScene::Release(void)
 	DeleteGraph(pushedButton_);
 	DeleteGraph(gameEnd_);
 	DeleteGraph(gameStart_);
+	DeleteGraph(configImg_);
 	DeleteGraph(instructions_);
 	DeleteGraph(selectNow_);
 

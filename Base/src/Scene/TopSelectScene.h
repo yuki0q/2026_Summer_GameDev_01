@@ -42,6 +42,8 @@ private:
 	int imgSkillSelect_;
 	int imgSkillSelectText_;
 
+	int imgTopIntro_[4] = { -1, -1, -1, -1 };
+
 	// ƒ‚ƒfƒ‹
 	int modelHandles_[4] = { -1, -1, -1, -1 };
 

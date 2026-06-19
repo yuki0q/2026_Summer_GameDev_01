@@ -17,6 +17,8 @@ TopSelectScene::TopSelectScene(void)
 	imgSkillSelect_(0),
 	imgSkillSelectText_(0),
 	selectIndex_(0),
+	imgTopIntro_(0),
+	modelHandles_(0),
 	isStickLeftOld_(false),
 	isStickRightOld_(false),
 	SceneBase()
@@ -33,6 +35,13 @@ void TopSelectScene::Init(void)
 	modelHandles_[1] = resMng_.Load(ResourceManager::SRC::GREEN_TOP).handleId_;	// 緑
 	modelHandles_[2] = resMng_.Load(ResourceManager::SRC::YELLOW_TOP).handleId_;// 黄
 	modelHandles_[3] = resMng_.Load(ResourceManager::SRC::RED_TOP).handleId_;	// 赤
+
+	imgTopIntro_[0] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_AT).handleId_;	// 攻撃
+	imgTopIntro_[1] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_DF).handleId_;	// 防御
+	imgTopIntro_[2] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_ST).handleId_;	// スタミナ
+	imgTopIntro_[3] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_BL).handleId_;	// バランス
+
+	imgTopSelectText_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
 
 	selectIndex_ = 0;
 
@@ -95,6 +104,13 @@ void TopSelectScene::Update(void)
 		sceMng_.SetPlayerTopType(selectIndex_);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
+
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+	{
+		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+	}
+
 	top_.Update();
 }
 
@@ -108,6 +124,8 @@ void TopSelectScene::Draw(void)
 	DrawString(100, 100, "SELECT YOUR SPINNING TOP", 0xffffff);
 	DrawString(100, 150, typeNames[selectIndex_], 0xffff00);
 	DrawString(100, 600, "Press LEFT / RIGHT to Select, SPACE to Decide", 0xffffff);
+	DrawRotaGraph(900, 500, 1.5f, 0.0f, imgTopSelectText_, true);
+	DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex_], true);
 
 	// 選択中の3Dモデルを原点に描画
 	if (modelHandles_[selectIndex_] != -1)
@@ -132,6 +150,12 @@ void TopSelectScene::Release(void)
 		{
 			MV1DeleteModel(modelHandles_[i]);
 			modelHandles_[i] = -1;
+		}
+
+		if (imgTopIntro_[i] != -1)
+		{
+			DeleteGraph(imgTopIntro_[i]);
+			imgTopIntro_[i] = -1;
 		}
 	}
 }

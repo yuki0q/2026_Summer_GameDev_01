@@ -330,6 +330,22 @@ void GameScene::CollisionResolve(void)
 			// 押し出しの基本強度
 			float pushPower = 150.0f;
 
+			if (player_->GetTopType() == TopBase::TOP_TYPE::DEFENSE && player_->IsShielding())
+			{
+				// プレイヤーが防御型でシールド中なら、自分が受けるノックバックをほぼゼロに
+				pushPower = 0.1f;
+				// さらに相手（エネミー）に追加のスピン減少ダメージを与える
+				enemy->SpinScrape(10.0f);
+			}
+
+			if (enemy->GetTopType() == TopBase::TOP_TYPE::DEFENSE && player_->IsShielding())
+			{
+				// プレイヤーが防御型でシールド中なら、自分が受けるノックバックをほぼゼロに
+				pushPower = 0.1f;
+				// さらに相手（エネミー）に追加のスピン減少ダメージを与える
+				player_->SpinScrape(5.0f);
+			}
+
 			// プレイヤーは法線と「逆」方向（引かれる方向）に強く押し出す
 			playerTargetPos = VSub(playerTargetPos, VScale(normal, pushPower));
 

@@ -50,6 +50,7 @@ protected:
 	// çXêVån
 	void UpdateProcess(void) override;
 	void UpdateProcessPost(void) override;
+	void ProcessMove(void) override;
 
 	void Draw(void)override;
 

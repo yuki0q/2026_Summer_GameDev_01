@@ -24,7 +24,8 @@ NormalEnemy::~NormalEnemy(void)
 
 void NormalEnemy::InitLoad(void)
 {
-	topType_ = TOP_TYPE::STAMINA;
+	//topType_ = TOP_TYPE::STAMINA;
+	topType_ = static_cast<TOP_TYPE>(GetRand(3));
 
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();
@@ -142,9 +143,6 @@ void NormalEnemy::UpdateProcess(void)
 		break;
 	}
 
-	// 状態別更新
-	stateUpdate_();
-
 	VECTOR dir = AsoUtility::VECTOR_ZERO;
 
 	bool isDash = false;
@@ -166,6 +164,12 @@ void NormalEnemy::UpdateProcessPost(void)
 
 }
 
+void NormalEnemy::ProcessMove(void)
+{
+	// 状態別更新
+	stateUpdate_();
+}
+
 void NormalEnemy::Draw(void)
 {
 	EnemyBase::Draw();
@@ -177,6 +181,10 @@ void NormalEnemy::Draw(void)
 		0xffff00, true);
 	DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
 		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+
+	if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+		DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");
+	}
 }
 
 void NormalEnemy::Respawn(void)
@@ -220,11 +228,11 @@ void NormalEnemy::ChangeStateThink(void)
 	// 思考
 	// ランダムに次の行動を決定
 	// 30%で待機、70%で徘徊
-	//int rand = GetRand(100);
+	/*int rand = GetRand(100);
 
-	/*if (rand < 30)
+	if (rand < 30)
 	{
-		ChangeState(STATE::IDLE);
+		isSkill_ = true;
 	}
 	else
 	{
@@ -259,7 +267,7 @@ void NormalEnemy::ChangeStateWander(void)
 
 	// ランダムな移動時間
 	//step_ = 100.0f + static_cast<float>(GetRand(5));
-	step_ = (3.0f + GetRand(3)) * 60.0f;
+	step_ = (3.0f + GetRand(3));
 
 	// 移動スピード
 	//topsSpeed_ = 3.0f;
@@ -283,6 +291,7 @@ void NormalEnemy::UpdateThink(void)
 {
 	if (GetCollisionTarget_()) { 
 		ChangeState(STATE::WANDER); }
+
 	// Think時は中心にとどまる
 		// XZ成分のみで距離を計算
 		float dx = 0.0f - centerPos_.x;
@@ -292,29 +301,87 @@ void NormalEnemy::UpdateThink(void)
 		VECTOR toTarget = VGet(0.0f - centerPos_.x, 0.0f, 0.0f - centerPos_.z);
 		float distXZ = VSize(toTarget);
 
-		// 到達判定（誤差以内なら完了）
-		if (distXZ < 2.0f)
-		{
-			// XZのみ目標座標に合わせる（Yは触らない）
-			centerPos_.x = 0.0f;
-			centerPos_.z = 0.0f;
+		if (topType_ == TOP_TYPE::DEFENSE || topType_ == TOP_TYPE::STAMINA) {
+			// 到達判定（誤差以内なら完了）
+			if (distXZ < 5.0f)
+			{
+				// XZのみ目標座標に合わせる（Yは触らない）
+				centerPos_.x = 0.0f;
+				centerPos_.z = 0.0f;
+
+				int rand = GetRand(100);
+
+				if (rand < 30)
+				{
+					topsSpeed_ = SPEED_MOVE;
+					isSkill_ = true;
+				}
+				else
+				{
+					isSkill_ = false;
+				}
+
+				//isSkill_ = true;
+			}
+			else
+			{
+				//// 補間速度（大きいほど素早く移動）
+				//float lerpSpeed = 0.3f;
+				//centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
+
+				// 中心への方向ベクトルを正規化
+				VECTOR moveDir = VNorm(toTarget);
+
+				// スタミナ（スピン量）の割合に応じた移動量を計算
+				float spinRatio = topsSpin_ / TOPS_SPIN_MAX;
+				//float spinRatio = 2.0f;
+				centerMovePow_ = VScale(moveDir, topsSpeed_ * spinRatio);
+
+				// centerPos_ を物理移動
+				centerPos_ = VAdd(centerPos_, centerMovePow_);
+			}
 		}
-		else
-		{
-			//// 補間速度（大きいほど素早く移動）
-			//float lerpSpeed = 0.3f;
-			//centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
+		else {
+			VECTOR toTarget = VGet(player_->GetTransform().pos.x - centerPos_.x, 
+				0.0f, 
+				player_->GetTransform().pos.z - centerPos_.z);
 
-			// 中心への方向ベクトルを正規化
-			VECTOR moveDir = VNorm(toTarget);
+			if (distXZ < 2.0f)
+			{
+				// XZのみ目標座標に合わせる（Yは触らない）
+				centerPos_.x = 0.0f;
+				centerPos_.z = 0.0f;
+			}
+			else
+			{
 
-			// スタミナ（スピン量）の割合に応じた移動量を計算
-			float spinRatio = topsSpin_ / TOPS_SPIN_MAX;
-			//float spinRatio = 2.0f;
-			centerMovePow_ = VScale(moveDir, topsSpeed_ * spinRatio);
+				//// 補間速度（大きいほど素早く移動）
+				//float lerpSpeed = 0.3f;
+				//centerPos_ = VAdd(centerPos_, VScale(toTarget, lerpSpeed));
 
-			// centerPos_ を物理移動
- 			centerPos_ = VAdd(centerPos_, centerMovePow_);
+				// 中心への方向ベクトルを正規化
+				VECTOR moveDir = VNorm(toTarget);
+
+				// スタミナ（スピン量）の割合に応じた移動量を計算
+				float spinRatio = topsSpin_ / TOPS_SPIN_MAX;
+				//float spinRatio = 2.0f;
+				centerMovePow_ = VScale(moveDir, topsSpeed_ * spinRatio);
+
+				// centerPos_ を物理移動
+				centerPos_ = VAdd(centerPos_, centerMovePow_);
+
+				int rand = GetRand(100);
+
+				if (rand < 30)
+				{
+					topsSpeed_ = SPEED_DASH;
+					isSkill_ = true;
+				}
+				else
+				{
+					isSkill_ = false;
+				}
+			}
 		}
 }
 

@@ -32,6 +32,11 @@ void Player::Draw(void)
 
 	DrawRotaGraph(50.0f, 
 		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+
+	if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+		DrawFormatString(30,670,0xffffff,"Skill Ready!!");
+	}
+
 }
 
 void Player::Release(void)
@@ -132,9 +137,6 @@ void Player::UpdateProcess(void)
 		return;
 	}
 
-	// 移動操作
-	ProcessMove();
-
 	// ジャンプ処理
 	ProcessJump();
 	
@@ -152,7 +154,8 @@ void Player::ProcessMove(void)
 	VECTOR dir = AsoUtility::VECTOR_ZERO;
 
 	bool isDash = false;
-	float accele = 0.3f;
+	isSkill_ = false;
+
 	moveSpeed_ = 0.0f;
 	topsSpeed_ = SPEED_MOVE;
 
@@ -174,7 +177,8 @@ void Player::ProcessMove(void)
 			if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_BL; }
 			if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_D)) { dir = AsoUtility::DIR_BR; }
 
-			if (ins.IsNew(KEY_INPUT_RSHIFT)) { isDash = true; }
+			if (ins.IsNew(KEY_INPUT_LSHIFT)) { isDash = true; }
+			if (ins.IsNew(KEY_INPUT_RSHIFT)) { isSkill_ = true; }
 
 			if (ins.IsNew(KEY_INPUT_G)) { isDying_ = true; }
 			
@@ -194,20 +198,29 @@ void Player::ProcessMove(void)
 				isDash = true;
 			}
 
+			if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
+				InputManager::JOYPAD_BTN::LB))
+			{
+				isSkill_ = true;
+			}
+
 		}
 	}
 
-	if (isDash)
-	{
-		moveSpeed_ = SPEED_DASH;
-		//topsSpeed_ += accele;
-		topsSpeed_ = SPEED_DASH;
-	}
+		if (isDash)
+		{
+			moveSpeed_ = SPEED_DASH;
+			topsSpeed_ = SPEED_DASH;
+		}
 
 	if (!AsoUtility::EqualsVZero(dir))
 	{
-		// 移動スピード
-		moveSpeed_ = SPEED_MOVE;
+		if (!isSkill_ || !isDash) {
+			// 移動スピード
+			moveSpeed_ = SPEED_MOVE;
+		}
+
+		if (isSkill_) { moveSpeed_ = topsSpeed_ = skillSpeed_; }
 
 		// ジャンプ中はアニメーションを変えない
 		if (!isJump_)

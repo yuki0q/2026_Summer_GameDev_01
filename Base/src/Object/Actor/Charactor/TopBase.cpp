@@ -23,6 +23,7 @@ TopBase::TopBase(void)
 	dyingScrapSpeed_(0.0f),
 	topsSpin_(0.0f),
 	topsSpinMax_(0.0f),
+	radiusFactor_(0.0f),
 	topsWeight_(0.0f),
 	topsRadius_(0.0f),
 	topsMovement_(0.0f),
@@ -48,6 +49,20 @@ TopBase::TopBase(void)
 	dyingTimer_(0.0f),
 	trailColorF_(0),
 	trailColorE_(0),
+	stability_(0.0f),
+	defaultTilt_(0.0f),
+	wobbleSpeed_(0.0f),
+	trailTimer_(0.0f),
+	isDashing_(false),
+	isShielding_(false),
+	isStabilitying_(false),
+	isBlancing_(false),
+	skillTimer_(0.0f),
+	isExSkill_(false),
+	isSkill_(false),
+	skillCoolTimer_(0.0f),
+	skillSpeed_(0.0f),
+	dyeCount_(0),
 	topType_(TOP_TYPE::BALANCE),// デフォルトはバランス]
 	sceMng_(SceneManager::GetInstance())
 {
@@ -103,6 +118,26 @@ void TopBase::InitAnimation(void)
 
 void TopBase::InitPost(void)
 {
+	dyeCount_ = 0;
+	// 攻撃型
+	isDashing_ = false;
+	// 防御型
+	isShielding_ = false;
+	// スタミナ型
+	isStabilitying_ = false;
+	// バランス型
+	isBlancing_ = false;
+
+	skillSpeed_ = 0.0f;
+	skillTimer_ = 0.0f;
+	skillCoolTimer_ = 0.0f;
+	isSkill_ = false;
+	isExSkill_ = false;
+
+	stability_ = 1.0f;
+	defaultTilt_ = 0.0f;
+	wobbleSpeed_ = 1.0f;
+	trailTimer_ = 0.0f;             // 軌跡を追加する周期タイマー
 	isRespawning_ = false;       // リスポーン直後フラグ
 	respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
 	isDying_ = false;       // 倒れ中フラグ
@@ -118,8 +153,10 @@ void TopBase::InitPost(void)
 		topsSpin_ = topsSpinMax_ = 90.0f;
 		topsWeight_ = 30.0f;
 		topsShock_ = 0.5f;
-		scrapSpeed_ = 0.10f;
+		scrapSpeed_ = 0.0005f;
+		skillSpeed_ = 100.0f;
 		dyingScrapSpeed_ = 0.10f;
+		radiusFactor_ = 1.2f;
 
 		// 軌跡のカラー
 		trailColorF_ = GetColor(100, 100, 255);
@@ -133,8 +170,10 @@ void TopBase::InitPost(void)
 		topsSpin_ = topsSpinMax_ = 100.0f;
 		topsWeight_ = 28.5f;
 		topsShock_ = 0.3f;
-		scrapSpeed_ = 0.10f;
-		dyingScrapSpeed_ = 0.03f;
+		scrapSpeed_ = 0.0002;
+		skillSpeed_ = 1.0f;
+		dyingScrapSpeed_ = 0.05f;
+		radiusFactor_ = 0.3f;
 
 		trailColorF_ = GetColor(100, 255, 100);
 		trailColorE_ = GetColor(50, 255, 50);
@@ -147,8 +186,10 @@ void TopBase::InitPost(void)
 		topsSpin_ = topsSpinMax_ = 120.0f;
 		topsWeight_ = 25.0f;
 		topsShock_ = 0.2f;
-		scrapSpeed_ = 0.10f;
-		dyingScrapSpeed_ = 0.01f;
+		scrapSpeed_ = 0.0002;
+		skillSpeed_ = SPEED_MOVE;
+		dyingScrapSpeed_ = 0.03f;
+		radiusFactor_ = 0.75;
 
 		trailColorF_ = GetColor(200, 200, 100);
 		trailColorE_ = GetColor(255, 255, 50);
@@ -160,8 +201,10 @@ void TopBase::InitPost(void)
 		topsSpin_ = topsSpinMax_ = 110.0f;
 		topsWeight_ = 27.5f;
 		topsShock_ = 0.4f;
-		scrapSpeed_ = 0.10f;
-		dyingScrapSpeed_ = 0.05f;
+		scrapSpeed_ = 0.0002f;
+		skillSpeed_ = 50.0f;
+		dyingScrapSpeed_ = 0.075f;
+		radiusFactor_ = 1.0f;
 
 		trailColorF_ = GetColor(255, 100, 100);
 		trailColorE_ = GetColor(255, 50, 50);
@@ -309,6 +352,9 @@ void TopBase::UpdateProcess(void)
 	// コマの回転・移動処理
 	ProcessTopMove();
 
+	// 移動操作
+	ProcessMove();
+
 	// コマの傾き
 	ProcessTopTilt();
 
@@ -361,7 +407,8 @@ void TopBase::ProcessJump(void)
 void TopBase::ProcessTopMove(void)
 {
 	if (transform_.pos.y < TOPS_DEAD_POS_Y) {
-		Respawn(); // リスポーン判定
+		//Respawn(); // リスポーン判定
+		isEnd_ = true;
 	}
 
 	// リスポーンタイマーの更新
@@ -414,10 +461,14 @@ void TopBase::ProcessTopMove(void)
 
 	//ローカル座標を親の回転行列で回転
 	VECTOR localRotPos_ = VTransform(
-		{ transform_.localPos.x * topsSpin_ / topsSpinMax_, 0.0f,
-		transform_.localPos.z * topsSpin_ / topsSpinMax_ }, parentMat);
+		{ transform_.localPos.x * (topsSpin_ / topsSpinMax_) * radiusFactor_, 0.0f,
+		transform_.localPos.z * (topsSpin_ / topsSpinMax_) * radiusFactor_ }, parentMat);
 	/*VECTOR localRotPos_ = VTransform(VScale(transform_.localPos,
 		topsSpin_ / TOPS_SPIN_MAX), parentMat);*/
+
+	if (isShielding_) {
+		localRotPos_.x = localRotPos_.z = 1.0f;
+	}
 
 	// ワールド座標
 	//transform_.pos = VAdd(localRotPos_, { centerPos_.x,transform_.pos.y,centerPos_.z });
@@ -437,14 +488,18 @@ void TopBase::ProcessTopMove(void)
 	{
 		if (topsSpin_ > 0.0f) 
 		{
-			if (topsSpin_ < 20.0f)
-			{
-				topsSpin_ -= dyingScrapSpeed_;//0.10f;
-			}
-			else
-			{
-				// 通常時（10.0f以上）の緩やかな削れかた
-				topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+			if (!isStabilitying_) {
+				if (topsSpin_ < 20.0f)
+				{
+					topsSpin_ -= dyingScrapSpeed_;//0.10f;
+				}
+				else
+				{
+					// 通常時（10.0f以上）の緩やかな削れかた
+					/*topsSpin_ -= (topsSpin_ * scrapSpeed_ + 
+						topsMovement_ * scrapSpeed_/2.0f) / 2.0f;*/
+					topsSpin_ -= (topsSpin_ * 0.0002f + topsMovement_ * 0.0001f) / 2.0f;
+				}
 			}
 		}
 		else {
@@ -629,6 +684,8 @@ void TopBase::ProcessTopTilt(void)
 	}
 	else
 	{
+		topsSpin_ = 0.0f;
+
 		// 倒れる演出中の処理
 		dyingTimer_ += dt;
 
@@ -661,7 +718,7 @@ void TopBase::ProcessTopTilt(void)
 		// 指定時間経過したらリスポーン
 		if (dyingTimer_ >= fallDuration)
 		{
-			//Respawn();
+			/*Respawn();*/
 			isEnd_ = true;
 			isDying_ = false;
 		}
@@ -721,27 +778,134 @@ void TopBase::TopSorting(void)
 		ProccesTypeBalance();
 		break;
 	}
+
+	if (skillCoolTimer_ > 0.0f)
+	{
+		skillCoolTimer_ -= scnMng_.GetDeltaTime();
+		if (skillCoolTimer_ <= 0.0f) 
+			skillCoolTimer_ = 0.0f; // 0以下にならないようクランプ
+	}
+
+	if (isDashing_)
+	{
+		skillTimer_ -= scnMng_.GetDeltaTime();
+		if (skillTimer_ <= 0.0f || !isSkill_)
+		{
+			isDashing_ = false;
+			topsShock_ = 0.5f; // 元の衝撃力に戻す
+			radiusFactor_ = 1.2f;
+			trailColorF_ = GetColor(100, 100, 255);
+			trailColorE_ = GetColor(50, 50, 255);
+		}
+	}
+
+	if (isShielding_)
+	{
+		skillTimer_ -= scnMng_.GetDeltaTime();
+		if (skillTimer_ <= 0.0f || !isSkill_)
+		{
+			isShielding_ = false;
+			trailColorF_ = GetColor(100, 255, 100);
+			trailColorE_ = GetColor(50, 255, 50);
+		}
+	}
+
+	if (isStabilitying_)
+	{
+		skillTimer_ -= scnMng_.GetDeltaTime();
+		if (skillTimer_ <= 0.0f || !isSkill_)
+		{
+			isStabilitying_ = false;
+			trailColorF_ = GetColor(255, 255, 100);
+			trailColorE_ = GetColor(255, 255, 50);
+			stability_ = 3.0f;
+		}
+	}
+
+	if (isBlancing_)
+	{
+		skillTimer_ -= scnMng_.GetDeltaTime();
+		if (skillTimer_ <= 0.0f || !isSkill_)
+		{
+			isBlancing_ = false;
+			trailColorF_ = GetColor(255, 100, 100);
+			trailColorE_ = GetColor(255, 50, 50);
+			stability_ = 1.5f;
+			topsShock_ = 0.4f;
+		}
+	}
 }
 
 void TopBase::ProccesTypeAttack(void)
 {
-	// ★コア物理：コマが傾いている方向へグイグイ引っ張られる推進力を計算
 	// 現在の移動システム（centerMovePow_）に合わせて、毎フレーム足し込むベクトルを作る
 	float attackMoveForce = 5.0f; // centerMovePow_に直接足すため、数値は小さめ（3.0f〜8.0f程度）から調整してください
 	VECTOR slideAccel = { tiltX_ * attackMoveForce, 0.0f, tiltZ_ * attackMoveForce };
 
 	// 攻撃型の推進力を、実際に移動に使われている centerMovePow_ に直接加算する
 	centerMovePow_ = VAdd(centerMovePow_, slideAccel);
+
+	if (!isDashing_ && skillCoolTimer_ <= 0.0f && isSkill_)
+	{
+		isDashing_ = true;
+		skillTimer_ = 1.0f;
+		skillCoolTimer_ = SKILL_COOL_TIME_A;
+	//	radiusFactor_ = 3.0f;
+		// 突進方向に強い慣性を乗せる（現在の移動速度や向きに合わせて）
+		VECTOR dashDir = VNorm({tiltX_, 0.0f, tiltZ_});
+		if (VSizeSq(dashDir) < 0.01f) {
+			dashDir = { 1.0f, 0.0f, 0.0f }; // 傾きがない場合の安全策
+		}
+
+		trailColorF_ = GetColor(200, 200, 255);
+		trailColorE_ = GetColor(150, 150, 255);
+		
+
+		// 瞬間的に慣性速度を大きくする
+		centerMovePow_ = VScale(dashDir, 800.0f);
+
+		// 攻撃型専用の衝撃力バフ（通常0.5f → ダッシュ時 2.0f）
+		topsShock_ = 2.0f;
+	}
 }
 
 void TopBase::ProccesTypeDefense(void)
 {
 	centerMovePow_ = VScale(centerMovePow_, 0.97f);
+
+	if (!isShielding_ && skillCoolTimer_ <= 0.0f && isSkill_)
+	{
+		isShielding_ = true;
+		skillTimer_ = 3.0f;
+
+		skillCoolTimer_ = SKILL_COOL_TIME_D;
+		trailColorF_ = GetColor(200, 255, 200);
+		trailColorE_ = GetColor(150, 255, 150);
+	}
+
+	
 }
 
 void TopBase::ProccesTypeStamina(void)
 {
 	centerMovePow_ = VScale(centerMovePow_, 0.85f);
+
+	if(!isStabilitying_ && skillCoolTimer_ <= 0.0f && isSkill_)
+	{
+		isStabilitying_ = true;
+		skillTimer_ = 5.0f; 
+
+		skillCoolTimer_ = SKILL_COOL_TIME_S;
+
+		collisionTiltX_ = 0.0f;
+		collisionTiltZ_ = 0.0f;
+
+		stability_ = 15.0f;
+
+		trailColorF_ = GetColor(255, 255, 200);
+		trailColorE_ = GetColor(255, 255, 150);
+	}
+	;
 }
 
 void TopBase::ProccesTypeBalance(void)
@@ -749,8 +913,34 @@ void TopBase::ProccesTypeBalance(void)
 	float balanceMoveForce = 1.5f;
 	VECTOR slideAccel = { tiltX_ * balanceMoveForce, 0.0f, tiltZ_ * balanceMoveForce };
 	centerMovePow_ = VAdd(centerMovePow_, slideAccel);
-}
 
+	if (!isBlancing_ && skillCoolTimer_ <= 0.0f && isSkill_)
+	{
+		isBlancing_ = true;
+		
+		VECTOR inputDir = { tiltX_, 0.0f, tiltZ_ };
+		if (topsSpin_ > topsSpinMax_ / 2.0f) 
+		{
+			// 攻撃型
+			centerMovePow_ = VScale(VNorm(inputDir), 1200.0f);
+			topsShock_ = 1.5f;
+			skillTimer_ = 1.2f;
+			skillSpeed_ = 80.0f;
+		}
+		else // 防御型
+		{
+			isShielding_ = true; // 既存のフラグを流用
+			stability_ = 10.0f;
+			skillTimer_ = 1.0f;
+			skillSpeed_ = 1.0f;
+		}
+
+		skillCoolTimer_ = SKILL_COOL_TIME_B;
+		trailColorF_ = GetColor(255, 200, 200);
+		trailColorE_ = GetColor(255, 150, 150);
+	}
+	;
+}
 
 void TopBase::CollisionReserve(void)
 
@@ -763,7 +953,11 @@ void TopBase::CollisionReserve(void)
 
 void TopBase::Respawn(void)
 {
-	isEnd_ = true;
+	/*dyeCount_++;
+
+	if (dyeCount_ >= 3) {
+		isEnd_ = true;
+	}*/
 
 
 	//transform_.pos = respawnPos_;

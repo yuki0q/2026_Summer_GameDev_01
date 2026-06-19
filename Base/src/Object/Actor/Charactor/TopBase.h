@@ -73,6 +73,8 @@ public:
 	void SetTopType(TOP_TYPE type) { topType_ = type; }
 	TOP_TYPE GetTopType(void) const { return topType_; }
 
+	bool IsShielding(void) { return isShielding_; }
+
 protected:
 
 	// リソースロード
@@ -155,6 +157,11 @@ protected:
 	// 軌跡（帯）の横幅
 	static constexpr float TRAIL_WIDTH = 25.0f;
 
+	static constexpr float SKILL_COOL_TIME_A = 2.0f; // クールタイムの長さ
+	static constexpr float SKILL_COOL_TIME_D = 5.0f; // クールタイムの長さ
+	static constexpr float SKILL_COOL_TIME_S = 10.0f; // クールタイムの長さ
+	static constexpr float SKILL_COOL_TIME_B = 2.0f; // クールタイムの長さ
+
 	// 操作
 	virtual void ProcessMove(void);
 	virtual void ProcessJump(void);
@@ -202,6 +209,9 @@ protected:
 	float topsSpeed_;
 	// コマのスタミナ
 	float topsSpin_;
+
+	// コマの公転半径
+	float radiusFactor_;
 
 	// スタミナの削れる速度
 	float scrapSpeed_;
@@ -253,8 +263,26 @@ protected:
 	bool isDying_;       // 倒れ中フラグ
 	float dyingTimer_;    // 倒れ始めてからの経過時間
 
+	// 攻撃型スキル時
+	bool isDashing_;
+	// 防御型スキル時
+	bool isShielding_;
+	// スタミナ型スキル時
+	bool isStabilitying_;
+	// バランス型スキル時
+	bool isBlancing_;
 
+	// EXスキルの管理フラグ
+	bool isExSkill_;
+	// スキルの管理フラグ
+	bool isSkill_;
+	// スキルの管理タイマー
+	float skillTimer_;
+	// スキルのクールタイマー
+	float skillCoolTimer_;     
 
+	// スキル使用時のスピード
+	float skillSpeed_;
 
 	// 軌跡の1点ごとのデータ
 	struct TrailPoint {
@@ -262,16 +290,17 @@ protected:
 		float alpha;      // 透明度
 	};
 
+	int dyeCount_;
 	int trailColorF_;
 	int trailColorE_;
 
 	std::vector<TrailPoint> trailPoints_; // 軌跡データの配列
-	float trailTimer_ = 0.0f;             // 軌跡を追加する周期タイマー
+	float trailTimer_;             // 軌跡を追加する周期タイマー
 
-	TOP_TYPE topType_; //
+	TOP_TYPE topType_;
 
 	// タイプごとの挙動調整用パラメータ
-	float stability_ = 1.0f;    // 軸の安定度（高いほどブレがすぐ収まる）
-	float defaultTilt_ = 0.0f;  // 平常時の傾き（攻撃型などは最初から少し傾ける）
-	float wobbleSpeed_ = 1.0f;  // ヨロヨロと円を描く速度（歳差運動の速さ）
+	float stability_ ;    // 軸の安定度（高いほどブレがすぐ収まる）
+	float defaultTilt_;  // 平常時の傾き（攻撃型などは最初から少し傾ける）
+	float wobbleSpeed_;  // ヨロヨロと円を描く速度（歳差運動の速さ）
 };

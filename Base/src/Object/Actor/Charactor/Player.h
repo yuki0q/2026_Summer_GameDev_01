@@ -92,12 +92,6 @@ private:
 	// コマの最大スピン（スタミナ）
 	static constexpr float TOPS_SPIN_MAX = 100.0f;
 
-	// 移動速度(通常)
-	static constexpr float SPEED_MOVE = 15.0f;
-
-	// 移動速度(ダッシュ)
-	static constexpr float SPEED_DASH = 30.0f;
-
 	// コマのリスポーンY座標
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 

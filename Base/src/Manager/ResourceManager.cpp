@@ -100,6 +100,18 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "1.png");
 	resourcesMap_.emplace(SRC::IMAGE_1, res);
 
+	res = new RES(RES_T::IMG, PATH_IMG + "IntroAT.png");
+	resourcesMap_.emplace(SRC::IMAGE_INTRO_AT, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "IntroDF.png");
+	resourcesMap_.emplace(SRC::IMAGE_INTRO_DF, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "IntroST.png");
+	resourcesMap_.emplace(SRC::IMAGE_INTRO_ST, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "IntroBL.png");
+	resourcesMap_.emplace(SRC::IMAGE_INTRO_BL, res);
+
 	res = new RES(RES_T::IMG, PATH_IMG + "YouWin.png");
 	resourcesMap_.emplace(SRC::RESULT_WIN, res);
 
@@ -138,6 +150,9 @@ void ResourceManager::Init(void)
 
 	res = new RES(RES_T::IMG, PATH_IMG + "gameStart.png");
 	resourcesMap_.emplace(SRC::GAME_START, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "config.png");
+	resourcesMap_.emplace(SRC::CONFIG_IMG, res);
 
 	res = new RES(RES_T::IMG, PATH_IMG + "instructions.png");
 	resourcesMap_.emplace(SRC::IMAGE_INSTRUCTUION, res);

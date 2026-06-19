@@ -88,6 +88,7 @@ private:
 	int pushedButton_;
 	int gameEnd_;
 	int gameStart_;
+	int configImg_;
 	int instructions_;
 	int selectNow_;
 
