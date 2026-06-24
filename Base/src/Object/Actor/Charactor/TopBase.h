@@ -25,7 +25,48 @@ public:
 		BALANCE,  // バランス型:すべての中間
 	};
 
-	TopBase(void);
+	// コマのデータ
+	struct TopData {
+		TopBase::TOP_TYPE type;
+
+		// コマのスタミナ
+		float topsSpin;
+		
+		// 軸の安定度（高いほどブレがすぐ収まる）
+		float stability;
+
+		// 平常時の傾き
+		float defaultTilt;
+
+		// 歳差運動の速さ
+		float wobbleSpeed;  
+
+		// コマの重さ
+		float topsWeight;
+
+		// コマごとの衝突の強さ
+		float topsShock;
+
+		// コマの通常時の速さ
+		float speed;
+
+		// コマの通常時の速さ
+		float dashSpeed;
+
+		// スキル使用時のスピード
+		float skillSpeed;
+
+		// スタミナの削れる速度
+		float scrapSpeed;
+
+		// スタミナが15以下の時の削れる速度
+		float dyingScrapSpeed;
+
+		// コマの公転半径
+		float radiusFactor;
+	};
+
+	TopBase(const TopBase::TopData& data);
 	virtual ~TopBase(void);
 
 	// 描画
@@ -207,6 +248,8 @@ protected:
 	bool isHit_;
 
 	float topsSpeed_;
+	float dashSpeed_;
+
 	// コマのスタミナ
 	float topsSpin_;
 
@@ -263,6 +306,12 @@ protected:
 	bool isDying_;       // 倒れ中フラグ
 	float dyingTimer_;    // 倒れ始めてからの経過時間
 
+	// スキル使用時のスピード
+	float skillSpeed_;
+
+	int trailColorF_;
+	int trailColorE_;
+
 	// 攻撃型スキル時
 	bool isDashing_;
 	// 防御型スキル時
@@ -281,9 +330,6 @@ protected:
 	// スキルのクールタイマー
 	float skillCoolTimer_;     
 
-	// スキル使用時のスピード
-	float skillSpeed_;
-
 	// 軌跡の1点ごとのデータ
 	struct TrailPoint {
 		VECTOR pos;       // 座標
@@ -291,8 +337,6 @@ protected:
 	};
 
 	int dyeCount_;
-	int trailColorF_;
-	int trailColorE_;
 
 	std::vector<TrailPoint> trailPoints_; // 軌跡データの配列
 	float trailTimer_;             // 軌跡を追加する周期タイマー

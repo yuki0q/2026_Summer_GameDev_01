@@ -2,6 +2,7 @@
 #include <EffekseerForDXLib.h>
 #include "Manager/InputManager.h"
 #include "Manager/ResourceManager.h"
+#include "Manager/TopDataManager.h"
 #include "Manager/SceneManager.h"
 #include "Common/FpsController.h"
 #include "Application.h"
@@ -73,6 +74,9 @@ void Application::Init(void)
 	// シーン管理初期化
 	SceneManager::CreateInstance();
 
+	TopDataManager::CreateInstance();
+
+	// 
 }
 
 void Application::Run(void)
@@ -113,6 +117,7 @@ void Application::Destroy(void)
 
 	// シーン管理解放
 	SceneManager::GetInstance().Destroy();
+	TopDataManager::GetInstance().Destroy();
 
 	// Effekseerを終了する。
 	Effkseer_End();

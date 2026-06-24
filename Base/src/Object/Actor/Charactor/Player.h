@@ -6,7 +6,7 @@ class Player : public TopBase
 
 public:
 
-	Player(void);
+	Player(const TopBase::TopData& data);
 	virtual ~Player(void);
 
 	// •`‰æ

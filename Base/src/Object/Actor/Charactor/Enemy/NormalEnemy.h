@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include "EnemyBase.h"
 class Player;
+class TopBase;
 
 class NormalEnemy : public EnemyBase
 {
@@ -25,7 +26,7 @@ public:
 	};
 
 	// コンストラクタ
-	NormalEnemy(const EnemyBase::EnemyData& data, Player* player);
+	NormalEnemy(const TopBase::TopData& data, Player* player);
 
 	// デストラクタ
 	~NormalEnemy(void) override;

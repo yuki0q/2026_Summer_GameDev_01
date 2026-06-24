@@ -4,20 +4,16 @@
 #include "EnemyBase.h"
 #include "../Player.h"
 
-EnemyBase::EnemyBase(const EnemyBase::EnemyData& data, Player* player)
+EnemyBase::EnemyBase(const TopBase::TopData& data, Player* player)
 	:
-	TopBase(),
-	type_(data.type),
-	hp_(data.hp),
+	TopBase(data),
 	defaultPos_(AsoUtility::VECTOR_ZERO),
 	defaultCenterPos_(AsoUtility::VECTOR_ZERO),
-	moveRange_(data.moveRange),
+	moveRange_(0.0f),
 	stateBase_(),
 	stateChanges_(),
 	player_(player)
 {
-	// ‰ŠúÀ•W‚Ìİ’è
-	transform_.pos = data.defaultPos;
 }
 
 EnemyBase::~EnemyBase(void)

@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
 #include "../Object/Actor/Charactor/Enemy/EnemyBase.h"
+#include "../Object/Actor/Charactor/TopBase.h"
 
 class ColliderBase;
 class EnemyBase;
 class Player;
+class TopBase;
+class TopDataManager;
 
 class EnemyManager
 {
@@ -12,7 +15,7 @@ class EnemyManager
 public:
 
 	// コンストラクタ
-	EnemyManager(Player* player);
+	EnemyManager(Player* player,TopDataManager& dataMng);
 
 	// デストラクタ
 	~EnemyManager(void);
@@ -36,10 +39,10 @@ public:
 	void AddHitCollider(const ColliderBase* hitCollider);
 
 	// CSVから敵情報の読取を行う
-	void LoadCsvData(void);
+	//void LoadCsvData(void);
 
 	// エネミー生成
-	EnemyBase* Create(const EnemyBase::EnemyData& data);
+	EnemyBase* Create(const TopBase::TopData& data);
 
 private:
 
@@ -48,4 +51,6 @@ private:
 
 	// プレイヤー
 	Player* player_;
+
+	TopDataManager& dataMng_;
 };

@@ -1,6 +1,7 @@
 #pragma once
 class ResourceManager;
 class SceneManager;
+class TopDataManager;
 
 class SceneBase
 {
@@ -32,4 +33,7 @@ protected:
 
 	// シーン管理
 	SceneManager& sceMng_;
+
+	// データ管理
+	TopDataManager& dataMng_;
 };

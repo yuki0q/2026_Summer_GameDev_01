@@ -9,25 +9,25 @@ class EnemyBase : public TopBase
 
 public:
 
-	// 種別
-	enum class TYPE
-	{
-		NORMAL_TOP,
-		TOP,
-	};
+	//// 種別
+	//enum class TYPE
+	//{
+	//	NORMAL_TOP,
+	//	TOP,
+	//};
 
-	// エネミーデータ
-	struct EnemyData
-	{
-		int id;
-		EnemyBase::TYPE type;
-		int hp;
-		VECTOR defaultPos;
-		float moveRange;
-	};
+	//// エネミーデータ
+	//struct EnemyData
+	//{
+	//	int id;
+	//	EnemyBase::TYPE type;
+	//	int hp;
+	//	VECTOR defaultPos;
+	//	float moveRange;
+	//};
 
 	// コンストラクタ
-	EnemyBase(const EnemyBase::EnemyData& data, Player* player);
+	EnemyBase(const TopBase::TopData& data, Player* player);
 
 	// デストラクタ
 	virtual ~EnemyBase(void) override;
@@ -45,12 +45,6 @@ protected:
 	std::function<void(void)> stateUpdate_;
 
 	Player* player_;
-
-	// 種別
-	TYPE type_;
-
-	// HP
-	int hp_;
 
 	// 初期位置
 	VECTOR defaultPos_;

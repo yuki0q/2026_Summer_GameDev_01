@@ -10,9 +10,9 @@
 #include "../../Collider/ColliderCapsule.h"
 #include "Player.h"
 
-Player::Player(void)
+Player::Player(const TopBase::TopData& data)
 	:
-	TopBase()
+	TopBase(data)
 {
 }
 
@@ -46,7 +46,7 @@ void Player::Release(void)
 
 void Player::InitLoad(void)
 {
-	topType_ = static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType());
+	//topType_ = static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType());
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();
 
@@ -192,13 +192,13 @@ void Player::ProcessMove(void)
 			// アナログキーの入力値から方向を取得
 			dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
-			if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
+			if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
 				InputManager::JOYPAD_BTN::RB))
 			{
 				isDash = true;
 			}
 
-			if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
+			if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
 				InputManager::JOYPAD_BTN::LB))
 			{
 				isSkill_ = true;
@@ -209,8 +209,8 @@ void Player::ProcessMove(void)
 
 		if (isDash)
 		{
-			moveSpeed_ = SPEED_DASH;
-			topsSpeed_ = SPEED_DASH;
+			moveSpeed_ = dashSpeed_;
+			topsSpeed_ = dashSpeed_;
 		}
 
 	if (!AsoUtility::EqualsVZero(dir))

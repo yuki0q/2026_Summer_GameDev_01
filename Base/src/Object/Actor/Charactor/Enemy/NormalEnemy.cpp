@@ -10,12 +10,13 @@
 #include "../Player.h"
 #include "NormalEnemy.h"
 
-NormalEnemy::NormalEnemy(const EnemyBase::EnemyData& data, Player* player)
+NormalEnemy::NormalEnemy(const TopBase::TopData& data, Player* player)
 	:
 	EnemyBase(data, player),
 	state_(STATE::NONE),
 	step_(0.0f)
 {
+	topType_ = data.type;
 }
 
 NormalEnemy::~NormalEnemy(void)
@@ -25,7 +26,7 @@ NormalEnemy::~NormalEnemy(void)
 void NormalEnemy::InitLoad(void)
 {
 	//topType_ = TOP_TYPE::STAMINA;
-	topType_ = static_cast<TOP_TYPE>(GetRand(3));
+	/*topType_ = static_cast<TOP_TYPE>(GetRand(3));*/
 
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();

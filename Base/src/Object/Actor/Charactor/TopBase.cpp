@@ -11,20 +11,13 @@
 #include "../../../Common/Quaternion.h"
 #include "TopBase.h"
 
-TopBase::TopBase(void)
+TopBase::TopBase(const TopBase::TopData& data)
 	:
 	CharactorBase(),
 	centerMovePow_(AsoUtility::VECTOR_ZERO),
 	centerPos_(AsoUtility::VECTOR_ZERO),
 	centerRot_(AsoUtility::VECTOR_ZERO),
 	centerQuaRot_(Quaternion::Identity()),
-	topsSpeed_(0.0f),
-	scrapSpeed_(0.0f),
-	dyingScrapSpeed_(0.0f),
-	topsSpin_(0.0f),
-	topsSpinMax_(0.0f),
-	radiusFactor_(0.0f),
-	topsWeight_(0.0f),
 	topsRadius_(0.0f),
 	topsMovement_(0.0f),
 	tiltX_(0.0f),
@@ -40,7 +33,6 @@ TopBase::TopBase(void)
 	collisionTargetPos_(AsoUtility::VECTOR_ZERO),
 	respawnPos_(AsoUtility::VECTOR_ZERO),
 	respawnCenterPos_(AsoUtility::VECTOR_ZERO),
-	topsShock_(0.0f),
 	isEnd_(false),
 	imgChara_(0),
 	isRespawning_(false),
@@ -49,9 +41,6 @@ TopBase::TopBase(void)
 	dyingTimer_(0.0f),
 	trailColorF_(0),
 	trailColorE_(0),
-	stability_(0.0f),
-	defaultTilt_(0.0f),
-	wobbleSpeed_(0.0f),
 	trailTimer_(0.0f),
 	isDashing_(false),
 	isShielding_(false),
@@ -61,9 +50,22 @@ TopBase::TopBase(void)
 	isExSkill_(false),
 	isSkill_(false),
 	skillCoolTimer_(0.0f),
-	skillSpeed_(0.0f),
 	dyeCount_(0),
-	topType_(TOP_TYPE::BALANCE),// デフォルトはバランス]
+	topType_(data.type),
+	topsSpin_(data.topsSpin),
+	topsSpinMax_(data.topsSpin),
+	stability_(data.stability),
+	defaultTilt_(data.defaultTilt),
+	wobbleSpeed_(data.wobbleSpeed),
+	topsWeight_(data.topsWeight),
+	topsShock_(data.topsShock),
+	topsSpeed_(data.speed),
+	dashSpeed_(data.dashSpeed),
+	skillSpeed_(data.skillSpeed),
+	scrapSpeed_(data.scrapSpeed),
+	dyingScrapSpeed_(data.dyingScrapSpeed),
+	radiusFactor_(data.radiusFactor),
+	//topType_(TOP_TYPE::BALANCE),// デフォルトはバランス]
 	sceMng_(SceneManager::GetInstance())
 {
 }
@@ -128,15 +130,11 @@ void TopBase::InitPost(void)
 	// バランス型
 	isBlancing_ = false;
 
-	skillSpeed_ = 0.0f;
 	skillTimer_ = 0.0f;
 	skillCoolTimer_ = 0.0f;
 	isSkill_ = false;
 	isExSkill_ = false;
 
-	stability_ = 1.0f;
-	defaultTilt_ = 0.0f;
-	wobbleSpeed_ = 1.0f;
 	trailTimer_ = 0.0f;             // 軌跡を追加する周期タイマー
 	isRespawning_ = false;       // リスポーン直後フラグ
 	respawnTimer_ = 0.0f;       // 無敵・衝突無視のタイマー数
@@ -147,67 +145,67 @@ void TopBase::InitPost(void)
 	switch (topType_)
 	{
 	case TOP_TYPE::ATTACK:
-		stability_ = 0.3f;     // 復元力が弱いので、ずっとヨロヨロする
-		defaultTilt_ = 0.26f;   // 最初から約8度くらい傾いて回る
-		wobbleSpeed_ = 2.5f;    // 激しくグルグル円を描く
-		topsSpin_ = topsSpinMax_ = 90.0f;
-		topsWeight_ = 30.0f;
-		topsShock_ = 0.5f;
-		scrapSpeed_ = 0.0005f;
-		skillSpeed_ = 100.0f;
-		dyingScrapSpeed_ = 0.10f;
-		radiusFactor_ = 1.2f;
+		//topsSpin_ = topsSpinMax_ = 90.0f;
+		//stability_ = 0.3f;     // 復元力が弱いので、ずっとヨロヨロする
+		//defaultTilt_ = 0.26f;   // 最初から約8度くらい傾いて回る
+		//wobbleSpeed_ = 2.5f;    // 激しくグルグル円を描く
+		//topsWeight_ = 30.0f;
+		//topsShock_ = 0.5f;
+		//scrapSpeed_ = 0.0005f;
+		//dyingScrapSpeed_ = 0.10f;
+		//skillSpeed_ = 100.0f;
+		//radiusFactor_ = 1.2f;
 
 		// 軌跡のカラー
-		trailColorF_ = GetColor(100, 100, 255);
-		trailColorE_ = GetColor(50, 50, 255);
+		trailColorF_ = 0x6464FF;
+		trailColorE_ = 0x3232FF;
 		break;
 
 	case TOP_TYPE::DEFENSE:
-		stability_ = 5.0f;     // 復元力が超高い。叩かれてもすぐ直立に戻る
-		defaultTilt_ = 0.0f;
-		wobbleSpeed_ = 0.8f;
-		topsSpin_ = topsSpinMax_ = 100.0f;
-		topsWeight_ = 28.5f;
-		topsShock_ = 0.3f;
-		scrapSpeed_ = 0.0002;
-		skillSpeed_ = 1.0f;
-		dyingScrapSpeed_ = 0.05f;
-		radiusFactor_ = 0.3f;
+		//topsSpin_ = topsSpinMax_ = 100.0f;
+		//stability_ = 5.0f;     // すぐ直立に戻る
+		//defaultTilt_ = 0.0f;
+		//wobbleSpeed_ = 0.8f;
+		//topsWeight_ = 28.5f;
+		//topsShock_ = 0.3f;
+		//scrapSpeed_ = 0.0002;
+		//skillSpeed_ = 1.0f;
+		//dyingScrapSpeed_ = 0.05f;
+		//radiusFactor_ = 0.3f;
 
-		trailColorF_ = GetColor(100, 255, 100);
-		trailColorE_ = GetColor(50, 255, 50);
+		trailColorF_ = 0x64ff64;
+		trailColorE_ = 0x32ff32;
 		break;
 
 	case TOP_TYPE::STAMINA:
-		stability_ = 3.0f;     // 標準的
-		defaultTilt_ = 0.0f;    // 全くブレずに静かに回る
-		wobbleSpeed_ = 1.0f;
-		topsSpin_ = topsSpinMax_ = 120.0f;
-		topsWeight_ = 25.0f;
-		topsShock_ = 0.2f;
-		scrapSpeed_ = 0.0002;
-		skillSpeed_ = SPEED_MOVE;
-		dyingScrapSpeed_ = 0.03f;
-		radiusFactor_ = 0.75;
+		//topsSpin_ = topsSpinMax_ = 120.0f;
+		//stability_ = 3.0f;     // 標準的
+		//defaultTilt_ = 0.0f;    // 全くブレずに静かに回る
+		//wobbleSpeed_ = 1.0f;
+		//topsWeight_ = 25.0f;
+		//topsShock_ = 0.2f;
+		//scrapSpeed_ = 0.0002;
+		//skillSpeed_ = SPEED_MOVE;
+		//dyingScrapSpeed_ = 0.03f;
+		//radiusFactor_ = 0.75;
 
-		trailColorF_ = GetColor(200, 200, 100);
-		trailColorE_ = GetColor(255, 255, 50);
+		trailColorF_ = 0xC8FF64;
+		trailColorE_ = 0xE1FF32;
 		break;
 	case TOP_TYPE::BALANCE:
-		stability_ = 1.5f;     // 標準的
-		defaultTilt_ = 0.15f;   
-		wobbleSpeed_ = 1.75f;
-		topsSpin_ = topsSpinMax_ = 110.0f;
-		topsWeight_ = 27.5f;
-		topsShock_ = 0.4f;
-		scrapSpeed_ = 0.0002f;
-		skillSpeed_ = 50.0f;
-		dyingScrapSpeed_ = 0.075f;
-		radiusFactor_ = 1.0f;
+		//topsSpin_ = topsSpinMax_ = 110.0f;
+		//stability_ = 1.5f;     // 標準的
+		//defaultTilt_ = 0.15f;   
+		//wobbleSpeed_ = 1.75f;
+		//topsWeight_ = 27.5f;
+		//topsShock_ = 0.4f;
+		//scrapSpeed_ = 0.0002f;
+		//skillSpeed_ = 50.0f;
+		//dyingScrapSpeed_ = 0.075f;
+		//radiusFactor_ = 1.0f;
 
-		trailColorF_ = GetColor(255, 100, 100);
-		trailColorE_ = GetColor(255, 50, 50);
+		trailColorF_ = 0xff6464;
+		trailColorE_ = 0xff3232;
 		break;
 	}
 }

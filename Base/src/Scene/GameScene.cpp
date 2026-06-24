@@ -4,6 +4,7 @@
 #include "../Manager/Camera.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/EnemyManager.h"
+#include "../Manager/TopDataManager.h"
 #include "../Manager/Resource.h"
 #include "../Object/Actor/NormalStage.h"
 #include "../Object/Actor/Charactor/Player.h"
@@ -32,8 +33,14 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+	/*TopDataManager* dataMng = new TopDataManager();
+	dataMng_.LoadCsvData("TopData.csv");*/
+
+	const TopBase::TopData* playerData = dataMng_.GetTopData
+	(static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType()));
+
 	// プレイヤー
-	player_ = new Player();
+	player_ = new Player(*playerData);
 	player_->Init();
 
 	// ステージ
@@ -41,7 +48,7 @@ void GameScene::Init(void)
 	normalStage_->Init();
 
 	// エネミー管理
-	enemyManager_ = new EnemyManager(player_);
+	enemyManager_ = new EnemyManager(player_, dataMng_);
 	enemyManager_->Init();
 
 	const ColliderBase* stageCollider =
