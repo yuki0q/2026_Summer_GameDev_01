@@ -116,6 +116,8 @@ public:
 
 	bool IsShielding(void) { return isShielding_; }
 
+	virtual void Respawn(void);
+
 protected:
 
 	// リソースロード
@@ -212,8 +214,6 @@ protected:
 
 	// 衝突判定
 	virtual void CollisionReserve(void) override;
-
-	virtual void Respawn(void);
 
 	// デバッグ描画
 	virtual void DrawDebug(void);

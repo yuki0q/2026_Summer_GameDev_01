@@ -68,11 +68,11 @@ void ResultScene::Draw(void)
 	if (isWin_)
 	{
 		//DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 4000.0f, 0.0f, imgResultBackLose_, TRUE);
-		DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResultLose_, TRUE);
+		DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResultWin_, TRUE);
 	}
 	else
 	{
-		DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResultWin_, TRUE);
+		DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResultLose_, TRUE);
 	}
 }
 

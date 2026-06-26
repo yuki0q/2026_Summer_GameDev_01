@@ -46,4 +46,16 @@ private:
 	int image3;
 	int image2;
 	int image1;
+
+	// プレイヤーのポイント
+	int playerScore_ = 0;   
+
+	// エネミーのポイント
+	int enemyScore_ = 0;    
+
+	// このラウンドのポイント加算が済んだか
+	bool isRoundProcessed_; 
+
+	// ラウンドの管理フラグ
+	bool isRoundEnd_;
 };

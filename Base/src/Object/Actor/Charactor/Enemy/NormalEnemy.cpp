@@ -190,20 +190,13 @@ void NormalEnemy::Draw(void)
 
 void NormalEnemy::Respawn(void)
 {
+	TopBase::Respawn();
 
-	isEnd_ = true;
-	//transform_.pos = respawnPos_;
-	//centerPos_ = respawnCenterPos_;
-	//topsSpin_ = TOPS_SPIN_MAX;
-	topsVel_ = { 0.0f,0.0f,0.0f };
-	prevPos_ = respawnPos_;
+	transform_.pos = respawnPos_;
+	centerPos_ = respawnCenterPos_;
+
 	ChangeState(STATE::THINK);
-
-
-	isDying_ = false;
-	dyingTimer_ = 0.0f;
-	tiltX_ = 0.0f;
-	tiltZ_ = 0.0f;
+	step_ = 0.0f;
 }
 
 void NormalEnemy::ChangeState(STATE state)

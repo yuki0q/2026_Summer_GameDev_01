@@ -951,34 +951,35 @@ void TopBase::CollisionReserve(void)
 
 void TopBase::Respawn(void)
 {
-	/*dyeCount_++;
-
-	if (dyeCount_ >= 3) {
-		isEnd_ = true;
-	}*/
-
-
-	//transform_.pos = respawnPos_;
-	//centerPos_ = respawnCenterPos_;
+	topsVel_ = { 0.0f, 0.0f, 0.0f };
+	transform_.pos = respawnPos_;
+	centerPos_ = respawnCenterPos_;
+	prevPos_ = respawnPos_;
 	topsSpin_ = topsSpinMax_;
 
-	// 速度をゼロに
-	topsVel_ = { 0.0f, 0.0f, 0.0f };
-	prevPos_ = respawnPos_;
+	// === ここから追加・修正 ===
+	// 衝突による強制移動やめり込み補正の目標座標をクリアする
+	collisionTargetPos_ = { 0.0f, 0.0f, 0.0f };
+	hasCollisionTarget_ = false;
+
+	// 衝突によって発生したコマの傾き（衝撃）をリセット
+	collisionTiltX_ = 0.0f;
+	collisionTiltZ_ = 0.0f;
+	centerMovePow_ = { 0.0f, 0.0f, 0.0f }; // 加速度・移動パワーもゼロに
+	// === ここまで追加・修正 ===
 
 	isRespawning_ = true;
 	respawnTimer_ = 0.0f;
-
-
 
 	isDying_ = false;
 	dyingTimer_ = 0.0f;
 	tiltX_ = 0.0f;
 	tiltZ_ = 0.0f;
 
-	// ワープ時に古い軌跡が引っ張られないようにリセット
+	isEnd_ = false;
+
 	trailPoints_.clear();
-	trailTimer_ = 0.0f;
+	trailTimer_ = 0.0f;	
 }
 
 void TopBase::DrawDebug(void)

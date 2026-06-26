@@ -55,6 +55,8 @@ protected:
 
 	void Draw(void)override;
 
+	void Respawn(void) override;
+
 private:
 
 	// モデルの大きさ
@@ -107,8 +109,6 @@ private:
 
 	// 更新ステップ
 	float step_;
-
-	void Respawn(void) override;
 
 	// 状態遷移
 	void ChangeState(STATE state);

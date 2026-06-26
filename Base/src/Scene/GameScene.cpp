@@ -23,7 +23,11 @@ GameScene::GameScene(void)
 	isEnd_(false),
 	image3(0),
 	image2(0),
-	image1(0)
+	image1(0),
+	playerScore_(0),
+	enemyScore_(0),
+	isRoundEnd_(false),
+	isRoundProcessed_(false)
 {
 }
 
@@ -94,6 +98,12 @@ void GameScene::Init(void)
 	isStart_ = false;
 	isEnd_ = false;
 
+	// スコアのリセット
+	playerScore_ = 0;
+	enemyScore_ = 0;
+	isRoundEnd_ = false;
+	isRoundProcessed_ = false;
+
 	image3 = resMng_.Load(ResourceManager::SRC::IMAGE_3).handleId_;
 	image2 = resMng_.Load(ResourceManager::SRC::IMAGE_2).handleId_;
 	image1 = resMng_.Load(ResourceManager::SRC::IMAGE_1).handleId_;
@@ -120,18 +130,58 @@ void GameScene::Update(void)
 	for (auto& enemy : enemyManager_->GetEemies())
 	{
 		if (player_->IsGameEnd() || enemy->IsGameEnd()) {
+			isRoundEnd_ = true;
+
+			// 敵を場外に飛ばしたかスピンが無くなったかを判定
+			if (enemy->IsGameEnd() && !player_->IsGameEnd())
+			{
+				playerScore_ += 1;
+			}
+			// プレイヤーが負けた場合
+			else if (player_->IsGameEnd() && !enemy->IsGameEnd())
+			{
+				enemyScore_ += 1;
+			}
+			// 3. 同時（引き分け）
+			else {
+				playerScore_ += 1;
+				enemyScore_ += 1;
+			}
+
+			break;
+		}
+	}
+
+	if (isRoundEnd_ && !isEnd_)
+	{
+		if (playerScore_ >= 3 || enemyScore_ >= 3)
+		{
 			isEnd_ = true;
+		}
+		else
+		{
+			// 4点未満なら、各オブジェクトに用意されている「Respawn」を呼び出して次ラウンドへ
+			player_->Respawn();
+			for (auto& enemy : enemyManager_->GetEemies()) {
+				enemy->Respawn();
+			}
+			// カウントダウンを再設定して仕切り直し
+			countTime_ = 180;
+			isStart_ = false;
+			isRoundEnd_ = false;
 		}
 	}
 
 	normalStage_->Update();
 
 	if (isEnd_) {
-		sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
+		//sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
+		if (playerScore_ >= 3) { sceMng_.SetPlayerWin(true); }
+		else if(enemyScore_ >= 3){ sceMng_.SetPlayerWin(false); }
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
 	}
 
-	if (isStart_&&!isEnd_) {
+	if (isStart_ && !isRoundEnd_ && !isEnd_) {
 		player_->Update();
 		enemyManager_->Update();
 		Collision();
