@@ -22,7 +22,9 @@ TitleScene::TitleScene(void)
 	selectNow_(0),
 	select_(0),
 	count_(0),
+	introWindow_(false),
 	window_(false),
+	windowSelect_(0),
 	isStickUpOld(false),
 	isStickDownOld(false),
 	SceneBase()
@@ -74,7 +76,7 @@ void TitleScene::Init(void)
 	// 定点カメラ
 	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
 
-	window_ = false;
+	introWindow_ = false;
 	isStickUpOld = false;
 	isStickDownOld = false;
 }
@@ -109,47 +111,99 @@ void TitleScene::Update(void)
 	bool isStickUpNow = (inputDir.z > 0.5f);
 	bool isStickDownNow = (inputDir.z < -0.5f);
 
-	if (ins.IsTrgDown(KEY_INPUT_S) || (isStickDownNow && !isStickDownOld)) {
-		select_ += SELECT_MOVE;
-	}
-	else if (select_ > 680) {
-		select_ = 480;
-	}
-
-	if (ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
-		select_ -= SELECT_MOVE;
-	}
-	else if (select_ < 480) {
-		select_ = 680;
-	}
-
-	isStickUpOld = isStickUpNow;
-	isStickDownOld = isStickDownNow;
-
-	count_ = (select_ - DEFAULT_SELECT) / SELECT_MOVE;
-
-	if ((ins.IsTrgDown(KEY_INPUT_SPACE) ||
-		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
-		&& !window_)
+	if (!window_)
 	{
-		switch (count_) {
-		case 0:
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
-			break;
-		case 1:
-			//sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
-			window_ = true;
-			break;
-		case 2:
-			Application::GetInstance().Shutdown();
-			break;
+
+		if (ins.IsTrgDown(KEY_INPUT_DOWN) || 
+			ins.IsTrgDown(KEY_INPUT_S) || (isStickDownNow && !isStickDownOld)) {
+			select_ += SELECT_MOVE;
 		}
-	}
-	else if ((ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
-		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
-		&& window_)
+		else if (select_ > 680) {
+			select_ = 480;
+		}
+
+		if (ins.IsTrgDown(KEY_INPUT_UP) || 
+			ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
+			select_ -= SELECT_MOVE;
+		}
+		else if (select_ < 480) {
+			select_ = 680;
+		}
+
+		isStickUpOld = isStickUpNow;
+		isStickDownOld = isStickDownNow;
+
+		count_ = (select_ - DEFAULT_SELECT) / SELECT_MOVE;
+
+		if ((ins.IsTrgDown(KEY_INPUT_SPACE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+			&& !introWindow_)
+		{
+			switch (count_) {
+			case 0:
+				window_ = true;
+				windowSelect_ = 0;
+				//
+				break;
+			case 1:
+				//sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+				introWindow_ = true;
+				break;
+			case 2:
+				Application::GetInstance().Shutdown();
+				break;
+			}
+		}
+		else if ((ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+			&& introWindow_)
+		{
+			introWindow_ = false;
+		}
+	}else
 	{
-		window_ = false;
+		// ウィンドウ内での上下選択（1人プレイか2人プレイか）
+		if (ins.IsTrgDown(KEY_INPUT_UP) || ins.IsTrgDown(KEY_INPUT_DOWN)
+		|| ins.IsTrgDown(KEY_INPUT_W) || ins.IsTrgDown(KEY_INPUT_S)
+			|| (isStickUpNow && !isStickUpOld)
+			|| (isStickDownNow && !isStickDownOld))
+		{
+			// 0 と 1 を反転させる
+			windowSelect_ += 1;
+		}
+		else if (windowSelect_ > 1) {
+			windowSelect_ = 0;
+		}
+
+		isStickUpOld = isStickUpNow;
+		isStickDownOld = isStickDownNow;
+
+		// キャンセルボタン（例: BACKSPACEやESCキーなど）でウィンドウを閉じる
+		if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+		{
+			window_ = false;
+		}
+
+		// ウィンドウが開いている状態で決定ボタンが押されたら、ここで初めてシーンを遷移させる
+		if ((ins.IsTrgDown(KEY_INPUT_SPACE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)))
+		{
+			// プレイ人数をSceneManagerなどに保存する
+			if (windowSelect_ == 0)
+			{
+				// 1人プレイ用の設定を設定
+				sceMng_.SetPlayerNo(1);
+			}
+			else
+			{
+				// 2人プレイ用の設定を設定
+				sceMng_.SetPlayerNo(2);
+			}
+
+			// ゲームシーンへ遷移
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
+		}
 	}
 
 	top_.Update();
@@ -184,9 +238,44 @@ void TitleScene::Draw(void)
 		DrawRotaGraph(Application::SCREEN_SIZE_X / 2, select_, 0.6f, 0.0f, selectNow_, true);
 	}
 
-	if (window_) {
+	if (introWindow_) {
 		// 操作説明用の画像を描画
 		DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 360, 0.7f, 0.0f, configImg_, true);
+	}
+	if (window_)
+	{
+		// 画面中央に黒透過のウィンドウ（四角形）を描画
+		// 画面サイズが 1280 x 720 だと仮定した場合の中央付近
+		int winX1 = 440, winY1 = 200;
+		int winX2 = 840, winY2 = 520;
+
+		// ウィンドウの背景（少し透ける黒）
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+		DrawBox(winX1, winY1, winX2, winY2, GetColor(0, 0, 0), true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// ウィンドウの枠線（白）
+		DrawBox(winX1, winY1, winX2, winY2, GetColor(255, 255, 255), false);
+
+		// タイトル文字
+		DrawString(540, 240, "PLAY MODE SELECT", GetColor(255, 255, 255));
+
+		// 1人プレイの文字と選択カーソル
+		unsigned int color1P = (windowSelect_ == 0) ? GetColor(255, 255, 0) : GetColor(150, 150, 150);
+		DrawString(580, 320, "1 PLAYER", color1P);
+		if (windowSelect_ == 0) {
+			DrawString(550, 320, "?", color1P);
+		}
+
+		// 2人プレイの文字と選択カーソル
+		unsigned int color2P = (windowSelect_ == 1) ? GetColor(255, 255, 0) : GetColor(150, 150, 150);
+		DrawString(580, 380, "2 PLAYERS", color2P);
+		if (windowSelect_ == 1) {
+			DrawString(550, 380, "?", color2P);
+		}
+
+		// 操作案内
+		DrawString(510, 460, "[SPACE]:Enter  [BACKSPACE]:Cancel", GetColor(200, 200, 200));
 	}
 }
 

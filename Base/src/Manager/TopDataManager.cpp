@@ -61,40 +61,40 @@ void TopDataManager::LoadCsvData(const std::string& filePath)
 		data.type = static_cast<TopBase::TOP_TYPE>(stoi(strSplit[idx++]));
 
 		// コマのスタミナ
-		data.topsSpin = stoi(strSplit[idx++]);
+		data.topsSpin = stof(strSplit[idx++]);
 
 		// 軸の安定度（高いほどブレがすぐ収まる）
-		data.stability = stoi(strSplit[idx++]);
+		data.stability = stof(strSplit[idx++]);
 
 		// 平常時の傾き
-		data.defaultTilt = stoi(strSplit[idx++]);
+		data.defaultTilt = stof(strSplit[idx++]);
 
 		// 歳差運動の速さ
-		data.wobbleSpeed = stoi(strSplit[idx++]);
+		data.wobbleSpeed = stof(strSplit[idx++]);
 
 		// コマの重さ
-		data.topsWeight = stoi(strSplit[idx++]);
+		data.topsWeight = stof(strSplit[idx++]);
 
 		// コマごとの衝突の強さ
-		data.topsShock = stoi(strSplit[idx++]);
+		data.topsShock = stof(strSplit[idx++]);
 
 		// コマの通常時の速さ
-		data.speed = stoi(strSplit[idx++]);
+		data.speed = stof(strSplit[idx++]);
 
 		// コマの通常時の速さ
-		data.dashSpeed = stoi(strSplit[idx++]);
+		data.dashSpeed = stof(strSplit[idx++]);
 
 		// スキル使用時のスピード
-		data.skillSpeed = stoi(strSplit[idx++]);
+		data.skillSpeed = stof(strSplit[idx++]);
 
 		// スタミナの削れる速度
-		data.scrapSpeed = stoi(strSplit[idx++]);
+		data.scrapSpeed = stof(strSplit[idx++]);
 
 		// スタミナが15以下の時の削れる速度
-		data.dyingScrapSpeed = stoi(strSplit[idx++]);
+		data.dyingScrapSpeed = stof(strSplit[idx++]);
 
 		// コマの公転半径
-		data.radiusFactor = stoi(strSplit[idx++]);
+		data.radiusFactor = stof(strSplit[idx++]);
 
 		dataMap_[data.type] = data;
 	}

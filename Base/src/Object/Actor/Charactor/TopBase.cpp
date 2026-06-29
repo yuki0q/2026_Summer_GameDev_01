@@ -239,6 +239,11 @@ float TopBase::GetSpin(void)
 void TopBase::SpinScrape(float spin)
 {
 	topsSpin_ -= spin;
+
+	if (topsSpin_ < 0.0f)
+	{
+		topsSpin_ = 0.0f;
+	}
 }
 
 float TopBase::GetWeight(void)
@@ -484,7 +489,7 @@ void TopBase::ProcessTopMove(void)
 
 	if (!isDying_)
 	{
-		if (topsSpin_ > 0.0f) 
+		if (topsSpin_ >= 0.0f) 
 		{
 			if (!isStabilitying_) {
 				if (topsSpin_ < 20.0f)
@@ -517,10 +522,10 @@ void TopBase::ProcessTopMove(void)
 		topsSpeed_ = 3.0f;
 	}*/
 
-	if (topsSpin_ < 0.0f)
-	{
-		topsSpin_ = 0.0f;
-	}
+	//if (topsSpin_ < 0.0f)
+	//{
+	//	topsSpin_ = 0.0f;
+	//}
 
 	if (transform_.pos.y > 300.0f) transform_.pos.y = 300.0f;
 
@@ -682,7 +687,7 @@ void TopBase::ProcessTopTilt(void)
 	}
 	else
 	{
-		topsSpin_ = 0.0f;
+		//topsSpin_ = 0.0f;
 
 		// 倒れる演出中の処理
 		dyingTimer_ += dt;

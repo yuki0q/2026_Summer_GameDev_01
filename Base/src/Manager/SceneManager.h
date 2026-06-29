@@ -72,8 +72,13 @@ public:
 
 	// コマのタイプをセットする
 	void SetPlayerTopType(int type) { playerType_ = type; }
-
 	int GetPlayerTopType(void)const { return playerType_; }
+
+	void SetPlayerTopType2P(int type) { playerType2_ = type; }
+	int GetPlayerTopType2P(void)const { return playerType2_; }
+
+	void SetPlayerNo(int playerNo) { playerNo_ = playerNo; }
+	int GetPlayerNo(void)const { return playerNo_; }
 
 private:
 
@@ -83,6 +88,8 @@ private:
 	bool isPlayerWin_ = false; // プレイヤーが勝ったかどうか（生存フラグ）
 
 	int playerType_;
+	int playerType2_;
+	int playerNo_;
 
 	SCENE_ID sceneId_;
 	SCENE_ID waitSceneId_;

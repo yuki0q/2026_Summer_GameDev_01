@@ -6,7 +6,7 @@ class Player : public TopBase
 
 public:
 
-	Player(const TopBase::TopData& data);
+	Player(const TopBase::TopData& data, int playerNo);
 	virtual ~Player(void);
 
 	// 描画
@@ -41,6 +41,7 @@ protected:
 private:
 
 	static constexpr VECTOR PLAYER_DEFAULT_POS = { 0.0f, 75.0f, -500.0f };
+	static constexpr VECTOR PLAYER_DEFAULT_POS_2P = { 0.0f, 75.0f, 500.0f };
 
 	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 1.0f,1.0f,1.0f };
 
@@ -79,6 +80,7 @@ private:
 
 	// プレイヤーの回転の中心点の初期座標
 	static constexpr VECTOR PLAYER_ROT_CENTER_POS = { 0.0f, 75.0f, -500.0f };
+	static constexpr VECTOR PLAYER_ROT_CENTER_POS_2P = { 0.0f, 75.0f, 500.0f };
 
 	// 相対座標の初期値
 	static constexpr VECTOR TOPS_DEFAULT_LOCAL_POS = { 100.0f,0.0f,100.0f };
@@ -108,6 +110,7 @@ private:
 	// デバッグ描画
 	void DrawDebug(void) override;
 
+	int playerNo_;
 	//// プレイヤーの回転の中心点座標
 	//VECTOR centorPos_;
 	//VECTOR centorRot_;

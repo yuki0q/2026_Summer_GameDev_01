@@ -80,35 +80,71 @@ void TopSelectScene::Update(void)
 	bool isStickLeftNow = (inputDir.x > 0.5f);
 	bool isStickRightNow = (inputDir.x < -0.5f);
 
-	if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
-		selectIndex_ = (selectIndex_ + 3) % 4; // 左へループ
-	}
+	if (sceMng_.GetPlayerNo() == 1) {
 
-	if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
-		selectIndex_ = (selectIndex_ + 1) % 4; // 右へループ
-	}
+		if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
+			selectIndex_ = (selectIndex_ + 3) % 4; // 左へループ
+		}
 
-	isStickLeftOld_ = isStickLeftNow;
-	isStickRightOld_ = isStickRightNow;
+		if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
+			selectIndex_ = (selectIndex_ + 1) % 4; // 右へループ
+		}
 
-	if (modelHandles_[selectIndex_] != -1)
-	{
-		top_.quaRot = Quaternion::Mult(top_.quaRot,
-			Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
-	}
-	top_.SetModel(modelHandles_[selectIndex_]);
-	// シーン遷移
-	if (ins.IsTrgDown(KEY_INPUT_SPACE)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, 
-		InputManager::JOYPAD_BTN::DOWN))
-	{
-		sceMng_.SetPlayerTopType(selectIndex_);
-		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
-	}
+		isStickLeftOld_ = isStickLeftNow;
+		isStickRightOld_ = isStickRightNow;
 
-	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
-		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
-	{
-		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		if (modelHandles_[selectIndex_] != -1)
+		{
+			top_.quaRot = Quaternion::Mult(top_.quaRot,
+				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
+		}
+		top_.SetModel(modelHandles_[selectIndex_]);
+		// シーン遷移
+		if (ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::DOWN))
+		{
+			sceMng_.SetPlayerTopType(selectIndex_);
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+		}
+
+		if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+		{
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		}
+	}
+	else if(sceMng_.GetPlayerNo() == 2) {
+
+		if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
+			selectIndex_ = (selectIndex_ + 3) % 4; // 左へループ
+		}
+
+		if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
+			selectIndex_ = (selectIndex_ + 1) % 4; // 右へループ
+		}
+
+		isStickLeftOld_ = isStickLeftNow;
+		isStickRightOld_ = isStickRightNow;
+
+		if (modelHandles_[selectIndex_] != -1)
+		{
+			top_.quaRot = Quaternion::Mult(top_.quaRot,
+				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
+		}
+		top_.SetModel(modelHandles_[selectIndex_]);
+		// シーン遷移
+		if (ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::DOWN))
+		{
+			sceMng_.SetPlayerTopType(selectIndex_);
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+		}
+
+		if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
+			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+		{
+			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		}
 	}
 
 	top_.Update();

@@ -81,7 +81,11 @@ private:
 	bool isStickDownOld;
 
 	// 操作説明ウィンドウのフラグ
+	bool introWindow_;
+
+	// プレイ人数選択のフラグ
 	bool window_;
+	int windowSelect_;
 
 	// 描画用
 	int button_;

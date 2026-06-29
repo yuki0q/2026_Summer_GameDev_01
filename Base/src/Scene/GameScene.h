@@ -4,6 +4,7 @@
 class NormalStage;
 class Player;
 class EnemyManager;
+class TopBase;
 
 class GameScene : public SceneBase
 {
@@ -32,10 +33,15 @@ public:
 
 	void CollisionResolve(void);
 
+	void ResolveTopToTop(TopBase* topA, TopBase* topB);
+
 private:
 
 	NormalStage* normalStage_;
+	// 1P
 	Player* player_;
+	// 2P
+	Player* player2_;        
 	EnemyManager* enemyManager_;
 
 	int shadowMapHandle_;
@@ -58,4 +64,7 @@ private:
 
 	// ラウンドの管理フラグ
 	bool isRoundEnd_;
+
+	// 1 または 2 (SceneManagerなどから取得するか、デバッグ用に設定)
+	int playerCount_;   
 };

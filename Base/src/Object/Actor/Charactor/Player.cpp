@@ -10,8 +10,9 @@
 #include "../../Collider/ColliderCapsule.h"
 #include "Player.h"
 
-Player::Player(const TopBase::TopData& data)
+Player::Player(const TopBase::TopData& data , int playerNo)
 	:
+	playerNo_(playerNo),
 	TopBase(data)
 {
 }
@@ -24,17 +25,39 @@ void Player::Draw(void)
 {
 	TopBase::Draw();
 	DrawDebug();
-	DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
-		300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
-	DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
-		40.0f + topsSpin_ /TOPS_SPIN_MAX * 250.0f, Application::SCREEN_SIZE_Y - 70.0f, 
-		0xffff00, true);
 
-	DrawRotaGraph(50.0f, 
-		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+	if (playerNo_ == 1) {
+		DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
+			300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
+		DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
+			40.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f, Application::SCREEN_SIZE_Y - 70.0f,
+			0xffff00, true);
 
-	if (skillCoolTimer_ <= 0.0f && !isSkill_) {
-		DrawFormatString(30,670,0xffffff,"Skill Ready!!");
+		DrawRotaGraph(50.0f,
+			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+
+		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+			DrawFormatString(30, 670, 0xffffff, "Skill Ready!!");
+		}
+	}
+	else if (playerNo_ == 2) {
+		DrawBoxAA(Application::SCREEN_SIZE_X - 300.0f, Application::SCREEN_SIZE_Y - 120.0f,
+			Application::SCREEN_SIZE_X - 30.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
+
+		DrawBoxAA(Application::SCREEN_SIZE_X - 290.0f, Application::SCREEN_SIZE_Y - 110.0f,
+			Application::SCREEN_SIZE_X - 290.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f,
+			Application::SCREEN_SIZE_Y - 70.0f,
+			0xffff00, true);
+
+		DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
+			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+
+		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+			DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");
+		}
+
+		
+		
 	}
 
 }
@@ -50,14 +73,26 @@ void Player::InitLoad(void)
 	// 基底クラスのリソースロード
 	TopBase::InitLoad();
 
-	imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_1P).handleId_;
+	if (playerNo_ == 1) {
+		imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_1P).handleId_;
+	}
+	else if (playerNo_ == 2)
+	{
+		imgChara_ = resMng_.Load(ResourceManager::SRC::IMAGE_2P).handleId_;
+	}
 }
 
 void Player::InitTransform(void)
 {
-	respawnCenterPos_ = PLAYER_ROT_CENTER_POS;
-
-	respawnPos_ = PLAYER_DEFAULT_POS;
+	if (playerNo_ == 1) {
+		respawnCenterPos_ = PLAYER_ROT_CENTER_POS;
+		respawnPos_ = PLAYER_DEFAULT_POS;
+	}
+	else if (playerNo_ == 2)
+	{
+		respawnCenterPos_ = PLAYER_ROT_CENTER_POS_2P;
+		respawnPos_ = PLAYER_DEFAULT_POS_2P;
+	}
 
 	transform_.scl = PLAYER_DEFAULT_SCALE;
 	transform_.quaRot = Quaternion::Identity();
@@ -163,9 +198,9 @@ void Player::ProcessMove(void)
 	centerMovePow_ = AsoUtility::VECTOR_ZERO;
 
 	if (!hasCollisionTarget_) {
-		// ゲームパッドが接続されている数で処理を分ける
-		if (GetJoypadNum() == 0)
-		{
+
+		if (playerNo_ == 1) {
+
 			// WASDで移動する
 			if (ins.IsNew(KEY_INPUT_W)) { dir = AsoUtility::DIR_F; }
 			if (ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_L; }
@@ -181,30 +216,74 @@ void Player::ProcessMove(void)
 			if (ins.IsNew(KEY_INPUT_RSHIFT)) { isSkill_ = true; }
 
 			if (ins.IsNew(KEY_INPUT_G)) { isDying_ = true; }
+
+			if (GetJoypadNum() == 2 || sceMng_.GetPlayerNo() == 1) {
+
+				// 接続されているゲームパッド１の情報を取得
+				InputManager::JOYPAD_IN_STATE padState =
+					ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+				// アナログキーの入力値から方向を取得
+				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+					InputManager::JOYPAD_BTN::RB))
+				{
+					isDash = true;
+				}
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+					InputManager::JOYPAD_BTN::LB))
+				{
+					isSkill_ = true;
+				}
+			}
+		}
+		else if (playerNo_ == 2) {
 			
-		}
-		else
-		{
-			// 接続されているゲームパッド１の情報を取得
-			InputManager::JOYPAD_IN_STATE padState =
-				ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+			if (GetJoypadNum() == 1) {
 
-			// アナログキーの入力値から方向を取得
-			dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+				// 接続されているゲームパッド１の情報を取得
+				InputManager::JOYPAD_IN_STATE padState =
+					ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
-			if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-				InputManager::JOYPAD_BTN::RB))
-			{
-				isDash = true;
+				// アナログキーの入力値から方向を取得
+				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+					InputManager::JOYPAD_BTN::RB))
+				{
+					isDash = true;
+				}
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+					InputManager::JOYPAD_BTN::LB))
+				{
+					isSkill_ = true;
+				}
 			}
+			else if (GetJoypadNum() == 2) {
+				// 接続されているゲームパッド１の情報を取得
+				InputManager::JOYPAD_IN_STATE padState =
+					ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD2);
 
-			if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-				InputManager::JOYPAD_BTN::LB))
-			{
-				isSkill_ = true;
+				// アナログキーの入力値から方向を取得
+				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD2,
+					InputManager::JOYPAD_BTN::RB))
+				{
+					isDash = true;
+				}
+
+				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD2,
+					InputManager::JOYPAD_BTN::LB))
+				{
+					isSkill_ = true;
+				}
 			}
-
 		}
+
 	}
 
 		if (isDash)
@@ -267,45 +346,45 @@ void Player::ProcessMove(void)
 
 void Player::ProcessJump(void)
 {
-	auto& ins = InputManager::GetInstance();
-	// 持続ジャンプ処理
-	bool isHitKeyNew = ins.IsNew(KEY_INPUT_BACKSLASH)
-		|| ins.IsPadBtnNew(
-			InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
-	if (isHitKeyNew)
-	{
-		// ジャンプの入力受付時間を減少
-		stepJump_ += scnMng_.GetDeltaTime();
-		if (stepJump_ < TIME_JUMP_INPUT)
-		{
-			// ジャンプ量の計算
-			float jumpSpeed = POW_JUMP_KEEP * scnMng_.GetDeltaTime();
-			jumpPow_ = VAdd(jumpPow_, VScale(AsoUtility::DIR_U, jumpSpeed));
-		}
-	}
-	else
-	{
-		// ボタンを離したらジャンプ力に加算しない
-		return;
-	}
-
-	// 初期ジャンプ処理
-	bool isHitKey = ins.IsTrgDown(KEY_INPUT_BACKSLASH)
-		|| ins.IsPadBtnTrgDown(
-			InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
+//	auto& ins = InputManager::GetInstance();
+//	// 持続ジャンプ処理
+//	bool isHitKeyNew = ins.IsNew(KEY_INPUT_BACKSLASH)
+//		|| ins.IsPadBtnNew(
+//			InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
+//	if (isHitKeyNew)
+//	{
+//		// ジャンプの入力受付時間を減少
+//		stepJump_ += scnMng_.GetDeltaTime();
+//		if (stepJump_ < TIME_JUMP_INPUT)
+//		{
+//			// ジャンプ量の計算
+//			float jumpSpeed = POW_JUMP_KEEP * scnMng_.GetDeltaTime();
+//			jumpPow_ = VAdd(jumpPow_, VScale(AsoUtility::DIR_U, jumpSpeed));
+//		}
+//	}
+//	else
+//	{
+//		// ボタンを離したらジャンプ力に加算しない
+//		return;
+//	}
+//
+//	// 初期ジャンプ処理
+//	bool isHitKey = ins.IsTrgDown(KEY_INPUT_BACKSLASH)
+//		|| ins.IsPadBtnTrgDown(
+//			InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
 
 	// ジャンプ
-	if (isHitKey && !isJump_)
-	{
-		// ジャンプ量の計算
-		float jumpSpeed = POW_JUMP_INIT * scnMng_.GetDeltaTime();
-		jumpPow_ = VScale(AsoUtility::DIR_U, jumpSpeed);
-		isJump_ = true;
+	//if (isHitKey && !isJump_)
+	//{
+	//	// ジャンプ量の計算
+	//	float jumpSpeed = POW_JUMP_INIT * scnMng_.GetDeltaTime();
+	//	jumpPow_ = VScale(AsoUtility::DIR_U, jumpSpeed);
+	//	isJump_ = true;
 
-		// アニメーション再生
-		/*animController_->Play(
-			static_cast<int>(ANIM_TYPE::JUMP), false);*/
-	}
+	//	// アニメーション再生
+	//	/*animController_->Play(
+	//		static_cast<int>(ANIM_TYPE::JUMP), false);*/
+	//}
 }
 
 void Player::ProcessAnimPos(void)
