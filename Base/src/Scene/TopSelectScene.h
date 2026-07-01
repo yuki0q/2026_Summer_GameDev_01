@@ -48,10 +48,14 @@ private:
 	int modelHandles_[4] = { -1, -1, -1, -1 };
 
 	// 選択管理 0:ATTACK, 1:DEFENSE, 2:STAMINA, 3:BALANCE
-	int selectIndex_; 
+	int selectIndex1P_; 
+	int selectIndex2P_; 
 
 	// キーの押しっぱなし防止用
 	bool isStickLeftOld_;
 	bool isStickRightOld_;
+
+	bool redySelect1P_;
+	bool redySelect2P_;
 };
 

@@ -52,6 +52,7 @@ private:
 	int image3;
 	int image2;
 	int image1;
+	int imgWin_;
 
 	// プレイヤーのポイント
 	int playerScore_ = 0;   
@@ -64,7 +65,7 @@ private:
 
 	// ラウンドの管理フラグ
 	bool isRoundEnd_;
+	int lastRoundWinner_;
 
-	// 1 または 2 (SceneManagerなどから取得するか、デバッグ用に設定)
 	int playerCount_;   
 };

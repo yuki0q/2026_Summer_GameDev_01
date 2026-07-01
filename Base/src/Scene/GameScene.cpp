@@ -9,6 +9,7 @@
 #include "../Object/Actor/NormalStage.h"
 #include "../Object/Actor/Charactor/Player.h"
 #include "../Object/Collider/ColliderBase.h"
+#include "../Application.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -25,10 +26,12 @@ GameScene::GameScene(void)
 	image3(0),
 	image2(0),
 	image1(0),
+	imgWin_(0),
 	playerScore_(0),
 	enemyScore_(0),
 	isRoundEnd_(false),
 	isRoundProcessed_(false),
+	lastRoundWinner_(0),
 	playerCount_(0)
 {
 }
@@ -64,7 +67,7 @@ void GameScene::Init(void)
 	if (playerCount_ == 2)
 	{
 		const TopBase::TopData* player2Data = dataMng_.GetTopData
-		(static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType()));
+		(static_cast<TopBase::TOP_TYPE>(sceMng_.GetPlayerTopType2P()));
 
 		player2_ = new Player(*player2Data, 2);
 		player2_->Init();
@@ -134,6 +137,7 @@ void GameScene::Init(void)
 	image3 = resMng_.Load(ResourceManager::SRC::IMAGE_3).handleId_;
 	image2 = resMng_.Load(ResourceManager::SRC::IMAGE_2).handleId_;
 	image1 = resMng_.Load(ResourceManager::SRC::IMAGE_1).handleId_;
+	imgWin_ = resMng_.Load(ResourceManager::SRC::IMAGE_WIN).handleId_;
 }
 
 void GameScene::Update(void)
@@ -165,16 +169,19 @@ void GameScene::Update(void)
 			if (player2_->IsGameEnd() && !player_->IsGameEnd())
 			{
 				playerScore_ += 1;
+				lastRoundWinner_ = 1;
 			}
 			// 1Pの負け（2Pの勝ち）
 			else if (player_->IsGameEnd() && !player2_->IsGameEnd())
 			{
 				enemyScore_ += 1; // enemyScore_を2P用に使用
+				lastRoundWinner_ = 2;
 			}
 			else
 			{
 				playerScore_ += 1; 
 				enemyScore_ += 1;
+				lastRoundWinner_ = 0;
 			}
 		}
 	}
@@ -189,16 +196,19 @@ void GameScene::Update(void)
 				if (enemy->IsGameEnd() && !player_->IsGameEnd())
 				{
 					playerScore_ += 1;
+					lastRoundWinner_ = 1;
 				}
 				// プレイヤーが負けた場合
 				else if (player_->IsGameEnd() && !enemy->IsGameEnd())
 				{
 					enemyScore_ += 1;
+					lastRoundWinner_ = 2;
 				}
 				// 3. 同時（引き分け）
 				else {
 					playerScore_ += 1;
 					enemyScore_ += 1;
+					lastRoundWinner_ = 0;
 				}
 				break;
 			}
@@ -256,9 +266,15 @@ void GameScene::Draw(void)
 	// シャドウマップへの描画の準備
 	ShadowMap_DrawSetup(shadowMapHandle_);
 
-	player_->Draw();
-	if (playerCount_ == 2) player2_->Draw();
-	else enemyManager_->Draw();
+	if (!isRoundEnd_ || lastRoundWinner_ == 1 || lastRoundWinner_ == 0) {
+		player_->Draw();
+	}
+	if (playerCount_ == 2) {
+		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) player2_->Draw();
+	}
+	else {
+		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) enemyManager_->Draw();
+	}
 	normalStage_->Draw();
 
 	// シャドウマップへの描画を終了
@@ -267,29 +283,51 @@ void GameScene::Draw(void)
 	// 描画に使用するシャドウマップを設定
 	SetUseShadowMap(0, shadowMapHandle_);
 
-	player_->Draw();
-	if (playerCount_ == 2) player2_->Draw();
-	else enemyManager_->Draw();
+	if (!isRoundEnd_ || lastRoundWinner_ == 1 || lastRoundWinner_ == 0) {
+		player_->Draw();
+	}
+	if (playerCount_ == 2) {
+		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) player2_->Draw();
+	}
+	else {
+		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) enemyManager_->Draw();
+	}
 	normalStage_->Draw();
 
 	// 描画に使用するシャドウマップの設定を解除
 	SetUseShadowMap(0, -1);
 
-	player_->DrawImage();
-
-	if (playerCount_ == 2) 
+	if (!isRoundEnd_ || lastRoundWinner_ == 1 || lastRoundWinner_ == 0) {
+		player_->DrawImage();
+	}
+	if (playerCount_ == 2)
 	{
-		player2_->DrawImage();
+		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) player2_->DrawImage();
 	}
 	else {
 		for (auto& enemy : enemyManager_->GetEemies()) {
-			enemy->DrawImage();
+			if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) enemy->DrawImage();
 		}
 	}
 
 	// 3Dの奥行き判定を一時的に無効化する
 	SetUseZBuffer3D(FALSE);
 	SetWriteZBuffer3D(FALSE);
+
+	for (int i = 0; i < playerScore_; i++)
+	{
+		float winX = 120.0f + (i * 60.0f);
+		float winY = Application::SCREEN_SIZE_Y - 150.0f;
+		DrawRotaGraph(winX, winY, 0.15f, 0.0f, imgWin_, TRUE);
+	}
+
+	// 2P / エネミー側の勝星描画
+	for (int i = 0; i < enemyScore_; i++)
+	{
+		float winX = (Application::SCREEN_SIZE_X - 180.0f) + (i * 60.0f);
+		float winY = Application::SCREEN_SIZE_Y - 150.0f;
+		DrawRotaGraph(winX, winY, 0.15f, 0.0f, imgWin_, TRUE);
+	}
 
 	if (!isStart_) {
 		int i = countTime_ / 60;
@@ -336,6 +374,7 @@ void GameScene::Release(void)
 	DeleteGraph(image3);
 	DeleteGraph(image2);
 	DeleteGraph(image1);
+	DeleteGraph(imgWin_);
 }
 
 void GameScene::Collision(void) 

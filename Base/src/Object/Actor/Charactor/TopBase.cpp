@@ -345,8 +345,9 @@ void TopBase::SetCollisionTarget(VECTOR targetPos)
 
 void TopBase::DrawImage(void)
 {
-	DrawBillboard3D({ centerPos_.x,centerPos_.y + 200.0f,centerPos_.z },
-		0.5f, 0.5f, 200.0f, 0.0f, imgChara_, true);
+	if (isRespawning_) return;
+		DrawBillboard3D({ centerPos_.x,centerPos_.y + 200.0f,centerPos_.z },
+			0.5f, 0.5f, 200.0f, 0.0f, imgChara_, true);
 
 }
 

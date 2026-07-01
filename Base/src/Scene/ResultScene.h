@@ -22,6 +22,8 @@ private:
 	// ‰æ‘œ
 	int imgResultWin_;
 	int imgResultBackWin_;
+	int imgResult1PWin_;
+	int imgResult2PWin_;
 
 	int imgResultLose_;
 	int imgResultBackLose_;

@@ -190,7 +190,7 @@ protected:
 	static constexpr float TOPS_DEAD_POS_Y = -300.0f;
 
 	// 衝突を無視する時間（秒数。1.0fで1秒間）
-	static constexpr float RESPAWN_MUTE_TIME = 1.0f;
+	static constexpr float RESPAWN_MUTE_TIME = 0.3f;
 
 	// 調整用定数
 	// 何秒ごとに点を打つか（小さいほど滑らか）

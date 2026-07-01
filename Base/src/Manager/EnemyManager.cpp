@@ -22,7 +22,7 @@ void EnemyManager::Init(void)
 {
 	// エネミーのデータ読み込み
 	//LoadCsvData();
-	const TopBase::TopData* enemyData = dataMng_.GetTopData(TopBase::TOP_TYPE::ATTACK);
+	const TopBase::TopData* enemyData = dataMng_.GetTopData(TopBase::TOP_TYPE::STAMINA);
 	if (enemyData)
 	{
 		enemies_.push_back(Create(*enemyData));

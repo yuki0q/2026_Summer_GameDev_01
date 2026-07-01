@@ -224,7 +224,7 @@ void Player::ProcessMove(void)
 					ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
 				// アナログキーの入力値から方向を取得
-				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+				VECTOR padDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
 					InputManager::JOYPAD_BTN::RB))
@@ -236,6 +236,11 @@ void Player::ProcessMove(void)
 					InputManager::JOYPAD_BTN::LB))
 				{
 					isSkill_ = true;
+				}
+
+				// パッドが入力されていればそれを優先、なければキーボードの入力をそのまま使う
+				if (!AsoUtility::EqualsVZero(padDir)) {
+					dir = padDir;
 				}
 			}
 		}

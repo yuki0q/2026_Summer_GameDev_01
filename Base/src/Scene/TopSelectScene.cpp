@@ -16,11 +16,14 @@ TopSelectScene::TopSelectScene(void)
 	imgTopSelectText_(0),
 	imgSkillSelect_(0),
 	imgSkillSelectText_(0),
-	selectIndex_(0),
+	selectIndex1P_(0),
+	selectIndex2P_(0),
 	imgTopIntro_(0),
 	modelHandles_(0),
 	isStickLeftOld_(false),
 	isStickRightOld_(false),
+	redySelect1P_(false),
+	redySelect2P_(false),
 	SceneBase()
 {
 }
@@ -43,9 +46,9 @@ void TopSelectScene::Init(void)
 
 	imgTopSelectText_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
 
-	selectIndex_ = 0;
+	selectIndex1P_ = selectIndex2P_ = 0;
 
-	top_.SetModel(modelHandles_[selectIndex_]);
+	top_.SetModel(modelHandles_[selectIndex1P_]);
 	top_.scl = PLAYER_DEFAULT_SCALE;
 
 	top_.quaRot = Quaternion::Identity();
@@ -76,75 +79,109 @@ void TopSelectScene::Update(void)
 
 	VECTOR inputDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
+
+	InputManager::JOYPAD_IN_STATE padState2 =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD2);
+
+	VECTOR inputDir2 = ins.GetDirectionXZAKey(padState2.AKeyLX, padState2.AKeyLY);
+
 	// スティックが右/左に一定以上倒されているかの判定フラグ
-	bool isStickLeftNow = (inputDir.x > 0.5f);
-	bool isStickRightNow = (inputDir.x < -0.5f);
+	bool isStickLeftNow = (inputDir.x > 0.5f) || (inputDir2.x > 0.5f);
+	bool isStickRightNow = (inputDir.x < -0.5f) || (inputDir2.x > 0.5f);
 
-	if (sceMng_.GetPlayerNo() == 1) {
+	bool pad1Down = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
+	bool pad2Down = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD2, InputManager::JOYPAD_BTN::DOWN);
+	
+	bool pad1Start = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START);
+	bool pad2Start = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD2, InputManager::JOYPAD_BTN::START);
 
+	if (!redySelect1P_) {
 		if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
-			selectIndex_ = (selectIndex_ + 3) % 4; // 左へループ
+			selectIndex1P_ = (selectIndex1P_ + 3) % 4; // 左へループ
 		}
 
 		if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
-			selectIndex_ = (selectIndex_ + 1) % 4; // 右へループ
+			selectIndex1P_ = (selectIndex1P_ + 1) % 4; // 右へループ
+		}
+
+		if (modelHandles_[selectIndex1P_] != -1)
+		{
+			top_.quaRot = Quaternion::Mult(top_.quaRot,
+				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
+		}
+		top_.SetModel(modelHandles_[selectIndex1P_]);
+	}
+	else if (!redySelect2P_ && redySelect1P_) {
+		if ((isStickLeftNow && !isStickLeftOld_)) {
+			selectIndex2P_ = (selectIndex2P_ + 3) % 4; // 左へループ
+		}
+
+		if ((isStickRightNow && !isStickRightOld_)) {
+			selectIndex2P_ = (selectIndex2P_ + 1) % 4; // 右へループ
 		}
 
 		isStickLeftOld_ = isStickLeftNow;
 		isStickRightOld_ = isStickRightNow;
 
-		if (modelHandles_[selectIndex_] != -1)
+		if (modelHandles_[selectIndex2P_] != -1)
 		{
 			top_.quaRot = Quaternion::Mult(top_.quaRot,
 				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
 		}
-		top_.SetModel(modelHandles_[selectIndex_]);
-		// シーン遷移
-		if (ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
-			InputManager::JOYPAD_BTN::DOWN))
+		top_.SetModel(modelHandles_[selectIndex2P_]);
+	}
+
+	isStickLeftOld_ = isStickLeftNow;
+	isStickRightOld_ = isStickRightNow;
+
+	// シーン遷移
+	if (ins.IsTrgDown(KEY_INPUT_SPACE) || pad1Down)
+	{
+		if(!redySelect1P_) sceMng_.SetPlayerTopType(selectIndex1P_);
+		redySelect1P_ = true;
+
+		if (sceMng_.GetPlayerNo() == 1) 
 		{
-			sceMng_.SetPlayerTopType(selectIndex_);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 		}
-
-		if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
-			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+		else if (sceMng_.GetPlayerNo() == 2) 
 		{
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+			if (modelHandles_[selectIndex2P_] != -1)
+			{
+				top_.quaRot = Quaternion::Mult(top_.quaRot,
+					Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
+			}
+			top_.SetModel(modelHandles_[selectIndex2P_]);
+			// シーン遷移
+			if (pad1Down || pad2Down)
+			{
+				if(!redySelect2P_)sceMng_.SetPlayerTopType2P(selectIndex2P_);
+				redySelect2P_ = true;
+			}
+
+			if (redySelect1P_ && redySelect2P_)
+			{
+				if (ins.IsTrgDown(KEY_INPUT_SPACE) || pad1Down || pad2Down)
+				{
+					sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+				}
+			}
+
+
 		}
 	}
-	else if(sceMng_.GetPlayerNo() == 2) {
 
-		if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
-			selectIndex_ = (selectIndex_ + 3) % 4; // 左へループ
-		}
-
-		if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
-			selectIndex_ = (selectIndex_ + 1) % 4; // 右へループ
-		}
-
-		isStickLeftOld_ = isStickLeftNow;
-		isStickRightOld_ = isStickRightNow;
-
-		if (modelHandles_[selectIndex_] != -1)
-		{
-			top_.quaRot = Quaternion::Mult(top_.quaRot,
-				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
-		}
-		top_.SetModel(modelHandles_[selectIndex_]);
-		// シーン遷移
-		if (ins.IsTrgDown(KEY_INPUT_SPACE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1,
-			InputManager::JOYPAD_BTN::DOWN))
-		{
-			sceMng_.SetPlayerTopType(selectIndex_);
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
-		}
-
-		if (ins.IsTrgDown(KEY_INPUT_ESCAPE) ||
-			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || pad1Start || pad2Start)
+	{
+		if (!redySelect1P_ && !redySelect2P_)
 		{
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 		}
+		else if (redySelect1P_ || redySelect2P_)
+		{
+			redySelect1P_ = redySelect2P_ = false;
+		}
+		
 	}
 
 	top_.Update();
@@ -158,13 +195,21 @@ void TopSelectScene::Draw(void)
 	// テキスト表示（現在の選択を表示）
 	const char* typeNames[] = { "ATTACK (BLUE)", "DEFENSE (GREEN)", "STAMINA (YELLOW)", "BALANCE (RED)" };
 	DrawString(100, 100, "SELECT YOUR SPINNING TOP", 0xffffff);
-	DrawString(100, 150, typeNames[selectIndex_], 0xffff00);
 	DrawString(100, 600, "Press LEFT / RIGHT to Select, SPACE to Decide", 0xffffff);
 	DrawRotaGraph(900, 500, 1.5f, 0.0f, imgTopSelectText_, true);
-	DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex_], true);
+
+	if (!redySelect1P_) {
+		DrawString(100, 150, typeNames[selectIndex1P_], 0xffff00);
+		DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex1P_], true);
+	}
+	else if (!redySelect2P_) {
+
+		DrawString(100, 150, typeNames[selectIndex2P_], 0xffff00);
+		DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex2P_], true);
+	}
 
 	// 選択中の3Dモデルを原点に描画
-	if (modelHandles_[selectIndex_] != -1)
+	if (modelHandles_[selectIndex1P_] != -1)
 	{
 		top_.pos = PLAYER_DEFAULT_POS;
 		MV1DrawModel(top_.modelId);
