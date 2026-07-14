@@ -28,7 +28,7 @@ private:
 	int imgResultLose_;
 	int imgResultBackLose_;
 	// BGM
-	int bgmResultWin_;
+	int resultWinBGM_;
 	int bgmResultLose_;
 
 };

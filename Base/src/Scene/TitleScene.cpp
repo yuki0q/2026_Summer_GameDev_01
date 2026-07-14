@@ -26,6 +26,7 @@ TitleScene::TitleScene(void)
 	window_(false),
 	windowSelect_(0),
 	isStickUpOld(false),
+	titleBGM_(0),
 	isStickDownOld(false),
 	SceneBase()
 {
@@ -47,6 +48,9 @@ void TitleScene::Init(void)
 	instructions_ = resMng_.Load(ResourceManager::SRC::IMAGE_INSTRUCTUION).handleId_;
 	gameEnd_ = resMng_.Load(ResourceManager::SRC::GAME_END).handleId_;
 	selectNow_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
+	titleBGM_ = LoadSoundMem("Data/Music/Title.mp3");
+	PlaySoundMem(titleBGM_, DX_PLAYTYPE_LOOP, true);
+	ChangeVolumeSoundMem(150, titleBGM_);
 
 	select_ = DEFAULT_SELECT;
 	count_ = 0;
@@ -201,6 +205,8 @@ void TitleScene::Update(void)
 				sceMng_.SetPlayerNo(2);
 			}
 
+			StopSoundMem(titleBGM_);
+
 			// ƒQ[ƒ€ƒV[ƒ“‚Ö‘JˆÚ
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 		}
@@ -219,7 +225,7 @@ void TitleScene::Draw(void)
 	MV1DrawModel(SpherePlanet_.modelId);*/
 
 	//DrawRotaGraph(IMG_TITLE_POS_X, IMG_TITLE_POS_Y, 1.0f, 0.0f, imgTitle_, true);
-	DrawBillboard3D(VGet(0.0f, 0.0f, -50.0f), 0.5f, 0.5f, 1000.0f, 0.0f, imgTitle_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X/2,Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgTitle_, true);
 	DrawRotaGraph(IMG_PUSH_SPACE_POS_X, IMG_PUSH_SPACE_POS_Y, 1.0f, 0.0f, imgPushSpace_, true);
 
 	MV1DrawModel(top_.modelId);
@@ -290,7 +296,7 @@ void TitleScene::Release(void)
 	DeleteGraph(configImg_);
 	DeleteGraph(instructions_);
 	DeleteGraph(selectNow_);
-
+	DeleteSoundMem(titleBGM_);
 	//skyDome_->Release();
 
 	delete animController_;

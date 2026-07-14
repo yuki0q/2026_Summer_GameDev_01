@@ -44,6 +44,8 @@ private:
 	Player* player2_;        
 	EnemyManager* enemyManager_;
 
+	VECTOR contactPoint_;
+
 	int shadowMapHandle_;
 	int countTime_;
 	bool isStart_;
@@ -53,6 +55,8 @@ private:
 	int image2;
 	int image1;
 	int imgWin_;
+
+	int GameBGM_;
 
 	// プレイヤーのポイント
 	int playerScore_ = 0;   
@@ -67,5 +71,6 @@ private:
 	bool isRoundEnd_;
 	int lastRoundWinner_;
 
-	int playerCount_;   
+	int playerCount_;
+
 };

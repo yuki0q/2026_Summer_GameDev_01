@@ -1,4 +1,5 @@
 #include <DxLib.h>
+#include <EffekseerForDXLib.h>
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/Camera.h"
@@ -10,6 +11,7 @@
 #include "../Object/Actor/Charactor/Player.h"
 #include "../Object/Collider/ColliderBase.h"
 #include "../Application.h"
+#include "../Effect/EffekseerEffect.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -32,7 +34,9 @@ GameScene::GameScene(void)
 	isRoundEnd_(false),
 	isRoundProcessed_(false),
 	lastRoundWinner_(0),
-	playerCount_(0)
+	playerCount_(0),
+	GameBGM_(0),
+	contactPoint_(0.0f,0.0f,0.0f)
 {
 }
 
@@ -42,6 +46,8 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+	EffekseerEffect::GetInstance()->CreateInstance();
+	EffekseerEffect::GetInstance()->Init();
 	/*TopDataManager* dataMng = new TopDataManager();
 	dataMng_.LoadCsvData("TopData.csv");*/
 
@@ -109,7 +115,7 @@ void GameScene::Init(void)
 
 	// 追従カメラモードに変更
 	Camera* camera = sceMng_.GetCamera();
-	camera->SetFollow(&normalStage_->GetTransform());
+	//camera->SetFollow(&player_->GetTransform());
 	camera->SetFollow(&normalStage_->GetTransform());
 	camera->ChangeMode(Camera::MODE::FOLLOW);
 	camera->AddHitCollider(stageCollider);
@@ -138,6 +144,10 @@ void GameScene::Init(void)
 	image2 = resMng_.Load(ResourceManager::SRC::IMAGE_2).handleId_;
 	image1 = resMng_.Load(ResourceManager::SRC::IMAGE_1).handleId_;
 	imgWin_ = resMng_.Load(ResourceManager::SRC::IMAGE_WIN).handleId_;
+
+	GameBGM_ = LoadSoundMem("Data/Music/GameScene.mp3");
+	PlaySoundMem(GameBGM_, DX_PLAYTYPE_LOOP, true);
+	ChangeVolumeSoundMem(150, GameBGM_);
 }
 
 void GameScene::Update(void)
@@ -246,7 +256,9 @@ void GameScene::Update(void)
 		//sceMng_.SetPlayerWin(player_->IsGameEnd()); // 勝利フラグをセット
 		if (playerScore_ >= 3) { sceMng_.SetPlayerWin(true); }
 		else if(enemyScore_ >= 3){ sceMng_.SetPlayerWin(false); }
+		EffekseerEffect::GetInstance()->ClearAllTrails();
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
+		StopSoundMem(GameBGM_);
 	}
 
 	if (isStart_ && !isRoundEnd_ && !isEnd_) {
@@ -375,6 +387,9 @@ void GameScene::Release(void)
 	DeleteGraph(image2);
 	DeleteGraph(image1);
 	DeleteGraph(imgWin_);
+	DeleteSoundMem(GameBGM_);
+
+	EffekseerEffect::GetInstance()->DeleteInstance();
 }
 
 void GameScene::Collision(void) 
@@ -412,6 +427,13 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 
 	// どちらかがリスポーン直後なら、めり込み補正や反発速度計算を一切行わずにスルーする
 	if (topA->IsRespawning() || topB->IsRespawning())return;
+
+	VECTOR dirAtoB = { diff.x / dist, diff.y / dist, diff.z / dist };
+
+	// Aの中心から、Aの半径分だけBの方向に進んだ位置を接触点とする
+	contactPoint_ = VAdd(topA->GetPos(), VScale(dirAtoB, topA->GetRadius()));
+
+	EffekseerEffect::GetInstance()->FireLightEffect(contactPoint_);
 
 	// 衝突応答 (物理演算)
 	//VECTOR normal = VDiv(diff, dist); // VNormの代わり（distが判明しているので効率的）

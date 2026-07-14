@@ -66,6 +66,9 @@ void ResourceManager::Init(void)
 	// ステージモデル
 	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Base2.mv1");
 	resourcesMap_.emplace(SRC::MAIN_STAGE, res);
+	
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/Desk.mv1");
+	resourcesMap_.emplace(SRC::STAGE_CLASS, res);
 
 	// スカイドーム
 	res = new RES(RES_T::MODEL, PATH_MDL + "SkyDome/Skydome.mv1");
@@ -121,11 +124,17 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "1PWin.png");
 	resourcesMap_.emplace(SRC::RESULT_1P_WIN, res);
 
+	res = new RES(RES_T::IMG, PATH_IMG + "WinScreen.png");
+	resourcesMap_.emplace(SRC::RESULT_IMG_WIN, res);
+
 	res = new RES(RES_T::IMG, PATH_IMG + "2PWin.png");
 	resourcesMap_.emplace(SRC::RESULT_2P_WIN, res);
 
 	res = new RES(RES_T::IMG, PATH_IMG + "YouLose.png");
 	resourcesMap_.emplace(SRC::RESULT_LOSE, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "LoseScreen.png");
+	resourcesMap_.emplace(SRC::RESULT_IMG_LOSE, res);
 
 	res = new RES(RES_T::IMG, PATH_IMG + "1P.png");
 	resourcesMap_.emplace(SRC::IMAGE_1P, res);
@@ -165,7 +174,6 @@ void ResourceManager::Init(void)
 
 	res = new RES(RES_T::IMG, PATH_IMG + "instructions.png");
 	resourcesMap_.emplace(SRC::IMAGE_INSTRUCTUION, res);
-
 }
 
 void ResourceManager::Release(void)

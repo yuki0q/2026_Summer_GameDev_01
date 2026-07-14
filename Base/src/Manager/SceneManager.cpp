@@ -151,8 +151,16 @@ void SceneManager::Draw(void)
 	// カメラ描画
 	camera_->DrawDebug();
 
+	// 3Dの奥行き判定を一時的に無効化する
+	SetUseZBuffer3D(FALSE);
+	SetWriteZBuffer3D(FALSE);
+	
 	// Effekseerにより再生中のエフェクトを描画する。
 	DrawEffekseer3D();
+
+	// 終わったら3D用に設定を戻す
+	SetUseZBuffer3D(TRUE);
+	SetWriteZBuffer3D(TRUE);
 
 	// ポーズ中なら、ゲーム画面の上に重ねてポーズ画面を描画する
 	if (sceneId_ == SCENE_ID::PAUSE && pauseScene_ != nullptr)

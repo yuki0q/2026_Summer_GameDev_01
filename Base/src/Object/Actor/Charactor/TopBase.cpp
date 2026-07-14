@@ -1,4 +1,5 @@
-﻿#include "../../../Utility/AsoUtility.h"
+﻿#include <EffekseerForDXLib.h>
+#include "../../../Utility/AsoUtility.h"
 #include "../../../Utility/MatrixUtility.h"
 #include "../../../Manager/ResourceManager.h"
 #include "../../../Manager/Resource.h"
@@ -9,6 +10,7 @@
 #include "../../Collider/ColliderLine.h"
 #include "../../Collider/ColliderCapsule.h"
 #include "../../../Common/Quaternion.h"
+#include "../../../Effect/EffekseerEffect.h"
 #include "TopBase.h"
 
 TopBase::TopBase(const TopBase::TopData& data)
@@ -42,6 +44,7 @@ TopBase::TopBase(const TopBase::TopData& data)
 	trailColorF_(0),
 	trailColorE_(0),
 	trailTimer_(0.0f),
+	isDash_(false),
 	isDashing_(false),
 	isShielding_(false),
 	isStabilitying_(false),
@@ -65,6 +68,8 @@ TopBase::TopBase(const TopBase::TopData& data)
 	scrapSpeed_(data.scrapSpeed),
 	dyingScrapSpeed_(data.dyingScrapSpeed),
 	radiusFactor_(data.radiusFactor),
+	currentEffHandle_(0),
+	prevDashing_(false),
 	//topType_(TOP_TYPE::BALANCE),// デフォルトはバランス]
 	sceMng_(SceneManager::GetInstance())
 {
@@ -120,6 +125,8 @@ void TopBase::InitAnimation(void)
 
 void TopBase::InitPost(void)
 {
+	ResetTrailEffect();
+
 	dyeCount_ = 0;
 	// 攻撃型
 	isDashing_ = false;
@@ -222,6 +229,10 @@ void TopBase::Draw(void)
 void TopBase::Release(void)
 {
 	CharactorBase::Release();
+
+	ResetTrailEffect();
+	EffekseerEffect::GetInstance()->SkillStop(this);
+	EffekseerEffect::GetInstance()->DeleteInstance();
 
 	DeleteGraph(imgChara_);
 }
@@ -731,39 +742,24 @@ void TopBase::ProcessTopTilt(void)
 
 void TopBase::ProcessTopTrail(void)
 {
-	float dt = scnMng_.GetDeltaTime();
-
-	if (!isDying_) {
-		trailTimer_ += dt;
-		if (trailTimer_ >= TRAIL_INTERVAL)
-		{
-			trailTimer_ = 0.0f;
-
-			// コマの現在の設置点（地面に接する中心座標）
-			VECTOR currentPos = transform_.pos;
-			currentPos.y += 1.0f; // 地面とのちらつきを防ぐために1だけ浮かせる
-
-			TrailPoint newPoint;
-			newPoint.pos = currentPos;
-			newPoint.alpha = 1.0f; // 最初はくっきり見える
-
-			// 先頭に新しい点を追加
-			trailPoints_.insert(trailPoints_.begin(), newPoint);
-
-			// 最大数を超えたら古い点を消す
-			if (trailPoints_.size() > TRAIL_MAX_POINTS)
-			{
-				trailPoints_.pop_back();
-			}
-		}
-	}
-
-	// 記録されている軌跡の透明度を徐々に下げる（時間経過で消える演出）
-	for (auto& point : trailPoints_)
+	bool dashEff = isDash_ || isDashing_;
+	// 通常からダッシュに切り替わった瞬間
+	if (dashEff && !prevDashing_)
 	{
-		point.alpha -= 0.5f * dt; // 1秒間で 0.5 減衰
-		if (point.alpha < 0.0f) point.alpha = 0.0f;
+		// ダッシュ用エフェクトに切り替える
+		EffekseerEffect::GetInstance()->TrailDashStart(this, static_cast<int>(topType_));
 	}
+	// ダッシュから通常に戻った瞬間
+	else if (!dashEff && prevDashing_)
+	{
+		// 通常エフェクトに戻す
+		EffekseerEffect::GetInstance()->TrailIdleStart(this, static_cast<int>(topType_));
+	}
+
+	// 前フレームの状態を記憶（次フレームの切り替え検知用）
+	prevDashing_ = dashEff;
+
+	EffekseerEffect::GetInstance()->TrailUpdate(this, transform_.pos);
 }
 
 void TopBase::TopSorting(void)
@@ -800,6 +796,7 @@ void TopBase::TopSorting(void)
 			radiusFactor_ = 1.2f;
 			trailColorF_ = GetColor(100, 100, 255);
 			trailColorE_ = GetColor(50, 50, 255);
+			EffekseerEffect::GetInstance()->SkillStop(this);
 		}
 	}
 
@@ -811,6 +808,7 @@ void TopBase::TopSorting(void)
 			isShielding_ = false;
 			trailColorF_ = GetColor(100, 255, 100);
 			trailColorE_ = GetColor(50, 255, 50);
+			EffekseerEffect::GetInstance()->SkillStop(this);
 		}
 	}
 
@@ -823,6 +821,7 @@ void TopBase::TopSorting(void)
 			trailColorF_ = GetColor(255, 255, 100);
 			trailColorE_ = GetColor(255, 255, 50);
 			stability_ = 3.0f;
+			EffekseerEffect::GetInstance()->SkillStop(this);
 		}
 	}
 
@@ -836,8 +835,10 @@ void TopBase::TopSorting(void)
 			trailColorE_ = GetColor(255, 50, 50);
 			stability_ = 1.5f;
 			topsShock_ = 0.4f;
+			EffekseerEffect::GetInstance()->SkillStop(this);
 		}
 	}
+	EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 }
 
 void TopBase::ProccesTypeAttack(void)
@@ -860,16 +861,14 @@ void TopBase::ProccesTypeAttack(void)
 		if (VSizeSq(dashDir) < 0.01f) {
 			dashDir = { 1.0f, 0.0f, 0.0f }; // 傾きがない場合の安全策
 		}
-
-		trailColorF_ = GetColor(200, 200, 255);
-		trailColorE_ = GetColor(150, 150, 255);
-		
-
 		// 瞬間的に慣性速度を大きくする
 		centerMovePow_ = VScale(dashDir, 800.0f);
 
 		// 攻撃型専用の衝撃力バフ（通常0.5f → ダッシュ時 2.0f）
 		topsShock_ = 2.0f;
+
+		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 	}
 }
 
@@ -883,8 +882,10 @@ void TopBase::ProccesTypeDefense(void)
 		skillTimer_ = 3.0f;
 
 		skillCoolTimer_ = SKILL_COOL_TIME_D;
-		trailColorF_ = GetColor(200, 255, 200);
-		trailColorE_ = GetColor(150, 255, 150);
+		
+		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
+
 	}
 
 	
@@ -906,8 +907,8 @@ void TopBase::ProccesTypeStamina(void)
 
 		stability_ = 15.0f;
 
-		trailColorF_ = GetColor(255, 255, 200);
-		trailColorE_ = GetColor(255, 255, 150);
+		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 	}
 	;
 }
@@ -930,6 +931,9 @@ void TopBase::ProccesTypeBalance(void)
 			topsShock_ = 1.5f;
 			skillTimer_ = 1.2f;
 			skillSpeed_ = 80.0f;
+
+			EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+			EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 		}
 		else // 防御型
 		{
@@ -937,11 +941,12 @@ void TopBase::ProccesTypeBalance(void)
 			stability_ = 10.0f;
 			skillTimer_ = 1.0f;
 			skillSpeed_ = 1.0f;
+
+			EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+			EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 		}
 
 		skillCoolTimer_ = SKILL_COOL_TIME_B;
-		trailColorF_ = GetColor(255, 200, 200);
-		trailColorE_ = GetColor(255, 150, 150);
 	}
 	;
 }
@@ -957,6 +962,9 @@ void TopBase::CollisionReserve(void)
 
 void TopBase::Respawn(void)
 {
+	EffekseerEffect::GetInstance()->SkillStop(this);
+	ResetTrailEffect();
+
 	topsVel_ = { 0.0f, 0.0f, 0.0f };
 	transform_.pos = respawnPos_;
 	centerPos_ = respawnCenterPos_;
@@ -986,6 +994,13 @@ void TopBase::Respawn(void)
 
 	trailPoints_.clear();
 	trailTimer_ = 0.0f;	
+}
+
+void TopBase::ResetTrailEffect(void)
+{
+	EffekseerEffect::GetInstance()->TrailStop(this);
+	EffekseerEffect::GetInstance()->TrailIdleStart(this, static_cast<int>(topType_));
+	EffekseerEffect::GetInstance()->TrailUpdate(this, transform_.pos);
 }
 
 void TopBase::DrawDebug(void)

@@ -108,14 +108,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,17 +126,18 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Effect\EffekseerEffect.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\Enemy\EnemyBase.cpp" />
     <ClCompile Include="src\Manager\EnemyManager.cpp" />
@@ -174,8 +175,10 @@
     <ClCompile Include="src\Object\Common\Transform.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\TopBase.cpp" />
     <ClCompile Include="src\Manager\TopDataManager.cpp" />
+    <ClCompile Include="src\Object\Actor\StageClassRoom.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Effect\EffekseerEffect.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Enemy\EnemyBase.h" />
     <ClInclude Include="src\Manager\EnemyManager.h" />
@@ -212,6 +215,7 @@
     <ClInclude Include="src\Object\Common\Transform.h" />
     <ClInclude Include="src\Object\Actor\Charactor\TopBase.h" />
     <ClInclude Include="src\Manager\TopDataManager.h" />
+    <ClInclude Include="src\Object\Actor\StageClassRoom.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 class ResourceManager;
 class SceneManager;
 class TopDataManager;
+class EffekseerEffect;
 
 class SceneBase
 {

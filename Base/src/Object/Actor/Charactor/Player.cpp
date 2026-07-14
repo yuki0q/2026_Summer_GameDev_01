@@ -188,7 +188,7 @@ void Player::ProcessMove(void)
 
 	VECTOR dir = AsoUtility::VECTOR_ZERO;
 
-	bool isDash = false;
+	isDash_ = false;
 	isSkill_ = false;
 
 	moveSpeed_ = 0.0f;
@@ -212,7 +212,7 @@ void Player::ProcessMove(void)
 			if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_A)) { dir = AsoUtility::DIR_BL; }
 			if (ins.IsNew(KEY_INPUT_S) && ins.IsNew(KEY_INPUT_D)) { dir = AsoUtility::DIR_BR; }
 
-			if (ins.IsNew(KEY_INPUT_LSHIFT)) { isDash = true; }
+			if (ins.IsNew(KEY_INPUT_LSHIFT)) { isDash_ = true; }
 			if (ins.IsNew(KEY_INPUT_RSHIFT)) { isSkill_ = true; }
 
 			if (ins.IsNew(KEY_INPUT_G)) { isDying_ = true; }
@@ -227,13 +227,13 @@ void Player::ProcessMove(void)
 				VECTOR padDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-					InputManager::JOYPAD_BTN::RB))
+					InputManager::JOYPAD_BTN::LB))
 				{
-					isDash = true;
+					isDash_ = true;
 				}
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-					InputManager::JOYPAD_BTN::LB))
+					InputManager::JOYPAD_BTN::RB))
 				{
 					isSkill_ = true;
 				}
@@ -256,13 +256,13 @@ void Player::ProcessMove(void)
 				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-					InputManager::JOYPAD_BTN::RB))
+					InputManager::JOYPAD_BTN::LB))
 				{
-					isDash = true;
+					isDash_ = true;
 				}
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
-					InputManager::JOYPAD_BTN::LB))
+					InputManager::JOYPAD_BTN::RB))
 				{
 					isSkill_ = true;
 				}
@@ -276,13 +276,13 @@ void Player::ProcessMove(void)
 				dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD2,
-					InputManager::JOYPAD_BTN::RB))
+					InputManager::JOYPAD_BTN::LB))
 				{
-					isDash = true;
+					isDash_ = true;
 				}
 
 				if (ins.IsPadBtnNew(InputManager::JOYPAD_NO::PAD2,
-					InputManager::JOYPAD_BTN::LB))
+					InputManager::JOYPAD_BTN::RB))
 				{
 					isSkill_ = true;
 				}
@@ -291,7 +291,7 @@ void Player::ProcessMove(void)
 
 	}
 
-		if (isDash)
+		if (isDash_)
 		{
 			moveSpeed_ = dashSpeed_;
 			topsSpeed_ = dashSpeed_;
@@ -299,7 +299,7 @@ void Player::ProcessMove(void)
 
 	if (!AsoUtility::EqualsVZero(dir))
 	{
-		if (!isSkill_ || !isDash) {
+		if (!isSkill_ || !isDash_) {
 			// 移動スピード
 			moveSpeed_ = SPEED_MOVE;
 		}
@@ -310,7 +310,7 @@ void Player::ProcessMove(void)
 		if (!isJump_)
 		{
 			// アニメーション
-			if (isDash)
+			if (isDash_)
 			{
 				animController_->Play(
 					static_cast<int>(ANIM_TYPE::FAST_RUN), true);

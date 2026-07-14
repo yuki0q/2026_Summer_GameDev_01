@@ -118,6 +118,8 @@ public:
 
 	virtual void Respawn(void);
 
+	void ResetTrailEffect(void);
+
 protected:
 
 	// リソースロード
@@ -277,6 +279,12 @@ protected:
 	float collisionTiltX_;
 	float collisionTiltZ_;
 
+	// 現在再生中のエフェクトの再生ハンドル
+	int currentEffHandle_; 
+
+	// 前フレームのダッシュ状態（切り替え検知用）
+	bool prevDashing_; 
+
 	VECTOR respawnPos_;
 	VECTOR respawnCenterPos_;
 
@@ -311,6 +319,8 @@ protected:
 
 	int trailColorF_;
 	int trailColorE_;
+
+	bool isDash_;
 
 	// 攻撃型スキル時
 	bool isDashing_;

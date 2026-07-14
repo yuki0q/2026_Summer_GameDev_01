@@ -87,6 +87,8 @@ private:
 	bool window_;
 	int windowSelect_;
 
+	int titleBGM_;
+
 	// •`‰æ—p
 	int button_;
 	int pushedButton_;
