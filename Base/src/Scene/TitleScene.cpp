@@ -48,6 +48,11 @@ void TitleScene::Init(void)
 	instructions_ = resMng_.Load(ResourceManager::SRC::IMAGE_INSTRUCTUION).handleId_;
 	gameEnd_ = resMng_.Load(ResourceManager::SRC::GAME_END).handleId_;
 	selectNow_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
+	texPlayerNo_ = resMng_.Load(ResourceManager::SRC::TEX_PLAYER_NOSELECT).handleId_;
+	texPlayer1_ = resMng_.Load(ResourceManager::SRC::TEX_PLAYER_1).handleId_;
+	texPlayer2_ = resMng_.Load(ResourceManager::SRC::TEX_PLAYER_2).handleId_;
+	texSpace_ = resMng_.Load(ResourceManager::SRC::TEX_SPACE).handleId_;
+	texEscape_ = resMng_.Load(ResourceManager::SRC::TEX_ESCAPE).handleId_;
 	titleBGM_ = LoadSoundMem("Data/Music/Title.mp3");
 	PlaySoundMem(titleBGM_, DX_PLAYTYPE_LOOP, true);
 	ChangeVolumeSoundMem(150, titleBGM_);
@@ -56,26 +61,37 @@ void TitleScene::Init(void)
 	count_ = 0;
 
 	// プレイヤー
-	top_.SetModel(resMng_.Load(ResourceManager::SRC::TOP).handleId_);
-	top_.scl = PLAYER_DEFAULT_SCALE;
+	topBlue_.SetModel(resMng_.Load(ResourceManager::SRC::BLUE_TOP).handleId_);
+	topBlue_.scl = PLAYER_DEFAULT_SCALE;
 
-	top_.quaRot = Quaternion::Identity();
-	top_.quaRot = Quaternion::Mult(top_.quaRot,
+	topBlue_.quaRot = Quaternion::Identity();
+	topBlue_.quaRot = Quaternion::Mult(topBlue_.quaRot,
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-90.0f), AsoUtility::AXIS_Y));
 
-	top_.quaRotLocal = Quaternion::Identity();
-	top_.quaRotLocal = Quaternion::Mult(top_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2RadF(180.0f), AsoUtility::AXIS_Y));
+	topBlue_.quaRot = Quaternion::Mult(topBlue_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-15.0f), AsoUtility::AXIS_Z));
 
-	top_.pos = PLAYER_DEFAULT_POS;
-	top_.Update();
-	animController_ = new AnimationController(top_.modelId);
-	//animController_->Add(static_cast<int>(ANIM_TYPE::RUN), 30.0f, Application::PATH_MODEL + "Player/Run.mv1");
+	topBlue_.quaRot = Quaternion::Mult(topBlue_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-20.0f), AsoUtility::AXIS_X));
 
-	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
+	topBlue_.pos = BLUE_DEFAULT_POS;
+	topBlue_.Update();
 
-	/*skyDome_ = new SkyDome(empty_);
-	skyDome_->Init();*/
+	topRed_.SetModel(resMng_.Load(ResourceManager::SRC::RED_TOP).handleId_);
+	topRed_.scl = PLAYER_DEFAULT_SCALE;
+
+	topRed_.quaRot = Quaternion::Identity();
+	topRed_.quaRot = Quaternion::Mult(topRed_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-90.0f), AsoUtility::AXIS_Y));
+
+	topRed_.quaRot = Quaternion::Mult(topRed_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(-15.0f), AsoUtility::AXIS_Z));
+
+	topRed_.quaRot = Quaternion::Mult(topRed_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(20.0f), AsoUtility::AXIS_X));
+
+	topRed_.pos = RED_DEFAULT_POS;
+	topRed_.Update();
 
 	// 定点カメラ
 	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
@@ -87,17 +103,12 @@ void TitleScene::Init(void)
 
 void TitleScene::Update(void)
 {
-	//SpherePlanet_.quaRot = Quaternion::Mult(SpherePlanet_.quaRot,
-	//	Quaternion::AngleAxis(AsoUtility::Deg2RadF(-1.0f), AsoUtility::AXIS_Y));
-	////;Euler(0.0f, 0.0f, AsoUtility::Deg2RadF(-1.0f)));
-
 	//SpherePlanet_.Update();
-	top_.quaRot = Quaternion::Mult(top_.quaRot,
+	topBlue_.quaRot = Quaternion::Mult(topBlue_.quaRot,
 		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
-	animController_->Play(static_cast<int>(ANIM_TYPE::RUN));
-
-	animController_->Update();
+	topRed_.quaRot = Quaternion::Mult(topRed_.quaRot,
+		Quaternion::AngleAxis(AsoUtility::Deg2RadF(10.0f), AsoUtility::AXIS_Y));
 
 	//skyDome_->Update();
 
@@ -212,7 +223,8 @@ void TitleScene::Update(void)
 		}
 	}
 
-	top_.Update();
+	topBlue_.Update();
+	topRed_.Update();
 }
 
 void TitleScene::Draw(void)
@@ -228,7 +240,8 @@ void TitleScene::Draw(void)
 	DrawRotaGraph(Application::SCREEN_SIZE_X/2,Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgTitle_, true);
 	DrawRotaGraph(IMG_PUSH_SPACE_POS_X, IMG_PUSH_SPACE_POS_Y, 1.0f, 0.0f, imgPushSpace_, true);
 
-	MV1DrawModel(top_.modelId);
+	MV1DrawModel(topBlue_.modelId);
+	MV1DrawModel(topRed_.modelId);
 
 	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 480, 0.5f, 0.0f, button_, true);
 	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, 580, 0.5f, 0.0f, button_, true);
@@ -263,25 +276,33 @@ void TitleScene::Draw(void)
 		// ウィンドウの枠線（白）
 		DrawBox(winX1, winY1, winX2, winY2, GetColor(255, 255, 255), false);
 
-		// タイトル文字
-		DrawString(540, 240, "PLAY MODE SELECT", GetColor(255, 255, 255));
-
+		// 人数選択
+		DrawRotaGraph(640, 240, 0.6, 0.0, texPlayerNo_, true);
+		
 		// 1人プレイの文字と選択カーソル
 		unsigned int color1P = (windowSelect_ == 0) ? GetColor(255, 255, 0) : GetColor(150, 150, 150);
-		DrawString(580, 320, "1 PLAYER", color1P);
+		//DrawString(580, 320, "1 PLAYER", color1P);
+		DrawRotaGraph(700, 320, 0.4, 0.0, texPlayer1_, true);
 		if (windowSelect_ == 0) {
-			DrawString(550, 320, "?", color1P);
+			//DrawString(550, 320, "?", color1P);
+			DrawRotaGraph(660, 320, 0.5f, 0.0f, selectNow_, true);
 		}
 
 		// 2人プレイの文字と選択カーソル
 		unsigned int color2P = (windowSelect_ == 1) ? GetColor(255, 255, 0) : GetColor(150, 150, 150);
-		DrawString(580, 380, "2 PLAYERS", color2P);
+		//DrawString(580, 380, "2 PLAYERS", color2P);
+		DrawRotaGraph(700, 380, 0.4, 0.0, texPlayer2_, true);
 		if (windowSelect_ == 1) {
-			DrawString(550, 380, "?", color2P);
+			//DrawString(550, 380, "?", color2P);
+			DrawRotaGraph(660, 380, 0.5f, 0.0f, selectNow_, true);
 		}
 
 		// 操作案内
-		DrawString(510, 460, "[SPACE]:Enter  [BACKSPACE]:Cancel", GetColor(200, 200, 200));
+		//texSpace_
+		DrawRotaGraph(550, 480, 0.45, 0.0, texSpace_, true);
+		DrawRotaGraph(720, 480, 0.45, 0.0, texEscape_, true);
+
+		//DrawString(510, 460, "[SPACE]:Enter  [BACKSPACE]:Cancel", GetColor(200, 200, 200));
 	}
 }
 
@@ -296,13 +317,15 @@ void TitleScene::Release(void)
 	DeleteGraph(configImg_);
 	DeleteGraph(instructions_);
 	DeleteGraph(selectNow_);
+	DeleteGraph(texPlayerNo_);
+	DeleteGraph(texPlayer1_);
+	DeleteGraph(texPlayer2_);
 	DeleteSoundMem(titleBGM_);
 	//skyDome_->Release();
-
-	delete animController_;
 	//delete skyDome_;
 
 	/*bigPlanet_.Release();
 	SpherePlanet_.Release();*/
-	top_.Release();
+	topBlue_.Release();
+	topRed_.Release();
 }

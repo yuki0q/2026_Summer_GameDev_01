@@ -251,7 +251,7 @@ void EffekseerEffect::SkillStart(TopBase* top, const int type)
 		break;
 	}
 
-	SetScalePlayingEffekseer3DEffect(playSkill_, 70.0f, 70.0f, 70.0f);
+	SetScalePlayingEffekseer3DEffect(playSkill_, 100.0f, 100.0f, 100.0f);
 
 	activeSkills_[top] = playSkill_;
 }

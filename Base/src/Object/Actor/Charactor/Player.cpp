@@ -26,12 +26,31 @@ void Player::Draw(void)
 	TopBase::Draw();
 	DrawDebug();
 
+	// ゲージの基本サイズ
+	const int GAUGE_WIDTH = 360;
+	const int GAUGE_HEIGHT = 100;
+
+	// 現在のスタミナの割合 (0.0f ～ 1.0f)
+	float spinRatio = topsSpin_ / topsSpinMax_;
+	if (spinRatio < 0.0f) spinRatio = 0.0f;
+	if (spinRatio > 1.0f) spinRatio = 1.0f;
+
+	// 割合に応じた描画幅
+	int barDrawWidth = static_cast<int>(GAUGE_WIDTH * spinRatio);
+
 	if (playerNo_ == 1) {
-		DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
-			300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
-		DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
-			40.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f, Application::SCREEN_SIZE_Y - 70.0f,
-			0xffff00, true);
+		// 1Pのゲージ描画位置
+		int bgX = 30;
+		int bgY = Application::SCREEN_SIZE_Y - 150;
+
+		// ゲージの枠を描画
+		DrawGraph(bgX, bgY, gaugeFrame, TRUE);
+
+		// ゲージの中身を割合分だけ切り取って描画
+		// DrawRectGraph( 描画X, 描画Y, 切り取り開始X, 切り取り開始Y, 切り取る幅, 切り取る高さ, グラフィックスハンドル, 透過フラグ )
+		DrawRectGraph(bgX, bgY,
+			0, 0, barDrawWidth, GAUGE_HEIGHT,
+			spinGauge, TRUE);
 
 		DrawRotaGraph(50.0f,
 			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
@@ -39,9 +58,29 @@ void Player::Draw(void)
 		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 			DrawFormatString(30, 670, 0xffffff, "Skill Ready!!");
 		}
+		/*DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
+			300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
+		DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
+			40.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f, Application::SCREEN_SIZE_Y - 70.0f,
+			0xffff00, true);
+
+		DrawRotaGraph(50.0f,
+			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);*/
 	}
 	else if (playerNo_ == 2) {
-		DrawBoxAA(Application::SCREEN_SIZE_X - 300.0f, Application::SCREEN_SIZE_Y - 120.0f,
+
+		// --- 2Pのゲージ描画位置（画面右側） ---
+		int bgX = Application::SCREEN_SIZE_X - GAUGE_WIDTH - 30;
+		int bgY = Application::SCREEN_SIZE_Y - 150;
+
+		// ゲージの枠を描画
+		DrawGraph(bgX, bgY, gaugeFrame, TRUE);
+
+		// ゲージの中身を描画
+		DrawRectGraph(bgX , bgY ,
+			0, 0, barDrawWidth, GAUGE_HEIGHT,
+			spinGauge, TRUE);
+		/*DrawBoxAA(Application::SCREEN_SIZE_X - 300.0f, Application::SCREEN_SIZE_Y - 120.0f,
 			Application::SCREEN_SIZE_X - 30.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
 
 		DrawBoxAA(Application::SCREEN_SIZE_X - 290.0f, Application::SCREEN_SIZE_Y - 110.0f,
@@ -50,7 +89,7 @@ void Player::Draw(void)
 			0xffff00, true);
 
 		DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
-			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);*/
 
 		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 			DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");

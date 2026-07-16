@@ -317,6 +317,11 @@ protected:
 	// スキル使用時のスピード
 	float skillSpeed_;
 
+
+	// sipnゲージ用
+	int gaugeFrame;
+	int spinGauge;
+
 	int trailColorF_;
 	int trailColorE_;
 
@@ -335,6 +340,9 @@ protected:
 	bool isExSkill_;
 	// スキルの管理フラグ
 	bool isSkill_;
+	// 前フレームのスキル状態（切り替え検知用）
+	bool prevSkill_;
+
 	// スキルの管理タイマー
 	float skillTimer_;
 	// スキルのクールタイマー

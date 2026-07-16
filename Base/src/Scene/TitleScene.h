@@ -48,15 +48,17 @@ private:
 
 	static constexpr VECTOR SPHERE_PLANET_ROT = { 90.0f + DX_PI_F / 180.0f,0.0f,0.0f };
 
-	static constexpr VECTOR PLAYER_DEFAULT_POS = { 160.0f, 130.0f, -105.0f };
+	static constexpr VECTOR BLUE_DEFAULT_POS = { -180.0f, -160.0f, -120.0f };
+	static constexpr VECTOR RED_DEFAULT_POS = { 180.0f, -160.0f, -120.0f };
 
-	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 0.4f,0.4f,0.4f };
+	static constexpr VECTOR PLAYER_DEFAULT_SCALE = { 1.2f,1.2f,1.2f };
 
 	// òfêØ
 	Transform bigPlanet_;
 	Transform SpherePlanet_;
 
-	Transform top_;
+	Transform topBlue_;
+	Transform topRed_;
 
 	AnimationController* animController_;
 	SkyDome* skyDome_;
@@ -97,5 +99,9 @@ private:
 	int configImg_;
 	int instructions_;
 	int selectNow_;
-
+	int texPlayerNo_;
+	int texPlayer1_;
+	int texPlayer2_;
+	int texSpace_;
+	int texEscape_;
 };

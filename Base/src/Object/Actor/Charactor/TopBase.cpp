@@ -52,6 +52,7 @@ TopBase::TopBase(const TopBase::TopData& data)
 	skillTimer_(0.0f),
 	isExSkill_(false),
 	isSkill_(false),
+	prevSkill_(false),
 	skillCoolTimer_(0.0f),
 	dyeCount_(0),
 	topType_(data.type),
@@ -70,6 +71,8 @@ TopBase::TopBase(const TopBase::TopData& data)
 	radiusFactor_(data.radiusFactor),
 	currentEffHandle_(0),
 	prevDashing_(false),
+	gaugeFrame(0),
+	spinGauge(0),
 	//topType_(TOP_TYPE::BALANCE),// デフォルトはバランス]
 	sceMng_(SceneManager::GetInstance())
 {
@@ -83,6 +86,10 @@ void TopBase::InitLoad(void)
 {
 	// 基底クラスのリソースロード
 	CharactorBase::InitLoad();
+
+	gaugeFrame = resMng_.Load(ResourceManager::SRC::IMAME_SPINGAUGE_FRAME).handleId_;
+	spinGauge = resMng_.Load(ResourceManager::SRC::IMAME_SPINGAUGE).handleId_;
+
 	switch (topType_)
 	{
 	case TOP_TYPE::ATTACK:
@@ -235,6 +242,8 @@ void TopBase::Release(void)
 	EffekseerEffect::GetInstance()->DeleteInstance();
 
 	DeleteGraph(imgChara_);
+	DeleteGraph(gaugeFrame);
+	DeleteGraph(spinGauge);
 }
 
 float TopBase::GetRadius(void)
@@ -764,6 +773,13 @@ void TopBase::ProcessTopTrail(void)
 
 void TopBase::TopSorting(void)
 {
+	if (isSkill_ && !prevSkill_)
+	{
+		EffekseerEffect::GetInstance()->SkillStop(this);
+
+		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
+	}
+
 	switch (topType_) {
 	case TOP_TYPE::ATTACK:
 		ProccesTypeAttack();
@@ -838,7 +854,14 @@ void TopBase::TopSorting(void)
 			EffekseerEffect::GetInstance()->SkillStop(this);
 		}
 	}
-	EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
+	//isSkill_がtrueの間だけ SkillUpdate を実行
+	if (isSkill_)
+	{
+		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
+	}
+
+	// 現在のフレームの状態を保存（次フレーム判定用）
+	prevSkill_ = isSkill_;
 }
 
 void TopBase::ProccesTypeAttack(void)
@@ -866,9 +889,6 @@ void TopBase::ProccesTypeAttack(void)
 
 		// 攻撃型専用の衝撃力バフ（通常0.5f → ダッシュ時 2.0f）
 		topsShock_ = 2.0f;
-
-		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
-		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 	}
 }
 
@@ -882,10 +902,6 @@ void TopBase::ProccesTypeDefense(void)
 		skillTimer_ = 3.0f;
 
 		skillCoolTimer_ = SKILL_COOL_TIME_D;
-		
-		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
-		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
-
 	}
 
 	
@@ -906,9 +922,6 @@ void TopBase::ProccesTypeStamina(void)
 		collisionTiltZ_ = 0.0f;
 
 		stability_ = 15.0f;
-
-		EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
-		EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 	}
 	;
 }
@@ -931,9 +944,6 @@ void TopBase::ProccesTypeBalance(void)
 			topsShock_ = 1.5f;
 			skillTimer_ = 1.2f;
 			skillSpeed_ = 80.0f;
-
-			EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
-			EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 		}
 		else // 防御型
 		{
@@ -941,9 +951,6 @@ void TopBase::ProccesTypeBalance(void)
 			stability_ = 10.0f;
 			skillTimer_ = 1.0f;
 			skillSpeed_ = 1.0f;
-
-			EffekseerEffect::GetInstance()->SkillStart(this, static_cast<int>(topType_));
-			EffekseerEffect::GetInstance()->SkillUpdate(this, transform_.pos);
 		}
 
 		skillCoolTimer_ = SKILL_COOL_TIME_B;
@@ -990,6 +997,7 @@ void TopBase::Respawn(void)
 	tiltX_ = 0.0f;
 	tiltZ_ = 0.0f;
 
+	prevSkill_ = false;
 	isEnd_ = false;
 
 	trailPoints_.clear();

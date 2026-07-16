@@ -98,14 +98,14 @@ void ResultScene::Draw(void)
 	else if (sceMng_.GetPlayerNo() == 2) {
 		if (isWin_)
 		{
-			DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgResultBackWin_, true);
+			DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgResult1PWin_, true);
 			//DrawBillboard3D(VGet(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, 4000.0f, 0.0f, imgResultBackLose_, TRUE);
 			//DrawBillboard3D(VGet(0.0f, 0.0f, -50.0f), 0.5f, 0.5f, 6100.0f, 0.0f, imgResultBackWin_, TRUE);
 			//DrawBillboard3D(VGet(0.0f, -15.0f, -55.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResult1PWin_, TRUE);
 		}
 		else
 		{
-			DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgResultBackWin_, true);
+			DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 0.9f, 0.0f, imgResult2PWin_, true);
 			//DrawBillboard3D(VGet(0.0f, 0.0f, -50.0f), 0.5f, 0.5f, 6100.0f, 0.0f, imgResultBackWin_, TRUE);
 			//DrawBillboard3D(VGet(0.0f, -15.0f, -55.0f), 0.5f, 0.5f, 2500.0f, 0.0f, imgResult2PWin_, TRUE);
 		}

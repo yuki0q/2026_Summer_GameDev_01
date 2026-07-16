@@ -32,7 +32,7 @@ void ResourceManager::Init(void)
 	Resource* res;
 
 	// ƒ^ƒCƒgƒ‹‰æ‘œ
-	res = new RES(RES_T::IMG, PATH_IMG + "Title.png");
+	res = new RES(RES_T::IMG, PATH_IMG + "newTitle.png");
 	resourcesMap_.emplace(SRC::TITLE_IMG, res);
 
 	// 
@@ -93,6 +93,12 @@ void ResourceManager::Init(void)
 	// Ž‹–ì
 	res = new RES(RES_T::IMG, PATH_IMG + "Surprise.png");
 	resourcesMap_.emplace(SRC::UI_SURPRISE, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "SpinFrame.png");
+	resourcesMap_.emplace(SRC::IMAME_SPINGAUGE_FRAME, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "SpinGauge.png");
+	resourcesMap_.emplace(SRC::IMAME_SPINGAUGE, res);
 
 	res = new RES(RES_T::IMG, PATH_IMG + "3.png");
 	resourcesMap_.emplace(SRC::IMAGE_3, res);
@@ -171,6 +177,21 @@ void ResourceManager::Init(void)
 
 	res = new RES(RES_T::IMG, PATH_IMG + "config.png");
 	resourcesMap_.emplace(SRC::CONFIG_IMG, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "texPlayNo.png");
+	resourcesMap_.emplace(SRC::TEX_PLAYER_NOSELECT, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "texPlay1.png");
+	resourcesMap_.emplace(SRC::TEX_PLAYER_1, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "texPlay2.png");
+	resourcesMap_.emplace(SRC::TEX_PLAYER_2, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "texSpace.png");
+	resourcesMap_.emplace(SRC::TEX_SPACE, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "texEscape.png");
+	resourcesMap_.emplace(SRC::TEX_ESCAPE, res);
 
 	res = new RES(RES_T::IMG, PATH_IMG + "instructions.png");
 	resourcesMap_.emplace(SRC::IMAGE_INSTRUCTUION, res);

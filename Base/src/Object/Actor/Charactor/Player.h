@@ -111,6 +111,7 @@ private:
 	void DrawDebug(void) override;
 
 	int playerNo_;
+
 	//// プレイヤーの回転の中心点座標
 	//VECTOR centorPos_;
 	//VECTOR centorRot_;

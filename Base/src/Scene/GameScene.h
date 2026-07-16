@@ -73,4 +73,10 @@ private:
 
 	int playerCount_;
 
+	// 演出用変数
+	float timeScale_;          // 時間の進む速さ（1.0 = 通常, 0.1 = 10%のスローなど）
+	float slowMotionTimer_;    // スローモーションの残り時間
+
+	// ステージ外を判定するための外周半径
+	static constexpr float STAGE_OUT_RADIUS = 1600.0f;
 };

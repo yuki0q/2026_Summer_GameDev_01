@@ -36,6 +36,8 @@ GameScene::GameScene(void)
 	lastRoundWinner_(0),
 	playerCount_(0),
 	GameBGM_(0),
+	timeScale_(1.0f),
+	slowMotionTimer_(0.0f),
 	contactPoint_(0.0f,0.0f,0.0f)
 {
 }
@@ -148,6 +150,9 @@ void GameScene::Init(void)
 	GameBGM_ = LoadSoundMem("Data/Music/GameScene.mp3");
 	PlaySoundMem(GameBGM_, DX_PLAYTYPE_LOOP, true);
 	ChangeVolumeSoundMem(150, GameBGM_);
+
+	timeScale_ = 1.0f;
+	slowMotionTimer_ = 0.0f;
 }
 
 void GameScene::Update(void)
@@ -451,7 +456,7 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 	// 正面よりの時
 	if (normalSpeed > tangentSpeed)
 	{
-		// 反発係数 (1.0で完全弾性衝突)
+		// 反発係数
 		float e = 0.8f;
 
 		// 衝撃量 j の計算
@@ -545,8 +550,8 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 		{
 			// プレイヤーが防御型でシールド中なら、自分が受けるノックバックをほぼゼロに
 			pushPower = 0.1f;
-			// さらに相手（エネミー）に追加のスピン減少ダメージを与える
-			topB->SpinScrape(10.0f);
+			// さらに相手に追加のダメージを与える
+			topB->SpinScrape(8.0f);
 		}
 
 		if (topB->GetTopType() == TopBase::TOP_TYPE::DEFENSE && topA->IsShielding())
@@ -557,10 +562,10 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 			topA->SpinScrape(5.0f);
 		}
 
-		// プレイヤーは法線と「逆」方向（引かれる方向）に強く押し出す
+		// プレイヤーは法線と逆方向に強く押し出す
 		playerTargetPos = VSub(playerTargetPos, VScale(normal, pushPower));
 
-		// エネミーは法線方向（進む方向）に強く押し出す
+		// エネミーは法線方向に強く押し出す
 		enemyTargetPos = VAdd(enemyTargetPos, VScale(normal, pushPower));
 
 		// ついでにノックバック感を出すために、速度ベクトル（慣性）も少し外側に上書き付与
@@ -576,10 +581,10 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 		// 押し出しの基本強度
 		float pushPower = 5.0f;
 
-		// プレイヤーは法線と「逆」方向（引かれる方向）に強く押し出す
+		// プレイヤーは法線と逆方向に強く押し出す
 		playerTargetPos = VSub(playerTargetPos, VScale(normal, pushPower));
 
-		// エネミーは法線方向（進む方向）に強く押し出す
+		// エネミーは法線方向に強く押し出す
 		enemyTargetPos = VAdd(enemyTargetPos, VScale(normal, pushPower));
 	}
 
