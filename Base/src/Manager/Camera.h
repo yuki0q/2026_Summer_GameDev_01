@@ -102,6 +102,9 @@ public:
 	// 追従対象の設定
 	void SetFollow(const Transform* follow);
 
+	// ズーム演出を開始させる関数
+	void TriggerZoomIn(const VECTOR& zoomPoint1, const VECTOR& zoomPoint2, float duration);
+
 protected:
 
 	// リソースロード
@@ -158,6 +161,10 @@ private:
 	VECTOR targetPos_;
 
 	bool isCollision_;
+
+	bool isZooming_ = false;          // ズーム演出中フラグ
+	VECTOR zoomTargetPoint_ = { 0,0,0 }; // ズームするターゲット座標
+	float zoomTimer_ = 0.0f;          // ズーム残り時間
 
 	// カメラの上方向
 	//VECTOR cameraUp_;

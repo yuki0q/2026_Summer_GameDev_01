@@ -165,6 +165,28 @@ void GameScene::Update(void)
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::PAUSE);
 	}
 
+	// スローモーションタイマーの更新
+	if (slowMotionTimer_ > 0.0f)
+	{
+		// 1フレームあたりの秒数（1/60秒とする）に timeScale を考慮して減算
+		slowMotionTimer_ -= (1.0f / 60.0f);
+		timeScale_ = 0.3f; // 通常の15%の速度
+
+		if (slowMotionTimer_ <= 0.0f)
+		{
+			slowMotionTimer_ = 0.0f;
+			timeScale_ = 1.0f; // 元に戻す
+
+			// カメラを元に戻す指示
+			Camera* camera = sceMng_.GetCamera();
+			camera->SetFollow(&normalStage_->GetTransform()); // 追従対象をステージ中心に戻す
+		}
+	}
+	else
+	{
+		timeScale_ = 1.0f;
+	}
+
 	if (countTime_ > 0)
 	{
 		countTime_--;
@@ -232,6 +254,9 @@ void GameScene::Update(void)
 
 	if (isRoundEnd_ && !isEnd_)
 	{
+		slowMotionTimer_ = 0.0f;
+		timeScale_ = 1.0f;
+
 		if (playerScore_ >= 3 || enemyScore_ >= 3)
 		{
 			isEnd_ = true;
@@ -255,6 +280,29 @@ void GameScene::Update(void)
 		}
 	}
 
+	static float updateAccumulator = 0.0f;
+	updateAccumulator += timeScale_;
+
+	if (updateAccumulator >= 1.0f)
+	{
+		updateAccumulator -= 1.0f;
+
+		if (isStart_ && !isRoundEnd_ && !isEnd_) {
+			player_->Update();
+			if (playerCount_ == 2) {
+				player2_->Update();
+			}
+			else {
+				enemyManager_->Update();
+			}
+			Collision();
+		}
+	}
+	else
+	{
+		// スロー中、スキップされたフレームでもコリジョン解決後の滑らかな「補間移動」などがある場合は
+		// 最低限の更新を行う、もしくは完全に更新を止める（今回は完全停止でスローを表現）
+	}
 	normalStage_->Update();
 
 	if (isEnd_) {
@@ -266,16 +314,7 @@ void GameScene::Update(void)
 		StopSoundMem(GameBGM_);
 	}
 
-	if (isStart_ && !isRoundEnd_ && !isEnd_) {
-		player_->Update();
-		if (playerCount_ == 2) {
-			player2_->Update();
-		}
-		else {
-			enemyManager_->Update();
-		}
-		Collision();
-	}
+	
 }
 
 void GameScene::Draw(void)
@@ -283,6 +322,8 @@ void GameScene::Draw(void)
 	// シャドウマップへの描画の準備
 	ShadowMap_DrawSetup(shadowMapHandle_);
 
+	normalStage_->Draw();
+
 	if (!isRoundEnd_ || lastRoundWinner_ == 1 || lastRoundWinner_ == 0) {
 		player_->Draw();
 	}
@@ -292,7 +333,7 @@ void GameScene::Draw(void)
 	else {
 		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) enemyManager_->Draw();
 	}
-	normalStage_->Draw();
+	
 
 	// シャドウマップへの描画を終了
 	ShadowMap_DrawEnd();
@@ -300,6 +341,8 @@ void GameScene::Draw(void)
 	// 描画に使用するシャドウマップを設定
 	SetUseShadowMap(0, shadowMapHandle_);
 
+	normalStage_->Draw();
+
 	if (!isRoundEnd_ || lastRoundWinner_ == 1 || lastRoundWinner_ == 0) {
 		player_->Draw();
 	}
@@ -309,7 +352,7 @@ void GameScene::Draw(void)
 	else {
 		if (!isRoundEnd_ || lastRoundWinner_ == 2 || lastRoundWinner_ == 0) enemyManager_->Draw();
 	}
-	normalStage_->Draw();
+	
 
 	// 描画に使用するシャドウマップの設定を解除
 	SetUseShadowMap(0, -1);
@@ -614,4 +657,32 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 		topB->GetTransform().pos)) *
 		topA->GetSpin() * 0.0001f);
 
+	float playerDistFromCenter = VSize({ playerTargetPos.x, 0.0f, playerTargetPos.z });
+	float enemyDistFromCenter = VSize({ enemyTargetPos.x, 0.0f, enemyTargetPos.z });
+
+	VECTOR target;
+
+	if (playerDistFromCenter > STAGE_OUT_RADIUS) {
+		target = { playerTargetPos.x,0.0f,playerTargetPos.z };
+	}
+	else if (enemyDistFromCenter > STAGE_OUT_RADIUS) {
+		target = { enemyTargetPos.x,0.0f,enemyTargetPos.z };
+	}
+
+	if (playerDistFromCenter > STAGE_OUT_RADIUS || enemyDistFromCenter > STAGE_OUT_RADIUS)
+	{
+		// すでにスロー中でなければ、スローを開始する
+		if (slowMotionTimer_ <= 0.0f)
+		{
+			slowMotionTimer_ = 0.5f; // 1.5秒間スローにする（実時間は 1.5 / 0.15 = 10秒 ではなく、スロータイマーの減算速度通りに終了します）
+
+			// カメラに一時的な注視ポイントを認識させる
+			Camera* camera = sceMng_.GetCamera();
+
+			// 1. カメラを接触した瞬間（contactPoint_）へ寄せるための「ダミーのTransform」をシーン上で作成するか、
+			// もしくはCamera自体に専用の関数「SetTemporaryFocus」を追加して直接位置を教える。
+			// 今回は最も既存コードを壊さないように、Cameraに新しく「ズーム演出用の位置」を直接渡す設計が綺麗です。
+			camera->TriggerZoomIn(contactPoint_, target, 1.5f);
+		}
+	}
 }

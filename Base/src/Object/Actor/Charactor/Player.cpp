@@ -38,6 +38,10 @@ void Player::Draw(void)
 	// 割合に応じた描画幅
 	int barDrawWidth = static_cast<int>(GAUGE_WIDTH * spinRatio);
 
+	// 3Dの奥行き判定を一時的に無効化する
+	SetUseZBuffer3D(FALSE);
+	SetWriteZBuffer3D(FALSE);
+
 	if (playerNo_ == 1) {
 		// 1Pのゲージ描画位置
 		int bgX = 30;
@@ -93,11 +97,11 @@ void Player::Draw(void)
 
 		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 			DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");
-		}
-
-		
-		
+		}		
 	}
+	// 3Dの奥行き判定を一時的に無効化する
+	SetUseZBuffer3D(TRUE);
+	SetWriteZBuffer3D(TRUE);
 
 }
 

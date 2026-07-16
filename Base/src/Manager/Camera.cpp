@@ -81,6 +81,13 @@ void Camera::SetFollow(const Transform* follow)
 	followTransform_ = follow;
 }
 
+void Camera::TriggerZoomIn(const VECTOR& zoomPoint1, const VECTOR& zoomPoint2, float duration)
+{
+	isZooming_ = true;
+	zoomTargetPoint_ = AsoUtility::Lerp(zoomPoint1, zoomPoint2, 0.15);
+	zoomTimer_ = duration;
+}
+
 void Camera::InitLoad(void)
 {
 }
@@ -313,8 +320,34 @@ void Camera::SetBeforeDrawFollow(void)
 	// カメラ操作(回転)
 	//ProcessRot(true);
 
-	// 追従対象との相対位置を同期
-	SyncFollow();
+	if (isZooming_ && zoomTimer_ > 0.0f)
+	{
+		// ズームタイマーの更新
+		zoomTimer_ -= 1.0f / 60.0f; // スローモーション中ですが、実時間で減算されるように設定
+
+		// 同期処理を一度実行してベースとなるカメラ位置を作る
+		SyncFollow();
+
+		// ズーム演出：ターゲット座標（接触点）にカメラと注視点を引き寄せる
+		// 接触ポイントの少し斜め上空にカメラを回り込ませる
+		VECTOR zoomCameraOffset = { 0.0f, 150.0f, -200.0f }; // コマの接触点を近くで映すためのオフセット（お好みで調整）
+		VECTOR idealZoomCameraPos = VAdd(zoomTargetPoint_, zoomCameraOffset);
+
+		// 線形補間（Lerp）を用いて、通常カメラの位置からズーム位置へとスムーズに遷移させる
+		// LERP_RATE_MOVE (0.1f) よりも少し早く寄せるために高めのブレンド率にします
+		transform_.pos = AsoUtility::Lerp(transform_.pos, idealZoomCameraPos, 0.4f);
+		targetPos_ = AsoUtility::Lerp(targetPos_, zoomTargetPoint_, 0.4f);
+
+		if (zoomTimer_ <= 0.0f)
+		{
+			isZooming_ = false;
+		}
+	}
+	else
+	{
+		// 通常の追従処理
+		SyncFollow();
+	}
 
 	// 衝突判定
 	Collision();
