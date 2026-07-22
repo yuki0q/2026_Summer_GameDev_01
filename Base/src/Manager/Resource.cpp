@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
+#include <Windows.h>
 #include "Resource.h"
 
 Resource::Resource(void)
@@ -41,6 +42,24 @@ Resource::Resource(TYPE type, const std::string& path, int numX, int numY, int s
 {
 }
 
+Resource::Resource(TYPE type, const std::string& fontFilePath, const std::string& fontName, int size, int thickness, int fontType)
+	:
+	type_(type),
+	path_(fontFilePath),     // 読み込むフォントファイルのパス (例: "Resources/Font/myfont.ttf")
+	fontName_(fontName),     // システムに認識させるフォント名 (例: "MyFontName")
+	fontSize_(size),
+	fontThickness_(thickness),
+	fontType_(fontType),
+	numX_(-1),
+	numY_(-1),
+	sizeX_(-1),
+	sizeY_(-1),
+	handleId_(-1),
+	handleIds_(nullptr),
+	isFontRegistered_(false) 
+{
+}
+
 Resource::~Resource(void)
 {
 }
@@ -74,6 +93,24 @@ void Resource::Load(void)
 	case Resource::TYPE::EFFEKSEER:
 
 		handleId_ = LoadEffekseerEffect(path_.c_str());
+		break;
+
+	case Resource::TYPE::FONT:
+
+		// フォントファイルパスが指定されている場合は Windows に登録
+		if (!path_.empty())
+		{
+			// AddFontResourceExA を呼び出し、プライベートフォントとしてプロセスに登録
+			int result = AddFontResourceExA(path_.c_str(), FR_PRIVATE, NULL);
+			if (result > 0)
+			{
+				isFontRegistered_ = true;
+			}
+		}
+
+		// DXライブラリ側でフォントハンドルを作成
+		// path_ が空なら fontName_ (システムフォント) をそのまま使用します
+		handleId_ = CreateFontToHandle(fontName_.c_str(), fontSize_, fontThickness_, fontType_);
 		break;
 
 	}
@@ -116,6 +153,21 @@ void Resource::Release(void)
 		DeleteEffekseerEffect(handleId_);
 		break;
 
+	case Resource::TYPE::FONT:
+		// フォントハンドルの削除
+		if (handleId_ != -1)
+		{
+			DeleteFontToHandle(handleId_);
+			handleId_ = -1;
+		}
+
+		// フォントの登録を解除
+		if (isFontRegistered_)
+		{
+			RemoveFontResourceExA(path_.c_str(), FR_PRIVATE, NULL);
+			isFontRegistered_ = false;
+		}
+		break;
 	}
 
 }

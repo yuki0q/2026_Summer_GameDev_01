@@ -2,6 +2,9 @@
 #include "CharactorBase.h"
 #include <vector>
 
+class VertexMaterial;
+class VertexRenderer;
+
 class TopBase : public CharactorBase
 {
 
@@ -244,6 +247,8 @@ protected:
 	VECTOR collisionTargetPos_;
 
 	int imgChara_;
+	int imgSkill_;
+	int imgSkillNot_;
 
 	// 衝突目標座標が有効かどうか
 	bool hasCollisionTarget_;
@@ -365,4 +370,8 @@ protected:
 	float stability_ ;    // 軸の安定度（高いほどブレがすぐ収まる）
 	float defaultTilt_;  // 平常時の傾き（攻撃型などは最初から少し傾ける）
 	float wobbleSpeed_;  // ヨロヨロと円を描く速度（歳差運動の速さ）
+
+	// 頂点シェーダ用
+	std::unique_ptr<VertexMaterial> vertexMaterial_;
+	std::unique_ptr<VertexRenderer> vertexRenderer_;
 };

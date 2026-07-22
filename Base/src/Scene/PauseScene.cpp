@@ -4,6 +4,7 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
+#include "../Manager/SoundManager.h"
 #include "../Application.h"
 #include "TitleScene.h"
 
@@ -55,6 +56,7 @@ void PauseScene::Update(void)
 	if (ins.IsTrgDown(KEY_INPUT_ESCAPE)||
 		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CANCEL);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
 
@@ -71,6 +73,7 @@ void PauseScene::Update(void)
 
 	if (ins.IsTrgDown(KEY_INPUT_S)|| (isStickDownNow && !isStickDownOld)) {
 		select_ += SELECT_MOVE;
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 	}
 	else if (select_ > 560) {
 		select_ = 200;
@@ -78,6 +81,7 @@ void PauseScene::Update(void)
 
 	if (ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
 		select_ -= SELECT_MOVE;
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 	}
 	else if (select_ < 200) {
 		select_ = 560;
@@ -93,12 +97,15 @@ void PauseScene::Update(void)
 	{
 		switch (count_) {
 		case 1:
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 			break;
 		case 2:
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 			break;
 		case 3:
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 			break;
 		case 4:

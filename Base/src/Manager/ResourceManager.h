@@ -59,6 +59,9 @@ public:
 		GAME_START,
 		CONFIG_IMG,
 		IMAGE_INSTRUCTUION,
+		IMAGE_SKILL,
+		IMAGE_SKILLNOT,
+		FONT_1,
 	};
 
 	// 明示的にインステンスを生成する

@@ -12,6 +12,14 @@ class ActorBase
 
 public:
 
+	// ポストエフェクトモード
+	enum class MODE
+	{
+		MAIN,
+		VERTEX,
+		MAX
+	};
+
 	// コンストラクタ
 	ActorBase(void);
 
@@ -78,4 +86,6 @@ protected:
 	// 初期化後の個別処理
 	virtual void InitPost(void) = 0;
 
+	// ポストエフェクトモード
+	MODE mode_;
 };

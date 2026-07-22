@@ -198,6 +198,9 @@ void NormalEnemy::Draw(void)
 		0, 0, barDrawWidth, GAUGE_HEIGHT,
 		spinGauge, TRUE);
 
+	DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
+		Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
+
 	if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 		DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");
 	}

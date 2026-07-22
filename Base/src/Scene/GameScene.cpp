@@ -6,6 +6,7 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/EnemyManager.h"
 #include "../Manager/TopDataManager.h"
+#include "../Manager/SoundManager.h"
 #include "../Manager/Resource.h"
 #include "../Object/Actor/NormalStage.h"
 #include "../Object/Actor/Charactor/Player.h"
@@ -35,7 +36,6 @@ GameScene::GameScene(void)
 	isRoundProcessed_(false),
 	lastRoundWinner_(0),
 	playerCount_(0),
-	GameBGM_(0),
 	timeScale_(1.0f),
 	slowMotionTimer_(0.0f),
 	contactPoint_(0.0f,0.0f,0.0f)
@@ -147,9 +147,12 @@ void GameScene::Init(void)
 	image1 = resMng_.Load(ResourceManager::SRC::IMAGE_1).handleId_;
 	imgWin_ = resMng_.Load(ResourceManager::SRC::IMAGE_WIN).handleId_;
 
-	GameBGM_ = LoadSoundMem("Data/Music/GameScene.mp3");
-	PlaySoundMem(GameBGM_, DX_PLAYTYPE_LOOP, true);
-	ChangeVolumeSoundMem(150, GameBGM_);
+	// タイトル画面に必要なサウンドをロード
+	SoundManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
+
+	// タイトルBGMを再生（自動でループ再生されます）
+	SoundManager::GetInstance()->PlayBGM(SoundID::BGM_BATTLE);
+	SoundManager::GetInstance()->SetBgmVolume(160); 
 
 	timeScale_ = 1.0f;
 	slowMotionTimer_ = 0.0f;
@@ -162,6 +165,7 @@ void GameScene::Update(void)
 	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || 
 		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_WINDOW);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::PAUSE);
 	}
 
@@ -310,8 +314,9 @@ void GameScene::Update(void)
 		if (playerScore_ >= 3) { sceMng_.SetPlayerWin(true); }
 		else if(enemyScore_ >= 3){ sceMng_.SetPlayerWin(false); }
 		EffekseerEffect::GetInstance()->ClearAllTrails();
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::RESULT);
-		StopSoundMem(GameBGM_);
 	}
 
 	
@@ -435,7 +440,8 @@ void GameScene::Release(void)
 	DeleteGraph(image2);
 	DeleteGraph(image1);
 	DeleteGraph(imgWin_);
-	DeleteSoundMem(GameBGM_);
+	SoundManager::GetInstance()->StopBGM();
+	SoundManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 
 	EffekseerEffect::GetInstance()->DeleteInstance();
 }
@@ -529,7 +535,7 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 		enemyNewVel = VScale(VAdd(topB->GetVel(),
 			VScale(impulse, 1.0f / topB->GetWeight())),
 			topA->GetTopsShock());
-
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_SMASH);
 	}
 	else {	// 擦りよりの時
 		tangent = VNorm(tangent);	// 正規化
@@ -561,6 +567,9 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 		enemyNewVel = VScale(VAdd(topB->GetVel(),
 			VScale(frictionImpulse, 1.0f / topB->GetWeight())),
 			topA->GetTopsShock());
+
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_ATTACK);
+
 	}
 
 	// めり込み補正 (Positional Correction)
@@ -671,6 +680,8 @@ void GameScene::ResolveTopToTop(TopBase* topA, TopBase* topB)
 
 	if (playerDistFromCenter > STAGE_OUT_RADIUS || enemyDistFromCenter > STAGE_OUT_RADIUS)
 	{
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_ATTACKOVER);
+
 		// すでにスロー中でなければ、スローを開始する
 		if (slowMotionTimer_ <= 0.0f)
 		{

@@ -138,6 +138,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Effect\EffekseerEffect.cpp" />
+    <ClCompile Include="src\Manager\SoundManager.cpp" />
+    <ClCompile Include="src\Manager\SoundTable.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.cpp" />
     <ClCompile Include="src\Object\Actor\Charactor\Enemy\EnemyBase.cpp" />
     <ClCompile Include="src\Manager\EnemyManager.cpp" />
@@ -153,6 +155,10 @@
     <ClCompile Include="src\Object\Collider\ColliderLine.cpp" />
     <ClCompile Include="src\Object\Collider\ColliderModel.cpp" />
     <ClCompile Include="src\Object\Collider\ColliderSphere.cpp" />
+    <ClCompile Include="src\Renderer\PixelMaterial.cpp" />
+    <ClCompile Include="src\Renderer\PixelRenderer.cpp" />
+    <ClCompile Include="src\Renderer\VertexMaterial.cpp" />
+    <ClCompile Include="src\Renderer\VertexRenderer.cpp" />
     <ClCompile Include="src\Scene\PauseScene.cpp" />
     <ClCompile Include="src\Scene\StageSelectScene.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
@@ -179,6 +185,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Effect\EffekseerEffect.h" />
+    <ClInclude Include="src\Manager\SoundManager.h" />
+    <ClInclude Include="src\Manager\SoundTable.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Enemy\NormalEnemy.h" />
     <ClInclude Include="src\Object\Actor\Charactor\Enemy\EnemyBase.h" />
     <ClInclude Include="src\Manager\EnemyManager.h" />
@@ -194,6 +202,10 @@
     <ClInclude Include="src\Object\Collider\ColliderLine.h" />
     <ClInclude Include="src\Object\Collider\ColliderModel.h" />
     <ClInclude Include="src\Object\Collider\ColliderSphere.h" />
+    <ClInclude Include="src\Renderer\PixelMaterial.h" />
+    <ClInclude Include="src\Renderer\PixelRenderer.h" />
+    <ClInclude Include="src\Renderer\VertexMaterial.h" />
+    <ClInclude Include="src\Renderer\VertexRenderer.h" />
     <ClInclude Include="src\Scene\PauseScene.h" />
     <ClInclude Include="src\Scene\StageSelectScene.h" />
     <ClInclude Include="src\Scene\GameScene.h" />
@@ -216,6 +228,89 @@
     <ClInclude Include="src\Object\Actor\Charactor\TopBase.h" />
     <ClInclude Include="src\Manager\TopDataManager.h" />
     <ClInclude Include="src\Object\Actor\StageClassRoom.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shader\Common\Pixel\PixelShader2DHeader.hlsli" />
+    <None Include="src\Shader\Common\Pixel\PixelShader3DHeader.hlsli" />
+    <None Include="src\Shader\Common\VertexToPixelHeader.hlsli" />
+    <None Include="src\Shader\Common\Vertex\CommonShader3DHeader.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexInput.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexInputType.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexShader3DHeader.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Shader\PostEffect\LensDistortion.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\PostEffect\Monotone.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\PostEffect\NegalShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="src\Shader\PostEffect\ScanLine.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\PostEffect\Vignette.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\NoTexPs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\NoTexVs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\RimLightPs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\SpecularPs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\SpecularVs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\StPs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\StVs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\WaterWavePs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shader\VertexShareder\WaterWaveVs.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/Data/Shader/%(Filename).cso</ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

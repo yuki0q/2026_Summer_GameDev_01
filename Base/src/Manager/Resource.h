@@ -14,7 +14,8 @@ public:
 		IMG,
 		IMGS,
 		MODEL,
-		EFFEKSEER
+		EFFEKSEER,
+		FONT
 	};
 
 	// コンストラクタ
@@ -23,6 +24,8 @@ public:
 	Resource(TYPE type, const std::string& path);
 	// コンストラクタ(IMGS用)
 	Resource(TYPE type, const std::string& path, int numX, int numY, int sizeX, int sizeY);
+	// コンストラクタ(Font用)
+	Resource(TYPE type, const std::string& fontFilePath, const std::string& fontName, int size, int thickness, int fontType);
 
 	// デストラクタ
 	~Resource(void);
@@ -51,6 +54,13 @@ public:
 	int numY_;
 	int sizeX_;
 	int sizeY_;
+
+	// フォント用メンバ変数
+	std::string fontName_;  // フォント名（例: "スマートフォントUI"）
+	int fontSize_;          // フォントサイズ
+	int fontThickness_;     // フォントの太さ
+	int fontType_;          // 描画タイプ（アンチエイリアスなど）
+	bool isFontRegistered_; // AddFontResourceExを実行したかどうかのフラグ
 
 	// モデル複製用
 	std::vector<int> duplicateModelIds_;

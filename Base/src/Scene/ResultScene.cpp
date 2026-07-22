@@ -6,6 +6,7 @@
 #include "../Manager/Camera.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
+#include "../Manager/SoundManager.h"
 #include "../Application.h"
 #include "GameScene.h"
 #include "ResultScene.h"
@@ -18,7 +19,6 @@ ResultScene::ResultScene(void)
 	imgResultBackLose_(0),
 	imgResult1PWin_(0),
 	imgResult2PWin_(0),
-	resultWinBGM_(0),
 	bgmResultLose_(0),
 	SceneBase()
 {
@@ -47,9 +47,12 @@ void ResultScene::Init(void)
 
 	imgResult2PWin_ = resMng_.Load(ResourceManager::SRC::RESULT_2P_WIN).handleId_;
 
-	resultWinBGM_ = LoadSoundMem("Data/Music/Result.mp3");
-	PlaySoundMem(resultWinBGM_, DX_PLAYTYPE_LOOP, true);
-	ChangeVolumeSoundMem(150, resultWinBGM_);
+	// タイトル画面に必要なサウンドをロード
+	SoundManager::GetInstance()->LoadSceneSound(LoadScene::RESULT);
+
+	// タイトルBGMを再生（自動でループ再生されます）
+	SoundManager::GetInstance()->PlayBGM(SoundID::BGM_RESULT);
+	SoundManager::GetInstance()->SetBgmVolume(160);
 }
 
 void ResultScene::Update(void)
@@ -60,21 +63,27 @@ void ResultScene::Update(void)
 		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)
 		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD2, InputManager::JOYPAD_BTN::DOWN))
 	{
-		StopSoundMem(resultWinBGM_);
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::RESULT);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
 
 	if (ins.IsTrgDown(KEY_INPUT_R)
 		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
-		StopSoundMem(resultWinBGM_);
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::RESULT);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 	}
 
 	if (ins.IsTrgDown(KEY_INPUT_S)
 		|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
-		StopSoundMem(resultWinBGM_);
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::RESULT);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 	}
 }
@@ -120,6 +129,8 @@ void ResultScene::Release(void)
 	DeleteGraph(imgResultLose_);
 	DeleteGraph(imgResultBackWin_);
 	//DeleteGraph(imgResultBackLose_);
-	DeleteSoundMem(resultWinBGM_);
 	DeleteGraph(bgmResultLose_);
+
+	SoundManager::GetInstance()->StopBGM();
+	SoundManager::GetInstance()->DeleteSceneSound(LoadScene::RESULT);
 }

@@ -6,6 +6,7 @@
 #include "../Manager/camera.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
+#include "../Manager/SoundManager.h"
 #include "../Object/Actor/Charactor/TopBase.h"
 #include "TopSelectScene.h"
 
@@ -24,6 +25,7 @@ TopSelectScene::TopSelectScene(void)
 	isStickRightOld_(false),
 	redySelect1P_(false),
 	redySelect2P_(false),
+	fontHandel_(0),
 	SceneBase()
 {
 }
@@ -43,6 +45,7 @@ void TopSelectScene::Init(void)
 	imgTopIntro_[1] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_DF).handleId_;	// 防御
 	imgTopIntro_[2] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_ST).handleId_;	// スタミナ
 	imgTopIntro_[3] = resMng_.Load(ResourceManager::SRC::IMAGE_INTRO_BL).handleId_;	// バランス
+	fontHandel_ = resMng_.Load(ResourceManager::SRC::FONT_1).handleId_;	// バランス
 
 	imgTopSelectText_ = resMng_.Load(ResourceManager::SRC::SELECT_NOW).handleId_;
 
@@ -67,124 +70,17 @@ void TopSelectScene::Init(void)
 
 	// カメラの初期設定（選択中のコマが綺麗に見える位置に配置）
 	SetCameraPositionAndTarget_UpVecY(VGet(0.0f, 150.0f, -200.0f), top_.pos);
+
+	// タイトル画面に必要なサウンドをロード
+	SoundManager::GetInstance()->LoadSceneSound(LoadScene::SELECT);
+
+	// タイトルBGMを再生（自動でループ再生されます）
+	SoundManager::GetInstance()->PlayBGM(SoundID::BGM_SELECT);
+	SoundManager::GetInstance()->SetBgmVolume(160);
 }
 
 void TopSelectScene::Update(void)
 {
-	//auto& ins = InputManager::GetInstance();
-
-	//// 接続されているゲームパッド１の情報を取得
-	//InputManager::JOYPAD_IN_STATE padState =
-	//	ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
-
-	//VECTOR inputDir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
-
-
-	//InputManager::JOYPAD_IN_STATE padState2 =
-	//	ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD2);
-
-	//VECTOR inputDir2 = ins.GetDirectionXZAKey(padState2.AKeyLX, padState2.AKeyLY);
-
-	//// スティックが右/左に一定以上倒されているかの判定フラグ
-	//bool isStickLeftNow = (inputDir.x > 0.5f) || (inputDir2.x > 0.5f);
-	//bool isStickRightNow = (inputDir.x < -0.5f) || (inputDir2.x > 0.5f);
-
-	//bool pad1Down = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
-	//bool pad2Down = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD2, InputManager::JOYPAD_BTN::DOWN);
-	//
-	//bool pad1Start = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START);
-	//bool pad2Start = ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD2, InputManager::JOYPAD_BTN::START);
-
-	//if (!redySelect1P_) {
-	//	if (ins.IsTrgDown(KEY_INPUT_A) || (isStickLeftNow && !isStickLeftOld_)) {
-	//		selectIndex1P_ = (selectIndex1P_ + 3) % 4; // 左へループ
-	//	}
-
-	//	if (ins.IsTrgDown(KEY_INPUT_D) || (isStickRightNow && !isStickRightOld_)) {
-	//		selectIndex1P_ = (selectIndex1P_ + 1) % 4; // 右へループ
-	//	}
-
-	//	if (modelHandles_[selectIndex1P_] != -1)
-	//	{
-	//		top_.quaRot = Quaternion::Mult(top_.quaRot,
-	//			Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
-	//	}
-	//	top_.SetModel(modelHandles_[selectIndex1P_]);
-	//}
-	//else if (!redySelect2P_ && redySelect1P_) {
-	//	if ((isStickLeftNow && !isStickLeftOld_)) {
-	//		selectIndex2P_ = (selectIndex2P_ + 3) % 4; // 左へループ
-	//	}
-
-	//	if ((isStickRightNow && !isStickRightOld_)) {
-	//		selectIndex2P_ = (selectIndex2P_ + 1) % 4; // 右へループ
-	//	}
-
-	//	isStickLeftOld_ = isStickLeftNow;
-	//	isStickRightOld_ = isStickRightNow;
-
-	//	if (modelHandles_[selectIndex2P_] != -1)
-	//	{
-	//		top_.quaRot = Quaternion::Mult(top_.quaRot,
-	//			Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
-	//	}
-	//	top_.SetModel(modelHandles_[selectIndex2P_]);
-	//}
-
-	//isStickLeftOld_ = isStickLeftNow;
-	//isStickRightOld_ = isStickRightNow;
-
-	//// シーン遷移
-	//if (ins.IsTrgDown(KEY_INPUT_SPACE) || pad1Down)
-	//{
-	//	if(!redySelect1P_) sceMng_.SetPlayerTopType(selectIndex1P_);
-	//	redySelect1P_ = true;
-
-	//	if (sceMng_.GetPlayerNo() == 1) 
-	//	{
-	//		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
-	//	}
-	//	else if (sceMng_.GetPlayerNo() == 2) 
-	//	{
-	//		if (modelHandles_[selectIndex2P_] != -1)
-	//		{
-	//			top_.quaRot = Quaternion::Mult(top_.quaRot,
-	//				Quaternion::AngleAxis(AsoUtility::Deg2RadF(0.5f), AsoUtility::AXIS_Y));
-	//		}
-	//		top_.SetModel(modelHandles_[selectIndex2P_]);
-	//		// シーン遷移
-	//		if (pad1Down || pad2Down)
-	//		{
-	//			if(!redySelect2P_)sceMng_.SetPlayerTopType2P(selectIndex2P_);
-	//			redySelect2P_ = true;
-	//		}
-
-	//		if (redySelect1P_ && redySelect2P_)
-	//		{
-	//			if (ins.IsTrgDown(KEY_INPUT_SPACE) || pad1Down || pad2Down)
-	//			{
-	//				sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
-	//			}
-	//		}
-
-
-	//	}
-	//}
-
-	//if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || pad1Start || pad2Start)
-	//{
-	//	if (!redySelect1P_ && !redySelect2P_)
-	//	{
-	//		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
-	//	}
-	//	else if (redySelect1P_ || redySelect2P_)
-	//	{
-	//		redySelect1P_ = redySelect2P_ = false;
-	//	}
-	//	
-	//}
-
-	//top_.Update();
 auto& ins = InputManager::GetInstance();
 
 // --- パッドが1台だけ接続されている状態を想定 ---
@@ -216,15 +112,18 @@ if (!redySelect1P_)
 {
 	if (isLeftInput1P) {
 		selectIndex1P_ = (selectIndex1P_ + 3) % 4; // 左ループ
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 	}
 	if (isRightInput1P) {
 		selectIndex1P_ = (selectIndex1P_ + 1) % 4; // 右ループ
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 	}
 
 	// 1P決定
 	if (isDecide1P) {
 		sceMng_.SetPlayerTopType(selectIndex1P_);
 		redySelect1P_ = true;
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 	}
 }
 
@@ -242,14 +141,17 @@ if (sceMng_.GetPlayerNo() == 2)
 	{
 		if (isLeftInput2P) {
 			selectIndex2P_ = (selectIndex2P_ + 3) % 4; // 左ループ
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 		}
 		if (isRightInput2P) {
 			selectIndex2P_ = (selectIndex2P_ + 1) % 4; // 右ループ
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 		}
 
 		// 2P決定
 		if (isDecide2P) {
 			sceMng_.SetPlayerTopType2P(selectIndex2P_);
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			redySelect2P_ = true;
 		}
 	}
@@ -279,7 +181,10 @@ if (modelHandles_[selectIndex1P_] != -1) {
 if (sceMng_.GetPlayerNo() == 1)
 {
 	if (redySelect1P_) {
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::SELECT);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+
 	}
 }
 else if (sceMng_.GetPlayerNo() == 2)
@@ -287,6 +192,10 @@ else if (sceMng_.GetPlayerNo() == 2)
 	// 両者が揃ったら、キーボードのSPACE、またはパッドの決定ボタンで遷移
 	if (redySelect1P_ && redySelect2P_) {
 		if (ins.IsTrgDown(KEY_INPUT_SPACE) || pad1Down) {
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
+
+			SoundManager::GetInstance()->StopBGM();
+			SoundManager::GetInstance()->DeleteSceneSound(LoadScene::SELECT);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 		}
 	}
@@ -298,9 +207,14 @@ else if (sceMng_.GetPlayerNo() == 2)
 if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || pad1Start)
 {
 	if (!redySelect1P_ && !redySelect2P_) {
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CANCEL);
+
+		SoundManager::GetInstance()->StopBGM();
+		SoundManager::GetInstance()->DeleteSceneSound(LoadScene::SELECT);
 		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
 	else {
+		SoundManager::GetInstance()->PlaySE(SoundID::SE_CANCEL);
 		redySelect1P_ = false;
 		redySelect2P_ = false;
 	}
@@ -316,17 +230,17 @@ void TopSelectScene::Draw(void)
 
 	// テキスト表示（現在の選択を表示）
 	const char* typeNames[] = { "ATTACK (BLUE)", "DEFENSE (GREEN)", "STAMINA (YELLOW)", "BALANCE (RED)" };
-	DrawString(100, 100, "SELECT YOUR SPINNING TOP", 0xffffff);
-	DrawString(100, 600, "Press LEFT / RIGHT to Select, SPACE to Decide", 0xffffff);
+	DrawStringToHandle(100, 100, "SELECT YOUR SPINNING TOP", 0xffffff, fontHandel_);
+	DrawStringToHandle(100, 600, "Press LEFT / RIGHT to Select, SPACE to Decide", 0xffffff, fontHandel_);
 	DrawRotaGraph(900, 500, 1.5f, 0.0f, imgTopSelectText_, true);
 
 	if (!redySelect1P_) {
-		DrawString(100, 150, typeNames[selectIndex1P_], 0xffff00);
+		DrawStringToHandle(100, 150, typeNames[selectIndex1P_], 0xffff00, fontHandel_);
 		DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex1P_], true);
 	}
 	else if (!redySelect2P_) {
 
-		DrawString(100, 150, typeNames[selectIndex2P_], 0xffff00);
+		DrawStringToHandle(100, 150, typeNames[selectIndex2P_], 0xffff00, fontHandel_);
 		DrawRotaGraph(900, 500, 0.7f, 0.0f, imgTopIntro_[selectIndex2P_], true);
 	}
 
@@ -345,6 +259,9 @@ void TopSelectScene::Release(void)
 	DeleteGraph(imgTopSelectText_);
 	DeleteGraph(imgSkillSelect_);
 	DeleteGraph(imgSkillSelectText_);
+
+	SoundManager::GetInstance()->StopBGM();
+	SoundManager::GetInstance()->DeleteSceneSound(LoadScene::SELECT);
 
 	// ロードしたモデルの解放
 	for (int i = 0; i < 4; ++i)

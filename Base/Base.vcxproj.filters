@@ -139,6 +139,24 @@
     <ClCompile Include="src\Object\Actor\StageClassRoom.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\PixelMaterial.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\PixelRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\VertexMaterial.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\VertexRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Manager\SoundTable.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Manager\SoundManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Scene\SceneBase.h">
@@ -205,5 +223,36 @@
     <ClInclude Include="src\Manager\TopDataManager.h" />
     <ClInclude Include="src\Effect\EffekseerEffect.h" />
     <ClInclude Include="src\Object\Actor\StageClassRoom.h" />
+    <ClInclude Include="src\Renderer\PixelMaterial.h" />
+    <ClInclude Include="src\Renderer\PixelRenderer.h" />
+    <ClInclude Include="src\Renderer\VertexMaterial.h" />
+    <ClInclude Include="src\Renderer\VertexRenderer.h" />
+    <ClInclude Include="src\Manager\SoundTable.h" />
+    <ClInclude Include="src\Manager\SoundManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shader\Common\Pixel\PixelShader3DHeader.hlsli" />
+    <None Include="src\Shader\Common\Pixel\PixelShader2DHeader.hlsli" />
+    <None Include="src\Shader\Common\Vertex\CommonShader3DHeader.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexInput.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexShader3DHeader.hlsli" />
+    <None Include="src\Shader\Common\Vertex\VertexInputType.hlsli" />
+    <None Include="src\Shader\Common\VertexToPixelHeader.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Shader\PostEffect\Vignette.hlsl" />
+    <FxCompile Include="src\Shader\PostEffect\LensDistortion.hlsl" />
+    <FxCompile Include="src\Shader\PostEffect\Monotone.hlsl" />
+    <FxCompile Include="src\Shader\PostEffect\ScanLine.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\NoTexPs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\NoTexVs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\RimLightPs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\SpecularPs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\SpecularVs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\StPs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\StVs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\WaterWavePs.hlsl" />
+    <FxCompile Include="src\Shader\VertexShareder\WaterWaveVs.hlsl" />
+    <FxCompile Include="src\Shader\PostEffect\NegalShader.hlsl" />
   </ItemGroup>
 </Project>

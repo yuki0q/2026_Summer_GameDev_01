@@ -80,6 +80,8 @@ public:
 	void SetPlayerNo(int playerNo) { playerNo_ = playerNo; }
 	int GetPlayerNo(void)const { return playerNo_; }
 
+	int GetMainScreen(void) const;
+
 private:
 
 	// 静的インスタンス
@@ -104,6 +106,9 @@ private:
 
 	// カメラ
 	Camera* camera_;
+
+	// メインスクリーン
+	int mainScreen_;
 
 	// シーン遷移中判定
 	bool isSceneChanging_;

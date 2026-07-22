@@ -4,6 +4,7 @@
 #include "Manager/ResourceManager.h"
 #include "Manager/TopDataManager.h"
 #include "Manager/SceneManager.h"
+#include "Manager/SoundManager.h"
 #include "Effect/EffekseerEffect.h"
 #include "Common/FpsController.h"
 #include "Application.h"
@@ -15,6 +16,8 @@ const std::string Application::PATH_MODEL = "Data/Model/";
 const std::string Application::PATH_EFFECT = "Data/Effect/";
 const std::string Application::PATH_CSV = "Data/Csv/";
 const std::string Application::PATH_MUSIC = "Data/Music/";
+const std::string Application::PATH_SHADER = "Data/Shader/";
+const std::string Application::PATH_FONT = "Data/Font/";
 
 void Application::CreateInstance(void)
 {
@@ -38,7 +41,7 @@ void Application::Init(void)
 
 	// ウィンドウサイズ
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
-	ChangeWindowMode(true);
+	ChangeWindowMode(false);
 
 	// FPS制御初期化
 	fpsController_ = new FpsController(FRAME_RATE);
@@ -71,6 +74,10 @@ void Application::Init(void)
 
 	// リソース管理初期化
 	ResourceManager::CreateInstance();
+
+	SoundManager::CreateInstance();
+	SoundManager::GetInstance()->Init();
+	SoundManager::GetInstance()->LoadSceneSound(LoadScene::SYSTEM);
 
 	// シーン管理初期化
 	SceneManager::CreateInstance();
@@ -115,6 +122,7 @@ void Application::Destroy(void)
 
 	InputManager::GetInstance().Destroy();
 	ResourceManager::GetInstance().Destroy();
+	SoundManager::DeleteInstance();
 
 	// シーン管理解放
 	SceneManager::GetInstance().Destroy();

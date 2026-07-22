@@ -10,6 +10,8 @@
 #include "../../Collider/ColliderLine.h"
 #include "../../Collider/ColliderCapsule.h"
 #include "../../../Common/Quaternion.h"
+#include "../../../Renderer/VertexMaterial.h"
+#include "../../../Renderer/VertexRenderer.h"
 #include "../../../Effect/EffekseerEffect.h"
 #include "TopBase.h"
 
@@ -37,6 +39,8 @@ TopBase::TopBase(const TopBase::TopData& data)
 	respawnCenterPos_(AsoUtility::VECTOR_ZERO),
 	isEnd_(false),
 	imgChara_(0),
+	imgSkill_(0),
+	imgSkillNot_(0),
 	isRespawning_(false),
 	respawnTimer_(0.0f),
 	isDying_(false),
@@ -89,6 +93,8 @@ void TopBase::InitLoad(void)
 
 	gaugeFrame = resMng_.Load(ResourceManager::SRC::IMAME_SPINGAUGE_FRAME).handleId_;
 	spinGauge = resMng_.Load(ResourceManager::SRC::IMAME_SPINGAUGE).handleId_;
+	imgSkill_ = resMng_.Load(ResourceManager::SRC::IMAGE_SKILL).handleId_;
+	imgSkillNot_ = resMng_.Load(ResourceManager::SRC::IMAGE_SKILLNOT).handleId_;
 
 	switch (topType_)
 	{
@@ -242,6 +248,8 @@ void TopBase::Release(void)
 	EffekseerEffect::GetInstance()->DeleteInstance();
 
 	DeleteGraph(imgChara_);
+	DeleteGraph(imgSkill_);
+	DeleteGraph(imgSkillNot_);
 	DeleteGraph(gaugeFrame);
 	DeleteGraph(spinGauge);
 }

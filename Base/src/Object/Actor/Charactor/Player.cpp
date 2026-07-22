@@ -59,9 +59,12 @@ void Player::Draw(void)
 		DrawRotaGraph(50.0f,
 			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
 
-		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+		/*if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 			DrawFormatString(30, 670, 0xffffff, "Skill Ready!!");
-		}
+		}*/
+		// ƒQ[ƒW‚Ì˜g‚ð•`‰æ
+		DrawGraph(30, 470, imgSkill_, TRUE);
+
 		/*DrawBoxAA(30.0f, Application::SCREEN_SIZE_Y - 120.0f,
 			300.0f, Application::SCREEN_SIZE_Y - 60.0f, 0xffffff, true);
 		DrawBoxAA(40.0f, Application::SCREEN_SIZE_Y - 110.0f,
@@ -90,14 +93,15 @@ void Player::Draw(void)
 		DrawBoxAA(Application::SCREEN_SIZE_X - 290.0f, Application::SCREEN_SIZE_Y - 110.0f,
 			Application::SCREEN_SIZE_X - 290.0f + topsSpin_ / TOPS_SPIN_MAX * 250.0f,
 			Application::SCREEN_SIZE_Y - 70.0f,
-			0xffff00, true);
+			0xffff00, true);*/
 
 		DrawRotaGraph(Application::SCREEN_SIZE_X - 280.0f,
-			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);*/
+			Application::SCREEN_SIZE_Y - 150.0f, 0.15f, 0.0f, imgChara_, true);
 
-		if (skillCoolTimer_ <= 0.0f && !isSkill_) {
+	/*	if (skillCoolTimer_ <= 0.0f && !isSkill_) {
 			DrawFormatString(980, 670, 0xffffff, "Skill Ready!!");
-		}		
+		}	*/	
+		DrawGraph(980, 670, imgSkill_, TRUE);
 	}
 	// 3D‚Ì‰œs‚«”»’è‚ðˆêŽž“I‚É–³Œø‰»‚·‚é
 	SetUseZBuffer3D(TRUE);

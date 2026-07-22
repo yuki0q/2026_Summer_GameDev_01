@@ -28,6 +28,7 @@ void ResourceManager::Init(void)
 	static std::string PATH_IMG = Application::PATH_IMAGE;
 	static std::string PATH_MDL = Application::PATH_MODEL;
 	static std::string PATH_EFF = Application::PATH_EFFECT;
+	static std::string PATH_FONT = Application::PATH_FONT;
 
 	Resource* res;
 
@@ -195,6 +196,21 @@ void ResourceManager::Init(void)
 
 	res = new RES(RES_T::IMG, PATH_IMG + "instructions.png");
 	resourcesMap_.emplace(SRC::IMAGE_INSTRUCTUION, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "canSkill.png");
+	resourcesMap_.emplace(SRC::IMAGE_SKILL, res);
+
+	res = new RES(RES_T::IMG, PATH_IMG + "canNotSkill.png");
+	resourcesMap_.emplace(SRC::IMAGE_SKILLNOT, res);
+
+//	res = new RES(RES_T::FONT, PATH_FONT + "WanpakuRuikaMonoSeikyo-04.TTF");
+
+	res = new RES(
+		RES_T::FONT,
+		PATH_FONT + "WanpakuRuikaMonoSeikyo-04.TTF", // 実際のファイルパス
+		"わんぱくルイカ等幅清音教漢-０４",           // フォントの登録ファミリー名
+		24, 3, DX_FONTTYPE_ANTIALIASING);
+	resourcesMap_.emplace(SRC::FONT_1, res);
 }
 
 void ResourceManager::Release(void)

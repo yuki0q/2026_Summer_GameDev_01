@@ -57,5 +57,7 @@ private:
 
 	bool redySelect1P_;
 	bool redySelect2P_;
+
+	int fontHandel_;
 };
 

@@ -5,6 +5,7 @@
 #include "../Manager/Camera.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
+#include "../Manager/SoundManager.h"
 //#include "../Object/Actor/SkyDome.h"
 #include "TitleScene.h"
 
@@ -26,7 +27,6 @@ TitleScene::TitleScene(void)
 	window_(false),
 	windowSelect_(0),
 	isStickUpOld(false),
-	titleBGM_(0),
 	isStickDownOld(false),
 	SceneBase()
 {
@@ -53,9 +53,7 @@ void TitleScene::Init(void)
 	texPlayer2_ = resMng_.Load(ResourceManager::SRC::TEX_PLAYER_2).handleId_;
 	texSpace_ = resMng_.Load(ResourceManager::SRC::TEX_SPACE).handleId_;
 	texEscape_ = resMng_.Load(ResourceManager::SRC::TEX_ESCAPE).handleId_;
-	titleBGM_ = LoadSoundMem("Data/Music/Title.mp3");
-	PlaySoundMem(titleBGM_, DX_PLAYTYPE_LOOP, true);
-	ChangeVolumeSoundMem(150, titleBGM_);
+	//titleBGM_ = LoadSoundMem("Data/Music/Title.mp3");
 
 	select_ = DEFAULT_SELECT;
 	count_ = 0;
@@ -99,6 +97,14 @@ void TitleScene::Init(void)
 	introWindow_ = false;
 	isStickUpOld = false;
 	isStickDownOld = false;
+
+	// タイトル画面に必要なサウンドをロード
+	SoundManager::GetInstance()->LoadSceneSound(LoadScene::TITLE);
+
+	// タイトルBGMを再生（自動でループ再生されます）
+	SoundManager::GetInstance()->PlayBGM(SoundID::BGM_TITLE);
+	SoundManager::GetInstance()->SetBgmVolume(160);
+
 }
 
 void TitleScene::Update(void)
@@ -132,6 +138,7 @@ void TitleScene::Update(void)
 		if (ins.IsTrgDown(KEY_INPUT_DOWN) || 
 			ins.IsTrgDown(KEY_INPUT_S) || (isStickDownNow && !isStickDownOld)) {
 			select_ += SELECT_MOVE;
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 		}
 		else if (select_ > 680) {
 			select_ = 480;
@@ -140,6 +147,7 @@ void TitleScene::Update(void)
 		if (ins.IsTrgDown(KEY_INPUT_UP) || 
 			ins.IsTrgDown(KEY_INPUT_W) || (isStickUpNow && !isStickUpOld)) {
 			select_ -= SELECT_MOVE;
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 		}
 		else if (select_ < 480) {
 			select_ = 680;
@@ -154,6 +162,7 @@ void TitleScene::Update(void)
 			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 			&& !introWindow_)
 		{
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			switch (count_) {
 			case 0:
 				window_ = true;
@@ -173,6 +182,7 @@ void TitleScene::Update(void)
 			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 			&& introWindow_)
 		{
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CANCEL);
 			introWindow_ = false;
 		}
 	}else
@@ -183,6 +193,7 @@ void TitleScene::Update(void)
 			|| (isStickUpNow && !isStickUpOld)
 			|| (isStickDownNow && !isStickDownOld))
 		{
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CARSOL);
 			// 0 と 1 を反転させる
 			windowSelect_ += 1;
 		}
@@ -198,12 +209,14 @@ void TitleScene::Update(void)
 			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 		{
 			window_ = false;
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_CANCEL);
 		}
 
 		// ウィンドウが開いている状態で決定ボタンが押されたら、ここで初めてシーンを遷移させる
 		if ((ins.IsTrgDown(KEY_INPUT_SPACE) ||
 			ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)))
 		{
+			SoundManager::GetInstance()->PlaySE(SoundID::SE_BUTTON);
 			// プレイ人数をSceneManagerなどに保存する
 			if (windowSelect_ == 0)
 			{
@@ -216,9 +229,9 @@ void TitleScene::Update(void)
 				sceMng_.SetPlayerNo(2);
 			}
 
-			StopSoundMem(titleBGM_);
-
 			// ゲームシーンへ遷移
+			SoundManager::GetInstance()->StopBGM();
+			SoundManager::GetInstance()->DeleteSceneSound(LoadScene::TITLE);
 			sceMng_.ChangeScene(SceneManager::SCENE_ID::TOP_SELECT);
 		}
 	}
@@ -320,12 +333,8 @@ void TitleScene::Release(void)
 	DeleteGraph(texPlayerNo_);
 	DeleteGraph(texPlayer1_);
 	DeleteGraph(texPlayer2_);
-	DeleteSoundMem(titleBGM_);
-	//skyDome_->Release();
-	//delete skyDome_;
-
-	/*bigPlanet_.Release();
-	SpherePlanet_.Release();*/
+	SoundManager::GetInstance()->StopBGM();
+	SoundManager::GetInstance()->DeleteSceneSound(LoadScene::TITLE);
 	topBlue_.Release();
 	topRed_.Release();
 }

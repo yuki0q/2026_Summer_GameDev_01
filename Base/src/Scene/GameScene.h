@@ -56,8 +56,6 @@ private:
 	int image1;
 	int imgWin_;
 
-	int GameBGM_;
-
 	// プレイヤーのポイント
 	int playerScore_ = 0;   
 
